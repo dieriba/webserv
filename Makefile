@@ -26,8 +26,8 @@ $(NAME):	$(OBJS)
 all:		$(NAME)
 
 clean:
-			rm -rf *.o
-			rm -rf *.d
+			rm -rf $(OBJS)
+			rm -rf $(DEPS)
 			
 fclean:		clean
 			rm -rf $(NAME)
