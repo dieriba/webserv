@@ -3,7 +3,7 @@
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 TcpServer::TcpServer(const std::string& filename)
 {
-    std::cout << filename << std::endl;
+    (void)filename;
     _servers.push_back(Server());
 }
 TcpServer::~TcpServer(){};
