@@ -1,16 +1,21 @@
-SRC		=	main.cpp \
-			srcs/Server.cpp \
-			srcs/Location.cpp
+MAIN	=	main.cpp
+		
+SRCS	=	./srcs/TcpServer.cpp \
+			./srcs/Server.cpp \
+			./srcs/ExceptionThrower.cpp \
+			./srcs/Location.cpp \
+			
+OBJS	=	$(MAIN:.cpp=.o)\
+			$(SRCS:.cpp=.o)
 
-OBJS	=	$(SRC:.cpp=.o)
-
-DEPS 	=	$(SRC:.cpp=.d)
+DEPS 	=	$(MAIN:.cpp=.d)\
+			$(SRCS:.cpp=.o)
 
 CC		=	c++ -g3
 
 CFLAGS	=	-Wall -Wextra -Werror -MMD -std=c++98
 
-NAME	=	RPN
+NAME	=	webserv
 
 .cpp.o :	
 			$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
