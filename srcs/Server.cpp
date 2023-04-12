@@ -1,8 +1,8 @@
 # include "../includes/Server.hpp"
-
+# include "../includes/Location.hpp"
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Server::Server()
-    :_serv_options(0),_port(0),_root_dir(""),_index(""),_body_size(0){};
+    :_serv_options(0),_port(0),_body_size(0),_root_dir(""),_index(""){};
 Server::Server(const Server& rhs)
 {
     _serv_options = rhs._serv_options;

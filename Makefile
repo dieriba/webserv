@@ -1,15 +1,15 @@
-MAIN	=	main.cpp
-		
-SRCS	=	./srcs/TcpServer.cpp \
-			./srcs/Server.cpp \
-			./srcs/ExceptionThrower.cpp \
-			./srcs/Location.cpp \
-			
-OBJS	=	$(MAIN:.cpp=.o)\
-			$(SRCS:.cpp=.o)
+SRCS_MAIN	=	main.cpp
 
-DEPS 	=	$(MAIN:.cpp=.d)\
-			$(SRCS:.cpp=.o)
+SRCS_		=	./srcs/TcpServer.cpp \
+				./srcs/Server.cpp \
+				./srcs/ExceptionThrower.cpp \
+				./srcs/Location.cpp
+
+OBJS	=	$(SRCS_MAIN:.cpp=.o)\
+			$(SRCS_:.cpp=.o)
+
+DEPS 	=	$(SRCS_MAIN:.cpp=.d)\
+			$(SRCS_:.cpp=.d)
 
 CC		=	c++ -g3
 
