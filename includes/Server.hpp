@@ -18,6 +18,7 @@ class Server
         const std::string& getIndex(void) const;
         const std::list<std::string>& getServerNames(void) const;
         const std::list<Location>& getLocations(void) const;
+        std::string getServerNames(void);
 
         /*Setters*/
         void    setPort(const unsigned int& port);
