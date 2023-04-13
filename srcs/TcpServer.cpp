@@ -90,6 +90,9 @@ void TcpServer::initHttpResponses(void)
     httpResponses[511] = "Network Authentification Required";
 }
 
+/*
+    @brief 
+*/
 void TcpServer::getServerConfig(std::ifstream& file)
 {
     std::string myline;

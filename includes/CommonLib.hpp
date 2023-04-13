@@ -10,6 +10,10 @@
 
 # define DEFAULT_CONF_FILE "./configs/default.conf"
 
+
+# define SERVER_CONTEXT "server"
+# define LOCATION_CONTEXT "location"
+
 /*
 
 
