@@ -9,6 +9,7 @@ class ExceptionThrower : public std::exception
         ExceptionThrower(const ExceptionThrower& rhs);
         ExceptionThrower& operator=(const ExceptionThrower& rhs);
         ~ExceptionThrower() throw();
+        
         /*virutal method inhirited from std::exception*/
         virtual const char* what(void) const throw();
     private:

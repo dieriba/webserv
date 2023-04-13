@@ -20,7 +20,9 @@ void    print_location_config(const Location& location)
 void    print_server_config(const Server server)
 {
     std::list<std::string>::iterator serv_it = server.getServerNames().begin();
-    std::list<Location>::iterator loca_it = server.getLocations().begin();
+    std::list<Location> loca(server.getLocations());
+    std::list<Location>::iterator loca_it_ = loca.begin();
+    std::list<Location>::iterator loca_it_end = loca.end();
     std::cout
         << "METHOD GET: " << (server.checkBits(GET) > 0 ? "Enabled" : "Disabled") << std::endl
         << "METHOD POST: " << (server.checkBits(POST) > 0 ? "Enabled" : "Disabled") << std::endl
@@ -31,9 +33,9 @@ void    print_server_config(const Server server)
         << "Index HTML: " << ((server.getIndex().size()) > 0 ? server.getIndex() : "No index html") << std::endl;
         for(; serv_it != server.getServerNames().end(); serv_it++)
             std::cout << "Server_name: " << *serv_it << std::endl;
-        for(; loca_it != server.getLocations().end(); loca_it++)
+        for(; loca_it_ != loca_it_end; loca_it_++)
         {
-            print_location_config(*loca_it);
+            print_location_config(*loca_it_);
             std::cout << "Next Location" << std::endl;
         }
 }

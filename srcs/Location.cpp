@@ -64,6 +64,9 @@ void    Location::setServer(Server *server)
     _server = server;
 };
 
+/*
+
+*/
 void    Location::setLocationOption(const unsigned int& nbit, char actions)
 {
     if (actions == SET)

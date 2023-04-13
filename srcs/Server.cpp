@@ -77,6 +77,9 @@ void    Server::setServOption(const unsigned int& nbit, char actions)
 
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
+/*
+
+*/
 bool    Server::checkBits(const unsigned int& nbit) const
 {
     return (bitcheck(_serv_options, nbit) > 0);
