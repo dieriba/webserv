@@ -6,7 +6,10 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <fstream>
 
+
+# define WHITESPACES "\n\t\r\f\v"
 
 # define DEFAULT_CONF_FILE "./configs/default.conf"
 

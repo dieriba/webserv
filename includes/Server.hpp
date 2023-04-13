@@ -16,6 +16,7 @@ class Server
         const unsigned int& getBodySize(void) const;
         const std::string& getRootDir(void) const;
         const std::string& getIndex(void) const;
+        const std::string& getRedirect(void) const;
         std::vector<Location> getLocations(void) const;
         std::vector<std::string> getServerNames(void) const;
 
@@ -25,6 +26,7 @@ class Server
         void    setBodySize(const unsigned int& body);
         void    setRootDir(const std::string& root_dir);
         void    setIndex(const std::string& root_dir);
+        void    setRedirect(const std::string& redirect);
         void    pushNewServerName(const std::string& server_name);
         void    pushNewLocation(const Location& server_name);
 
@@ -36,6 +38,7 @@ class Server
         unsigned int    _body_size;
         std::string     _root_dir;
         std::string     _index;
+        std::string     _redirect;
         std::vector<std::string> _server_names;
         std::vector<Location> _locations;
 };

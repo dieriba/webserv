@@ -3,7 +3,9 @@ SRCS_MAIN	=	main.cpp
 SRCS_		=	./srcs/TcpServer.cpp \
 				./srcs/Server.cpp \
 				./srcs/ExceptionThrower.cpp \
-				./srcs/Location.cpp
+				./srcs/Location.cpp \
+				./srcs/StringUtils.cpp \
+				./srcs/Parser.cpp \
 
 OBJS	=	$(SRCS_MAIN:.cpp=.o)\
 			$(SRCS_:.cpp=.o)

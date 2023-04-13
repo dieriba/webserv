@@ -49,27 +49,14 @@ int main (int argc, char **argv)
     {
         TcpServer::initHttpResponses();
         TcpServer tcp_servers(argc > 1 ? argv[1] : NULL);
-        Server a;
-        Server b;
-        Server c;
-        a.setPort(1500);
-        b.setPort(2500);
-        c.setPort(3500);
-        a.setServOption(GET, SET);
-        b.setServOption(ALL_METHODS, SET);
-        c.setServOption(DELETE, SET);
-        c.setServOption(DELETE, CLEAR);
-        tcp_servers.pushNewServer(a);
-        tcp_servers.pushNewServer(b);
-        tcp_servers.pushNewServer(c);
-        /*std::vector<Server> tmp(tcp_servers.getServers());
+        std::vector<Server> tmp(tcp_servers.getServers());
         std::vector<Server>::iterator it = tmp.begin();
         std::vector<Server>::iterator end = tmp.end();
         for ( ; it != end ; it++)
         {
             print_server_config(*it);
             std::cout << "-----------NEXT_SERV-------------\n\n";
-        }*/
+        }
     }
     catch(const std::exception& e)
     {

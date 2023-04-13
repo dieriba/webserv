@@ -2,10 +2,10 @@
 #define __TcpServer_HPP_
 
 #include "CommonLib.hpp"
-#include <fstream>
+#include "Parser.hpp"
 class Server;
 typedef std::map<short int, std::string>::iterator vec_it;
-class TcpServer
+class TcpServer: public Parser
 {
     public:
         TcpServer(const char *filename);
@@ -16,9 +16,6 @@ class TcpServer
 
         /*SETTERS*/
         void pushNewServer(const Server& server);
-
-        /*MEMBER FUNCTION*/
-        void getServerConfig(std::ifstream& file);
 
         /*STATIC MEMBER FUNCTION*/
         static void initHttpResponses(void);

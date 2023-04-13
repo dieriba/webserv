@@ -5,9 +5,9 @@ TcpServer::TcpServer(const char *filename)
 {
     std::ifstream file;
     _servers.reserve(BASE_VEC_ARR);
-    file.exceptions (std::ifstream::failbit | std::ifstream::badbit );
+    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     filename != NULL ? file.open(filename) : file.open(DEFAULT_CONF_FILE);
-    getServerConfig(file);
+    _servers = Parser::getServerConfig(file);
 }
 TcpServer::~TcpServer(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
@@ -93,14 +93,6 @@ void TcpServer::initHttpResponses(void)
 /*
     @brief 
 */
-void TcpServer::getServerConfig(std::ifstream& file)
-{
-    std::string myline;
-    while ( std::getline (file, myline) )
-    {
-        std::cout << myline << '\n';
-        if (file.eof()) return ;
-    }
-}
+
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
 std::map<short int, std::string> TcpServer::httpResponses;
