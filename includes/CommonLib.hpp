@@ -8,6 +8,13 @@
 #include <map>
 
 
+# define DEFAULT_CONF_FILE "./configs/default.conf"
+
+/*
+
+
+*/
+# define BASE_VEC_ARR 10
 /*
 
 */

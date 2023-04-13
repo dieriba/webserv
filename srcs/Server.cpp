@@ -35,8 +35,8 @@ const unsigned int& Server::getBodySize(void) const {return _body_size;};
 const std::string& Server::getRootDir(void) const {return _root_dir;};
 const std::string& Server::getIndex(void) const {return _index;};
 
-std::list<Location> Server::getLocations(void) const {return _locations;};
-std::list<std::string> Server::getServerNames(void) const {return _server_names;};
+std::vector<Location> Server::getLocations(void) const {return _locations;};
+std::vector<std::string> Server::getServerNames(void) const {return _server_names;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/

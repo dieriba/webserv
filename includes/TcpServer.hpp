@@ -2,18 +2,28 @@
 #define __TcpServer_HPP_
 
 #include "CommonLib.hpp"
+#include <fstream>
 class Server;
+typedef std::map<short int, std::string>::iterator vec_it;
 class TcpServer
 {
     public:
-        TcpServer(const std::string& filename);
+        TcpServer(const char *filename);
         ~TcpServer();
 
         /*GETTERS*/
-        std::list<Server> getServers(void) const;
+        std::vector<Server> getServers(void) const;
 
         /*SETTERS*/
         void pushNewServer(const Server& server);
+
+        /*MEMBER FUNCTION*/
+        void getServerConfig(std::ifstream& file);
+
+        /*STATIC MEMBER FUNCTION*/
+        static void initHttpResponses(void);
+        static const vec_it getHttpResponse(const short int& code);
+        static std::map<short int, std::string> httpResponses;
     private:
         /*
         
@@ -22,7 +32,6 @@ class TcpServer
         TcpServer& operator=(const TcpServer& rhs);
         TcpServer();
         
-        std::list<Server> _servers;
-        static std::map<std::string, short int> httpResponses;
+        std::vector<Server> _servers;
 };
 #endif

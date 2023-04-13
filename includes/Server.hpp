@@ -16,8 +16,8 @@ class Server
         const unsigned int& getBodySize(void) const;
         const std::string& getRootDir(void) const;
         const std::string& getIndex(void) const;
-        std::list<Location> getLocations(void) const;
-        std::list<std::string> getServerNames(void) const;
+        std::vector<Location> getLocations(void) const;
+        std::vector<std::string> getServerNames(void) const;
 
         /*Setters*/
         void    setServOption(const unsigned int& nbit, char actions);
@@ -36,7 +36,7 @@ class Server
         unsigned int    _body_size;
         std::string     _root_dir;
         std::string     _index;
-        std::list<std::string> _server_names;
-        std::list<Location> _locations;
+        std::vector<std::string> _server_names;
+        std::vector<Location> _locations;
 };
 #endif

@@ -19,10 +19,12 @@ void    print_location_config(const Location& location)
 
 void    print_server_config(const Server server)
 {
-    std::list<std::string>::iterator serv_it = server.getServerNames().begin();
-    std::list<Location> loca(server.getLocations());
-    std::list<Location>::iterator loca_it_ = loca.begin();
-    std::list<Location>::iterator loca_it_end = loca.end();
+    std::vector<std::string> serv = server.getServerNames();
+    std::vector<std::string>::iterator serv_it_ = serv.begin();
+    std::vector<std::string>::iterator serv_it_end = serv.end();
+    std::vector<Location> loca(server.getLocations());
+    std::vector<Location>::iterator loca_it_ = loca.begin();
+    std::vector<Location>::iterator loca_it_end = loca.end();
     std::cout
         << "METHOD GET: " << (server.checkBits(GET) > 0 ? "Enabled" : "Disabled") << std::endl
         << "METHOD POST: " << (server.checkBits(POST) > 0 ? "Enabled" : "Disabled") << std::endl
@@ -31,8 +33,8 @@ void    print_server_config(const Server server)
         << "Client Max Body Size: " << server.getBodySize() << std::endl
         << "Root Directory: " << ((server.getRootDir().size()) > 0 ? server.getRootDir() : "No root directory") << std::endl
         << "Index HTML: " << ((server.getIndex().size()) > 0 ? server.getIndex() : "No index html") << std::endl;
-        for(; serv_it != server.getServerNames().end(); serv_it++)
-            std::cout << "Server_name: " << *serv_it << std::endl;
+        for(; serv_it_ != serv_it_end; serv_it_++)
+            std::cout << "Server_name: " << *serv_it_ << std::endl;
         for(; loca_it_ != loca_it_end; loca_it_++)
         {
             print_location_config(*loca_it_);
@@ -45,7 +47,8 @@ int main (int argc, char **argv)
 {
     try
     {
-        TcpServer tcp_servers(argc > 1 ? argv[1] : "");
+        TcpServer::initHttpResponses();
+        TcpServer tcp_servers(argc > 1 ? argv[1] : NULL);
         Server a;
         Server b;
         Server c;
@@ -59,18 +62,18 @@ int main (int argc, char **argv)
         tcp_servers.pushNewServer(a);
         tcp_servers.pushNewServer(b);
         tcp_servers.pushNewServer(c);
-        std::list<Server> tmp(tcp_servers.getServers());
-        std::list<Server>::iterator it = tmp.begin();
-        std::list<Server>::iterator end = tmp.end();
+        /*std::vector<Server> tmp(tcp_servers.getServers());
+        std::vector<Server>::iterator it = tmp.begin();
+        std::vector<Server>::iterator end = tmp.end();
         for ( ; it != end ; it++)
         {
             print_server_config(*it);
             std::cout << "-----------NEXT_SERV-------------\n\n";
-        }
+        }*/
     }
     catch(const std::exception& e)
     {
-        std::cerr << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << std::endl;
     }
     
 }

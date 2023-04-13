@@ -45,6 +45,10 @@
         "limits": "cpp",
         "numbers": "cpp",
         "typeinfo": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "optional": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "fstream": "cpp"
     }
 }
