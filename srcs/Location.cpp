@@ -34,7 +34,7 @@ const unsigned int& Location::getBodySize(void) const {return _body_size;};
 const std::string& Location::getRootDir(void) const {return _root_dir;};
 const std::string& Location::getIndex(void) const {return _index;};
 const std::string& Location::getUri(void) const {return _uri;};
-const std::list<Location>& Location::getSubLocations(void) const {return _sub_locations;};
+std::list<Location> Location::getSubLocations(void) const {return _sub_locations;};
 const Server* Location::getServer(void) const {return _server; };
 /*----------------------------------------GETTER----------------------------------------*/
 
@@ -63,10 +63,21 @@ void    Location::setServer(Server *server)
 {
     _server = server;
 };
+
+void    Location::setLocationOption(const unsigned int& nbit, char actions)
+{
+    if (actions == SET)
+        bitset(_location_options, nbit);
+    else if (actions == CLEAR)
+        bitclear(_location_options, nbit);
+};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
-
+bool    Location::checkBits(const unsigned int& nbit) const
+{
+    return (bitcheck(_location_options, nbit) > 0);
+}
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
 
 /*----------------------------------------VIRTUAL FUNCTION----------------------------------------*/

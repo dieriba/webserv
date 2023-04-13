@@ -16,8 +16,8 @@ class Location
         const std::string& getIndex(void) const;
         const std::string& getRootDir(void) const;
         const std::string& getUri(void) const;
-        const std::list<Location>& getSubLocations(void) const;
         const Server* getServer(void) const;
+        std::list<Location> getSubLocations(void) const;
 
         /*Setters*/
         void    setBodySize(const unsigned int& body);
@@ -26,6 +26,10 @@ class Location
         void    setUri(const std::string& index);
         void    pushNewLocation(const Location& location);
         void    setServer(Server *server);
+        void    setLocationOption(const unsigned int& nbit, char actions);
+
+        /*MEMBER FUNCTION*/
+        bool    checkBits(const unsigned int& nbit) const;
     private:
         unsigned int    _location_options;
         unsigned int    _body_size;

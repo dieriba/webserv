@@ -4,10 +4,14 @@
 #include <string>
 #include <iostream>
 #include <list>
+#include <vector>
+#include <map>
 
-# define GET 1
-# define POST 2
-# define DELETE 3
+# define GET 0
+# define POST 1
+# define DELETE 2
+# define SET -1
+# define CLEAR -2
 # define ALL_METHODS 7
 
 #define bitset(byte,nbit)   (byte |= (1 << nbit))

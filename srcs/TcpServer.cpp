@@ -4,19 +4,22 @@
 TcpServer::TcpServer(const std::string& filename)
 {
     (void)filename;
-    _servers.push_back(Server());
 }
 TcpServer::~TcpServer(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
-const std::list<Server>& TcpServer::getServers(void) const {return _servers; };
+std::list<Server> TcpServer::getServers(void) const {return _servers; };
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
-
+void TcpServer::pushNewServer(const Server& server)
+{
+    _servers.push_back(server);
+};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
+std::map<std::string, short int> TcpServer::httpResponses;

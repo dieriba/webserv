@@ -10,12 +10,16 @@ class TcpServer
         ~TcpServer();
 
         /*GETTERS*/
-        const std::list<Server>& getServers(void) const;
+        std::list<Server> getServers(void) const;
+
+        /*SETTERS*/
+        void pushNewServer(const Server& server);
     private:
-        TcpServer();
         TcpServer(const TcpServer& rhs);
         TcpServer& operator=(const TcpServer& rhs);
+        TcpServer();
         std::list<Server> _servers;
+        static std::map<std::string, short int> httpResponses;
         /* data */
 };
 #endif

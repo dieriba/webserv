@@ -29,13 +29,14 @@ Server::~Server(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
-unsigned int&  Server::getServOptions(void) {return _serv_options;};
+unsigned int  Server::getServOptions(void) const {return _serv_options;};
 const unsigned int& Server::getPort(void) const {return _port;};
 const unsigned int& Server::getBodySize(void) const {return _body_size;};
 const std::string& Server::getRootDir(void) const {return _root_dir;};
 const std::string& Server::getIndex(void) const {return _index;};
-const std::list<std::string>& Server::getServerNames(void) const {return _server_names;};
-const std::list<Location>& Server::getLocations(void) const {return _locations;};
+
+std::list<Location> Server::getLocations(void) const {return _locations;};
+std::list<std::string> Server::getServerNames(void) const {return _server_names;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
@@ -63,11 +64,23 @@ void    Server::pushNewLocation(const Location& location)
 {
     _locations.push_back(location);
 };
+void    Server::setServOption(const unsigned int& nbit, char actions)
+{
+    if (actions == SET && nbit == ALL_METHODS)
+        _serv_options |= ALL_METHODS;
+    else if (actions == SET)
+        bitset(_serv_options, nbit);
+    else if (actions == CLEAR)
+        bitclear(_serv_options, nbit);
+};
 /*----------------------------------------SETTER----------------------------------------*/
 
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
-
+bool    Server::checkBits(const unsigned int& nbit) const
+{
+    return (bitcheck(_serv_options, nbit) > 0);
+}
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
 
 /*----------------------------------------VIRTUAL FUNCTION----------------------------------------*/
