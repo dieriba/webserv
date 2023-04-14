@@ -48,6 +48,7 @@ int main (int argc, char **argv)
     {
         TcpServer tcp_servers;
         TcpServer::initHttpResponses();
+        TcpServer::initHttpMethods();
         TcpServer::initKnownDirectives();
         tcp_servers.settingUpServer(argc > 1 ? argv[1] : NULL);
         std::vector<Server> tmp(tcp_servers.getServers());

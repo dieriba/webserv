@@ -5,6 +5,7 @@
 #include "Parser.hpp"
 class Server;
 typedef std::map<short int, std::string>::iterator vec_it;
+typedef std::map<std::string, short int>::iterator rev_it;
 class TcpServer: public Parser
 {
     public:
@@ -33,9 +34,11 @@ class TcpServer: public Parser
 
         /*STATIC MEMBER FUNCTION*/
         static void initHttpResponses(void);
+        static void initHttpMethods(void);
         static void initKnownDirectives(void);
-        static const vec_it getHttpResponse(const short int& code);
         static bool isKnownDirective(const std::string& directive);
+        static const vec_it getHttpResponse(const short int& code);
+        static int getHttpMethod(const std::string& method);
     protected:
         unsigned int _body_size;
         std::string _index;
@@ -46,5 +49,6 @@ class TcpServer: public Parser
         std::vector<Server> _servers;
         static std::map<short int, std::string> httpResponses;
         static std::map<std::string, bool> knownDirectives;
+        static std::map<std::string, short int> httpMethods;
 };
 #endif

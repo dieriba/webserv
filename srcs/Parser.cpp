@@ -176,14 +176,15 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
     {
         if (vec.size() > 4)
             throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
+        int method;
         for (size_t i = 1; i < vec.size(); i++)
         {
             SemicolonCheck(vec[i], i, len);
-            if (vec[i] != "GET" && vec[i] != "POST" && vec[i] != "DELETE")
+            if (vec[i].size() == 0 && i == len) break ;
+            method = TcpServer::getHttpMethod(vec[i]);
+            if (method < 0)
                 throw ExceptionThrower("Unknown HTTP Method");
-            if (vec[i] == "GET") server.setOptions(GET, SET);
-            else if (vec[i] == "POST") server.setOptions(POST, SET);
-            else if (vec[i] == "DELETE") server.setOptions(DELETE, SET);
+            server.setOptions(method, SET);
         }
     }
     else

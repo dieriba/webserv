@@ -68,6 +68,14 @@ void TcpServer::settingUpServer(const char *filename)
 
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 
+int TcpServer::getHttpMethod(const std::string& method)
+{
+    rev_it it = httpMethods.find(method);
+    if (it == httpMethods.end())
+        return (-1);
+    return (it -> second);
+}
+
 const vec_it TcpServer::getHttpResponse(const short int& response)
 {
     return httpResponses.find(response);
@@ -154,6 +162,13 @@ void TcpServer::initHttpResponses(void)
     httpResponses[511] = "Network Authentification Required";
 }
 
+void TcpServer::initHttpMethods(void)
+{
+    httpMethods["GET"] = GET;
+    httpMethods["POST"] = POST;
+    httpMethods["DELETE"] = DELETE;
+}
+
 /*
     @brief 
 */
@@ -161,3 +176,4 @@ void TcpServer::initHttpResponses(void)
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 std::map<short int, std::string> TcpServer::httpResponses;
 std::map<std::string, bool> TcpServer::knownDirectives;
+std::map<std::string, short int> TcpServer::httpMethods;
