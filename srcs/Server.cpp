@@ -25,7 +25,7 @@ Server::~Server(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
-const it_vec& Server::getCgiPath(const std::string& key)
+const it_vec Server::getCgiPath(const std::string& key)
 {
     for (it_vec i = _cgi.begin(); i != _cgi.end(); i++)
     {

@@ -16,7 +16,7 @@ class Server: public BitsManipulation, public TcpServer
         ~Server();
 
         /*GETTERS*/
-        const it_vec& getCgiPath(const std::string& key);
+        const it_vec getCgiPath(const std::string& key);
         const unsigned int& getPort(void) const;
         std::vector<Location> getLocations(void) const;
         std::vector<std::string> getServerNames(void) const;
