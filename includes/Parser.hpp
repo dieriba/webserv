@@ -3,6 +3,7 @@
 #include "CommonLib.hpp"
 #include "StringUtils.hpp"
 class Server;
+class Location;
 class Parser: public StringUtils
 {    
     public:
@@ -16,7 +17,8 @@ class Parser: public StringUtils
 
         /*MEMBER FUNC*/
         Server fillServer(std::ifstream& file, bool bracket);
-        void   fillMap(const std::string& line, std::map<std::string, std::string>& _serv_conf);
+        Location fillUpLocation(std::ifstream& file, bool bracket);
+        void   fillMap(const std::string& line, Server& server, std::map<std::string, std::string>& _serv_conf);
         Parser& operator=(const Parser& rhs);
 };
 #endif
