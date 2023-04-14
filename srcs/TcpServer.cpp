@@ -73,6 +73,25 @@ const vec_it TcpServer::getHttpResponse(const short int& response)
     return httpResponses.find(response);
 }
 
+bool TcpServer::isKnownDirective(const std::string& directive)
+{
+    return (knownDirectives.find(directive) != knownDirectives.end());
+}
+
+void TcpServer::initKnownDirectives(void)
+{
+    knownDirectives[LISTEN] = true;
+    knownDirectives[SERVER_NAMES] = true;
+    knownDirectives[ROOT] = true;
+    knownDirectives[ALLOWED_METHOD] = true;
+    knownDirectives[INDEX] = true;
+    knownDirectives[CLIENT_BODY] = true;
+    knownDirectives[LOCATION] = true;
+    knownDirectives[ERROR_FILE] = true;
+    knownDirectives[REDIRECT] = true;
+    knownDirectives[CGI] = true;
+}
+
 void TcpServer::initHttpResponses(void)
 {
     httpResponses[100] = "Continue";
@@ -141,3 +160,4 @@ void TcpServer::initHttpResponses(void)
 
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 std::map<short int, std::string> TcpServer::httpResponses;
+std::map<std::string, bool> TcpServer::knownDirectives;

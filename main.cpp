@@ -42,22 +42,22 @@ void    print_server_config(const Server server)
         }
 }
 
-
 int main (int argc, char **argv)
 {
     try
     {
         TcpServer tcp_servers;
         TcpServer::initHttpResponses();
+        TcpServer::initKnownDirectives();
         tcp_servers.settingUpServer(argc > 1 ? argv[1] : NULL);
-        std::vector<Server> tmp(tcp_servers.getServers());
-        std::vector<Server>::iterator it = tmp.begin();
-        std::vector<Server>::iterator end = tmp.end();
-        for ( ; it != end ; it++)
+        //std::vector<Server> tmp(tcp_servers.getServers());
+        //std::vector<Server>::iterator it = tmp.begin();
+        //std::vector<Server>::iterator end = tmp.end();
+        /*for ( ; it != end ; it++)
         {
             print_server_config(*it);
             std::cout << "-----------NEXT_SERV-------------\n\n";
-        }
+        }*/
     }
     catch(const std::exception& e)
     {

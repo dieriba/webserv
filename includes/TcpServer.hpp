@@ -33,8 +33,9 @@ class TcpServer: public Parser
 
         /*STATIC MEMBER FUNCTION*/
         static void initHttpResponses(void);
+        static void initKnownDirectives(void);
         static const vec_it getHttpResponse(const short int& code);
-    
+        static bool isKnownDirective(const std::string& directive);
     protected:
         unsigned int _body_size;
         std::string _index;
@@ -44,5 +45,6 @@ class TcpServer: public Parser
     private:
         std::vector<Server> _servers;
         static std::map<short int, std::string> httpResponses;
+        static std::map<std::string, bool> knownDirectives;
 };
 #endif

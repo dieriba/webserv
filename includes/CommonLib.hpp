@@ -9,19 +9,41 @@
 #include <fstream>
 
 
-# define WHITESPACES "\n\t\r\f\v"
+# define BASE_VEC_ARR 10
+# define WHITESPACES " \n\t\r\f\v"
 
-# define DEFAULT_CONF_FILE "./configs/default.conf"
-
-
-# define SERVER_CONTEXT "server"
-# define LOCATION_CONTEXT "location"
 
 /*
 
 
 */
-# define BASE_VEC_ARR 10
+# define LISTEN "listen"
+# define SERVER_NAMES "server_names"
+# define ROOT "root"
+# define ALLOWED_METHOD "allowed_methods"
+# define INDEX "index"
+# define CLIENT_BODY "client_max_body_size"
+# define LOCATION "location"
+# define ERROR_FILE "error_file"
+# define REDIRECT "redirect"
+# define CGI "cgi"
+/*
+
+*/
+# define DEFAULT_CONF_FILE "./configs/default.conf"
+# define MISSING_OP_BRACKET "Missing Opening Bracket"
+# define MISSING_END_BRACKET "Missing End Bracket"
+# define WRONG_FILE_FORMAT "Wrong File Format"
+# define MISSING_TOO_MANY_KEY_VALUE "Missing Or Too Many Arguments"
+# define LAST_ARGS "There should be only 1 ';'"
+# define MISSING_SEMICOLONS "Missing Semicolon Or Too Many"
+# define BAD_SYNTAX "Some Characters Used Are Not Allowed"
+/*
+
+*/
+# define SERVER_CONTEXT "server"
+# define LOCATION_CONTEXT "location"
+
 /*
 
 */

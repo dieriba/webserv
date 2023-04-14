@@ -15,7 +15,8 @@ class Parser: public StringUtils
     private:
 
         /*MEMBER FUNC*/
-        Server fillServer(std::ifstream& file);
+        Server fillServer(std::ifstream& file, bool bracket);
+        void   fillMap(const std::string& line, std::map<std::string, std::string>& _serv_conf);
         Parser& operator=(const Parser& rhs);
 };
 #endif
