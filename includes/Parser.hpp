@@ -18,7 +18,10 @@ class Parser: public StringUtils
         /*MEMBER FUNC*/
         Server fillServer(std::ifstream& file, bool bracket);
         Location fillUpLocation(std::ifstream& file, bool bracket);
-        void   fillMap(const std::string& line, Server& server, std::map<std::string, std::string>& _serv_conf);
+        void    SemicolonCheck(std::string& line, size_t i, size_t len);
+        void    fillMap(const std::string& line, Server& server, std::map<std::string, std::string>& _serv_conf);
+        void    checkOpeningLine(std::ifstream& file);
+        void    feedingUpServer(std::map<std::string, std::string>& _serv_conf, Server& server);
         Parser& operator=(const Parser& rhs);
 };
 #endif

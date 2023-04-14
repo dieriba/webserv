@@ -49,6 +49,7 @@
         "optional": "cpp",
         "ranges": "cpp",
         "span": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "sstream": "cpp"
     }
 }
