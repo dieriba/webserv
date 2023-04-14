@@ -47,8 +47,9 @@ int main (int argc, char **argv)
 {
     try
     {
+        TcpServer tcp_servers;
         TcpServer::initHttpResponses();
-        TcpServer tcp_servers(argc > 1 ? argv[1] : NULL);
+        tcp_servers.settingUpServer(argc > 1 ? argv[1] : NULL);
         std::vector<Server> tmp(tcp_servers.getServers());
         std::vector<Server>::iterator it = tmp.begin();
         std::vector<Server>::iterator end = tmp.end();

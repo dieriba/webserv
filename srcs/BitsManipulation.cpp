@@ -12,7 +12,6 @@ BitsManipulation& BitsManipulation::operator=(const BitsManipulation& rhs)
 BitsManipulation::~BitsManipulation(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
-
 /*----------------------------------------GETTER----------------------------------------*/
 unsigned int BitsManipulation::getOptions(void) const {return _options;};
 /*----------------------------------------GETTER----------------------------------------*/
@@ -28,7 +27,6 @@ void    BitsManipulation::setOptions(const unsigned int& nbit, char actions)
         bitclear(_options, nbit);
 };
 /*----------------------------------------SETTER----------------------------------------*/
-
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
 /*

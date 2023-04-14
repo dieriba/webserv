@@ -10,7 +10,6 @@ class TcpServer: public Parser
     public:
         /*CONSTRUCTOR/DESTRUCTOR/COPY/ASSIGNEMENT*/
         TcpServer();
-        TcpServer(const char *filename);
         TcpServer(const TcpServer& rhs);
         TcpServer& operator=(const TcpServer& rhs);
         ~TcpServer();
@@ -29,10 +28,12 @@ class TcpServer: public Parser
         void setRootDir(const std::string& root_dir);
         void setRedirect(const std::string& redirect);
 
+        /*MEMBER FUNCTION*/
+        void settingUpServer(const char *filename);
+
         /*STATIC MEMBER FUNCTION*/
         static void initHttpResponses(void);
         static const vec_it getHttpResponse(const short int& code);
-        static std::map<short int, std::string> httpResponses;
     
     protected:
         unsigned int _body_size;
@@ -42,5 +43,6 @@ class TcpServer: public Parser
 
     private:
         std::vector<Server> _servers;
+        static std::map<short int, std::string> httpResponses;
 };
 #endif

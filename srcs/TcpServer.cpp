@@ -3,14 +3,6 @@
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 TcpServer::TcpServer():_body_size(0),_index(""),_root_dir(""),_redirect(""){};
 
-TcpServer::TcpServer(const char *filename)
-{
-    std::ifstream file;
-    _servers.reserve(BASE_VEC_ARR);
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    filename != NULL ? file.open(filename) : file.open(DEFAULT_CONF_FILE);
-    _servers = Parser::getServerConfig(file);
-}
 TcpServer::TcpServer(const TcpServer& rhs)
     :Parser(rhs),_body_size(rhs._body_size),_index(rhs._index),_root_dir(rhs._root_dir),_redirect(rhs._redirect){};
 
@@ -28,12 +20,6 @@ TcpServer::~TcpServer(){};
 
 /*----------------------------------------GETTER----------------------------------------*/
 std::vector<Server> TcpServer::getServers(void) const {return _servers; };
-
-const vec_it TcpServer::getHttpResponse(const short int& response)
-{
-    return TcpServer::httpResponses.find(response);
-}
-
 const unsigned int& TcpServer::getBodySize(void) const {return _body_size;};
 const std::string& TcpServer::getRootDir(void) const {return _root_dir;};
 const std::string& TcpServer::getIndex(void) const {return _index;};
@@ -67,7 +53,26 @@ void    TcpServer::setRedirect(const std::string& redirect)
 }
 /*----------------------------------------SETTER----------------------------------------*/
 
-/*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
+/*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+void TcpServer::settingUpServer(const char *filename)
+{
+    std::ifstream file;   
+    _servers.reserve(BASE_VEC_ARR);
+    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    filename != NULL ? file.open(filename) : file.open(DEFAULT_CONF_FILE);
+    _servers = Parser::getServerConfig(file);
+}
+
+/*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+/*----------------------------------------STATIC FUNCTION----------------------------------------*/
+
+const vec_it TcpServer::getHttpResponse(const short int& response)
+{
+    return httpResponses.find(response);
+}
+
 void TcpServer::initHttpResponses(void)
 {
     httpResponses[100] = "Continue";
@@ -134,5 +139,5 @@ void TcpServer::initHttpResponses(void)
     @brief 
 */
 
-/*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
+/*----------------------------------------STATIC FUNCTION----------------------------------------*/
 std::map<short int, std::string> TcpServer::httpResponses;
