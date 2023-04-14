@@ -2,6 +2,7 @@
 #include "../includes/Server.hpp"
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Parser::Parser(){};
+Parser::Parser(const Parser& rhs):StringUtils(rhs){(void)rhs;};
 Parser::~Parser(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
@@ -11,7 +12,7 @@ Server Parser::fillServer(std::ifstream& file)
     
     (void) file;
     server.setPort(2000);
-    server.setServOption(GET, SET);
+    server.setOptions(GET, SET);
     return server;
 }
 
@@ -25,11 +26,10 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file)
     while (std::getline(file, line))
     {
         std::cout << StringUtils::trimBothEnd(line, WHITESPACES) << '\n';
-        /*if (line.find(SERVER_CONTEXT) != std::string::npos)
+        if (line.find(SERVER_CONTEXT) != std::string::npos)
         {
-            std::cout << "ENNTEREDDDDDDDDDDDDDDDD----\n";
             server.push_back(fillServer(file));
-        }*/
+        }
         if (file.eof()) break ;
     }
     return server;

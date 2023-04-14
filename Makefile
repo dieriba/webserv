@@ -6,6 +6,7 @@ SRCS_		=	./srcs/TcpServer.cpp \
 				./srcs/Location.cpp \
 				./srcs/StringUtils.cpp \
 				./srcs/Parser.cpp \
+				./srcs/BitsManipulation.cpp \
 
 OBJS	=	$(SRCS_MAIN:.cpp=.o)\
 			$(SRCS_:.cpp=.o)

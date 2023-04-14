@@ -2,6 +2,7 @@
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 StringUtils::StringUtils(){};
+StringUtils::StringUtils(const StringUtils& rhs){(void)rhs;};
 StringUtils::~StringUtils(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 

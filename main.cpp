@@ -13,7 +13,7 @@ void    print_location_config(const Location& location)
         << "Client Max Body Size: " << location.getBodySize() << std::endl
         << "Index HTML: " << (location.getIndex().size() > 0 ? location.getIndex() : "No root directory") << std::endl
         << "Root Directory: " << (location.getRootDir().size() > 0 ? location.getRootDir() : "No root directory") << std::endl
-        << "Index HTML: "  << (location.getUri().size() > 0 ? location.getUri() : "No root directory") << std::endl
+        << "Index HTML: "  << (location.getRedirect().size() > 0 ? location.getRedirect() : "No root directory") << std::endl
         << "Server: " << location.getServer() << std::endl;
 }
 

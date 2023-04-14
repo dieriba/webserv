@@ -7,6 +7,7 @@ class Parser: public StringUtils
 {    
     public:
         Parser();
+        Parser(const Parser& rhs);
         ~Parser();
 
         /*MEMBER FUNCTION*/
@@ -15,7 +16,6 @@ class Parser: public StringUtils
 
         /*MEMBER FUNC*/
         Server fillServer(std::ifstream& file);
-        Parser(const Parser& rhs);
         Parser& operator=(const Parser& rhs);
 };
 #endif
