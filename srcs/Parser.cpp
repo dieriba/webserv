@@ -206,10 +206,9 @@ void    Parser::SemicolonCheck(std::string& line, size_t i, size_t len)
     }
 }
 
-Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string& _line, bool bracket)
+Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string& line, bool bracket)
 {
     std::vector<std::string> vec;
-    std::string line(_line);
     std::map<std::string, std::string> _map;
     Location _location;
     
@@ -253,6 +252,7 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
                 
                 line.erase(--line.end());
                 fillMap(line, _location, _map);
+                line += "}";
                 break ;
             }
             else
@@ -414,6 +414,7 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
                 
                 line.erase(--line.end());
                 fillMap(line, server, _serv_conf);
+                line += "}";
                 break ;
             }
             if (line.find(LOCATION, 0, 8) != std::string::npos)
@@ -429,11 +430,15 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
                 server.pushNewLocation(fillUpLocation(&server, file, line, pos != std::string::npos));
                 if (line.find("}") == std::string::npos)
                     throw ExceptionThrower("Missing End Bracket");
+                else
+                {
+                    std::getline(file, line);
+                    break ;
+                }
             }
             else
                 fillMap(line, server, _serv_conf);
         }
-        
         if (file.eof()) break ;
     }
     feedingUpServer(_serv_conf, server);
@@ -470,6 +475,8 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file)
                 server.push_back(fillServer(file, line, (line.find('{') != std::string::npos)));
                 if (line.find("}") == std::string::npos)
                     throw ExceptionThrower("Missing End Bracket");
+                else
+                    break ;
             }
             else
                 throw ExceptionThrower("Wrong Format of config file: " + line);
