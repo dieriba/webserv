@@ -86,6 +86,22 @@ bool TcpServer::isKnownDirective(const std::string& directive)
     return (knownDirectives.find(directive) != knownDirectives.end());
 }
 
+bool TcpServer::isKnownLocationDirectives(const std::string& directive)
+{
+    return (knownLocationsDirectives.find(directive) != knownDirectives.end());
+}
+
+void TcpServer::initknownLocationsDirectives(void)
+{
+    knownDirectives[ROOT] = true;
+    knownDirectives[ALLOWED_METHOD] = true;
+    knownDirectives[INDEX] = true;
+    knownDirectives[REDIRECT] = true;
+    knownDirectives[ERROR_FILE] = true;
+    knownDirectives[CLIENT_BODY] = true;
+    knownDirectives[LOCATION] = true;
+}   
+
 void TcpServer::initKnownDirectives(void)
 {
     knownDirectives[LISTEN] = true;
@@ -176,4 +192,5 @@ void TcpServer::initHttpMethods(void)
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 std::map<short int, std::string> TcpServer::httpResponses;
 std::map<std::string, bool> TcpServer::knownDirectives;
+std::map<std::string, bool> TcpServer::knownLocationsDirectives;
 std::map<std::string, short int> TcpServer::httpMethods;

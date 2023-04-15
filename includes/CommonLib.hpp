@@ -11,7 +11,7 @@
 
 # define BASE_VEC_ARR 10
 # define WHITESPACES " \n\t\r\f\v"
-
+# define BASE_10 "0123456789"
 
 /*
 
@@ -38,6 +38,8 @@
 # define LAST_ARGS "There should be only 1 ';'"
 # define MISSING_SEMICOLONS "Missing Semicolon Or Too Many"
 # define BAD_SYNTAX "Some Characters Used Are Not Allowed"
+# define LISTEN_FORMAT "Required Format -> listen X.X.X.X::Y OR listen ::Y  OR listen Y"
+# define IP_FORMAT "IP Fomart -> X.X.X.X  -> 0 < X < 255"
 /*
 
 */

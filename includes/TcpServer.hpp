@@ -36,7 +36,9 @@ class TcpServer: public Parser
         static void initHttpResponses(void);
         static void initHttpMethods(void);
         static void initKnownDirectives(void);
+        static void initknownLocationsDirectives(void);
         static bool isKnownDirective(const std::string& directive);
+        static bool isKnownLocationDirectives(const std::string& directive);
         static const vec_it getHttpResponse(const short int& code);
         static int getHttpMethod(const std::string& method);
     protected:
@@ -49,6 +51,7 @@ class TcpServer: public Parser
         std::vector<Server> _servers;
         static std::map<short int, std::string> httpResponses;
         static std::map<std::string, bool> knownDirectives;
+        static std::map<std::string, bool> knownLocationsDirectives;
         static std::map<std::string, short int> httpMethods;
 };
 #endif

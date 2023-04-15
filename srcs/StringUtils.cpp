@@ -14,14 +14,19 @@ std::vector<std::string> StringUtils::stringSpliter(const std::string& line, con
     std::string token;
     std::vector<std::string> res;
 
-    while ((pos_end = line.find_first_of(delim, pos_start)) != std::string::npos)
-    {
-        token = line.substr(pos_start, pos_end - pos_start);
-        pos_end = line.find_first_not_of(WHITESPACES, pos_end);
-        pos_start = pos_end;
-        res.push_back(token);
+    if ((pos_start = (line.find_first_not_of(delim))) != std::string::npos)
+    { 
+        while ((pos_end = line.find_first_of(delim, pos_start)) != std::string::npos)
+        {
+            token = line.substr(pos_start, pos_end - pos_start);
+            pos_end = line.find_first_not_of(delim, pos_end);
+            pos_start = pos_end;
+            res.push_back(token);
+        }
     }
-    res.push_back(line.substr(pos_start));
+    
+    if (pos_start < line.size())
+        res.push_back(line.substr(pos_start));
     return res;
 }
 

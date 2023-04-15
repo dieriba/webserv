@@ -8,21 +8,135 @@ Parser::Parser(const Parser& rhs):StringUtils(rhs){(void)rhs;};
 Parser::~Parser(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
+void    Parser::setCommonDirectives(std::vector<std::string>& vec, std::map<std::string, std::string>& _map)
+{
+    /*
+            CHECK IF DIRECTIVES FOLLOWS THE RIGHT FORMAT
+            IF NOT THROW AN ERROR
+        */
+        if (vec.size() == 3)
+        {
+            if (vec.rbegin() -> length() != 1 || vec.rbegin() -> at(0) != ';')
+                throw ExceptionThrower(LAST_ARGS);
+            if (vec[1].find(';') != std::string::npos)
+                throw ExceptionThrower(BAD_SYNTAX);
+        }
+        else
+        {
+            if (Parser::count(vec[1], ';') > 1 || vec[1].at(vec[1].size() - 1) != ';')
+                throw ExceptionThrower(MISSING_SEMICOLONS);
+            vec[1].erase(vec[1].length() - 1);
+        }
+
+        /*
+            IF NO ERROR HAS BEEN THROWN
+            ADD THE DIRECTIVE TO THE MAP
+            CHECK IF DIRECTIVE HAVE ALREADY BEEN ADDED
+            IF SO THROW AN ERROR
+        */
+
+         if (_map.find(vec[0]) != _map.end())
+            throw ExceptionThrower("Redeclaration of the same directive");
+        //std::cout << vec[0] << " " << vec[1] << std::endl;
+        _map[vec[0]] = vec[1];
+}
+
+bool    Parser::validIpFormat(const std::string& ip)
+{
+    short int bits, count = 0;
+    size_t index = 0;
+    size_t  i = 0;
+    std::stringstream ss;
+
+    while (1)
+    {
+        index = ip.find(".", index);
+
+        ss << ip.substr(i);
+        ss >> bits;
+        if ((i == index) || (ss.fail() || bits > 255))
+            return false ;
+        count++;
+        if (index == std::string::npos) break ;
+        ss.clear();
+        ss.str("");
+        index++;
+        i = index;
+    }
+    
+    if (count != 4) return false ;
+
+    return true;
+}
+
+void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Location& location)
+{
+    unsigned int val;
+    std::vector<std::string> vec;
+    std::stringstream ss;
+
+    std::map<std::string, std::string>::iterator it;
+    std::map<std::string, std::string>::iterator end = _map.end();
+
+    it = _map.find(ROOT);
+
+    if (it != end) location.setRootDir(it -> second);
+    
+    it = _map.find(INDEX);
+    
+    if (it != end) location.setIndex(it -> second);
+
+    it = _map.find(CLIENT_BODY);
+
+    if (it != end)
+    {
+        ss << it -> second;
+        ss >> val;
+        location.setBodySize(val);
+    }
+
+    it = _map.find(REDIRECT);
+
+    if (it != end) location.setRedirect(it -> second);
+}
+
 void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, Server& server)
 {
-    std::stringstream ss_port;
-    std::stringstream ss_body;
-    unsigned int port;
-    unsigned int body;
+    unsigned int val;
+    std::vector<std::string> vec;
+    std::stringstream ss;
     std::map<std::string, std::string>::iterator it = _serv_conf.find(LISTEN);
     std::map<std::string, std::string>::iterator end = _serv_conf.end();
     
     if (it == end)
-        throw ExceptionThrower("Missing Port value");
+        throw ExceptionThrower("Missing \"listen\" Directive");
     
-    ss_port << it -> second;
-    ss_port >> port;
-    server.setPort(port);
+    if ((it -> second.find(':') != std::string::npos) && StringUtils::count(it -> second, ':') != 2)
+        throw ExceptionThrower(IP_FORMAT);
+    
+    vec = StringUtils::stringSpliter(it -> second, ":");
+    
+    if (vec.size() == 2 && ((vec[0].find_first_not_of(BASE_10".") != std::string::npos) || (vec[1].find_first_not_of(BASE_10";") != std::string::npos)))
+        throw ExceptionThrower(LISTEN_FORMAT);
+
+    if (vec.size() > 2) throw ExceptionThrower(LISTEN_FORMAT);
+    
+    if (vec.size() == 1 && (vec[0].find_first_not_of(BASE_10) != std::string::npos))
+        throw ExceptionThrower(LISTEN_FORMAT);
+
+    if (vec.size() == 2)
+    {
+        if (!validIpFormat(vec[0]))
+            throw ExceptionThrower(IP_FORMAT);
+        server.setIp(vec[0]);
+    }
+
+    ss << (vec.size() == 2 ? vec[1] : vec[0]);
+    ss >> val;
+
+    if (ss.fail()) throw ExceptionThrower("PORT VALUE IS TOO HIGH");
+
+    server.setPort(val);
     it = _serv_conf.find(ROOT);
 
     if (it != end) server.setRootDir(it -> second);
@@ -35,9 +149,11 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
 
     if (it != end)
     {
-        ss_body << it -> second;
-        ss_body >> body;
-        server.setBodySize(body);
+        ss.clear();
+        ss.str("");
+        ss << it -> second;
+        ss >> val;
+        server.setBodySize(val);
     }
 
     it = _serv_conf.find(REDIRECT);
@@ -45,9 +161,8 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
     if (it != end) server.setRedirect(it -> second);
 }
 
-void    Parser::checkOpeningLine(std::ifstream& file)
+void    Parser::checkOpeningLine(std::ifstream& file, std::string& line)
 {
-    std::string line;
     while (std::getline(file, line))
     {
         line = StringUtils::trimBothEnd(line, WHITESPACES);
@@ -65,7 +180,6 @@ void    Parser::checkOpeningLine(std::ifstream& file)
                 
             if (line.at(0) != '{')
                 throw ExceptionThrower("Opening Bracket Should Start The Line");
-                
             line.erase(line.begin());
             break ;
         }
@@ -92,11 +206,12 @@ void    Parser::SemicolonCheck(std::string& line, size_t i, size_t len)
     }
 }
 
-Location Parser::fillUpLocation(std::ifstream& file, bool bracket)
+Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string& _line, bool bracket)
 {
-    Location _location;
     std::vector<std::string> vec;
-    std::string line;
+    std::string line(_line);
+    std::map<std::string, std::string> _map;
+    Location _location;
     
     vec = StringUtils::stringSpliter(line, WHITESPACES);
     
@@ -109,25 +224,89 @@ Location Parser::fillUpLocation(std::ifstream& file, bool bracket)
     if (bracket && vec.size() == 2)
         vec[1].erase(vec[1].length() - 1);
 
-    _location.setRootDir(vec[1]);
-
+    _location.setSubPath(vec[1]);
     if (!bracket)
     {
         /*CHECKS IF FIRST LINE MEET PARSING REQUIREMENTS*/
-        checkOpeningLine(file);
-        if (line.size() > 1)
-            line = "";
+        checkOpeningLine(file, line);
+        if (line.size() > 1) fillMap(line, _location, _map);
     }
 
     if (file.eof()) throw ExceptionThrower(WRONG_FILE_FORMAT);
     
     while (std::getline(file, line))
     {
-        vec = StringUtils::stringSpliter(line, WHITESPACES);
+        line = StringUtils::trimBothEnd(line, WHITESPACES);
+
+        if (line.size())
+        {
+            if (line.find('}') != std::string::npos)
+            {
+                if (line.size() == 1)
+                    break ;
+
+                if (StringUtils::count(line, '}') > 1)
+                    throw ExceptionThrower("Too Many Closing Bracket");
+                
+                if (*(line.rbegin()) != '}')
+                    throw ExceptionThrower("Missing Closing Bracket");
+                
+                line.erase(--line.end());
+                fillMap(line, _location, _map);
+                break ;
+            }
+            else
+                fillMap(line, _location, _map);
+        }
+
         if (file.eof()) break ;
     }
-
+    feedingUpLocation(_map, _location);
+    _location.setServer(server);
     return _location;
+}
+
+void    Parser::fillMap(const std::string& line, Location& location, std::map<std::string, std::string>& _serv_conf)
+{
+    std::vector<std::string> vec;
+    size_t len;
+    
+    vec = StringUtils::stringSpliter(line, WHITESPACES);
+    
+    /*
+        CHECK IF DIRECTIVES EXIST
+        IF NOT THROW AN ERROR
+    */
+    if (!TcpServer::isKnownLocationDirectives(vec[0]))
+        throw ExceptionThrower("Directive " + vec[0] + " is unknown");
+
+    if (vec.size() == 1)
+        throw ExceptionThrower(MISSING_TOO_MANY_KEY_VALUE);
+
+    if (vec.size() > 3 && vec[0] != ALLOWED_METHOD)
+        throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
+
+    len = vec.size() - 1;
+
+    if (vec[0] == ALLOWED_METHOD)
+    {
+        int method;
+
+        if (vec.size() > 4)
+            throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
+        
+        for (size_t i = 1; i < vec.size(); i++)
+        {
+            SemicolonCheck(vec[i], i, len);
+            if (vec[i].size() == 0 && i == len) break ;
+            method = TcpServer::getHttpMethod(vec[i]);
+            if (method < 0)
+                throw ExceptionThrower("Unknown HTTP Method");
+            location.setOptions(method, SET);
+        }
+    }
+    else
+        setCommonDirectives(vec, _serv_conf);
 }
 
 void    Parser::fillMap(const std::string& line, Server& server, std::map<std::string, std::string>& _serv_conf)
@@ -137,16 +316,17 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
     
     vec = StringUtils::stringSpliter(line, WHITESPACES);
     
+    /*
+        CHECK IF DIRECTIVES EXIST
+        IF NOT THROW AN ERROR
+    */
+
     if (!TcpServer::isKnownDirective(vec[0]))
         throw ExceptionThrower("Directive " + vec[0] + " is unknown");
 
     if (vec.size() == 1)
         throw ExceptionThrower(MISSING_TOO_MANY_KEY_VALUE);
 
-    /*
-        CHECK IF DIRECTIVES EXIST
-        IF NOT THROW AN ERROR
-    */
     if (vec.size() > 3 && (vec[0] != SERVER_NAMES && vec[0] != ALLOWED_METHOD))
         throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
         
@@ -166,17 +346,26 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
     }
     else if (vec[0] == CGI)
     {
-        for (size_t i = 1; i < vec.size(); i++)
-        {
-            SemicolonCheck(vec[i], i, len);
-            server.pushNewCGI(vec[i]);
-        }
+        std::string path;
+        
+        if (server.getCgiPath(vec[1], path))
+            throw ExceptionThrower("CGI " + vec[1] + " already exists with path: " + vec[2]);
+
+        if (vec[1].find(';') != std::string::npos || (StringUtils::count(vec[2], ';') > 1))
+            throw ExceptionThrower("Bad Syntax");
+        
+        if (*vec.rbegin() -> rbegin() != ';')
+            throw ExceptionThrower("Missing Semicolon At the End");
+        vec[2].erase(vec[2].size() - 1);
+        server.pushNewCGI(vec[1], vec[2]);
     }
     else if (vec[0] == ALLOWED_METHOD)
     {
+        int method;
+
         if (vec.size() > 4)
             throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
-        int method;
+        
         for (size_t i = 1; i < vec.size(); i++)
         {
             SemicolonCheck(vec[i], i, len);
@@ -188,49 +377,19 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
         }
     }
     else
-    {
-        /*
-            CHECK IF DIRECTIVES FOLLOWS THE RIGHT FORMAT
-            IF NOT THROW AN ERROR
-        */
-        if (vec.size() == 3)
-        {
-            if (vec.rbegin() -> length() != 1 || vec.rbegin() -> at(0) != ';')
-                throw ExceptionThrower(LAST_ARGS);
-            if (vec[1].find(';') != std::string::npos)
-                throw ExceptionThrower(BAD_SYNTAX);
-        }
-        else
-        {
-            if (Parser::count(vec[1], ';') > 1 || vec[1].at(vec[1].size() - 1) != ';')
-                throw ExceptionThrower(MISSING_SEMICOLONS);
-            vec[1].erase(vec[1].length() - 1);
-        }
-
-        /*
-            IF NO ERROR HAS BEEN THROWN
-            ADD THE DIRECTIVE TO THE MAP
-            CHECK IF DIRECTIVE HAVE ALREADY BEEN ADDED
-            IF SO THROW AN ERROR
-        */
-
-         if (_serv_conf.find(vec[0]) != _serv_conf.end())
-            throw ExceptionThrower("Redeclaration of the same directive");
-        //std::cout << vec[0] << " " << vec[1] << std::endl;
-        _serv_conf[vec[0]] = vec[1];
-    }
+        setCommonDirectives(vec, _serv_conf);
 }
 
 Server Parser::fillServer(std::ifstream& file, bool bracket)
 {
     std::string line;
-    Server  server;
     std::map<std::string, std::string> _serv_conf;
+    Server  server;
     
     if (!bracket)
     {
         /*CHECKS IF FIRST LINE MEET PARSING REQUIREMENTS*/
-        checkOpeningLine(file);
+        checkOpeningLine(file, line);
         if (line.size() > 1)
             fillMap(line, server, _serv_conf);
     }
@@ -258,20 +417,20 @@ Server Parser::fillServer(std::ifstream& file, bool bracket)
                 fillMap(line, server, _serv_conf);
                 break ;
             }
-            /*if (line.find(LOCATION, 0, 8) != std::string::npos)
+            if (line.find(LOCATION, 0, 8) != std::string::npos)
             {
+                size_t pos = line.find('{');
+                
                 if (StringUtils::count(line, '{') > 1)
                     throw ExceptionThrower("Too Many Opening Bracket");
-
-                pos = line.find('{');
-
+                
                 if ((pos != std::string::npos) && *(line.rbegin()) != '{')
                     throw ExceptionThrower("Opening Bracket Must Be At The End Of The Line");
-
-                server.pushNewLocation(fillUpLocation(file, pos != std::string::npos));
+                
+                server.pushNewLocation(fillUpLocation(&server, file, line, pos != std::string::npos));
             }
-            else*/
-            fillMap(line, server, _serv_conf);
+            else
+                fillMap(line, server, _serv_conf);
         }
         
         if (file.eof()) break ;
@@ -308,10 +467,9 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file)
                     throw ExceptionThrower("Opening Bracket Must Be At The End Of The Line");
 
                 server.push_back(fillServer(file, (line.find('{') != std::string::npos)));
-                break ;
             }
-            
-            throw ExceptionThrower("Wrong Format of config file: " + line);
+            else
+                throw ExceptionThrower("Wrong Format of config file: " + line);
         }
         if (file.eof()) break ;
     }

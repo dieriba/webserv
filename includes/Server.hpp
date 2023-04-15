@@ -4,7 +4,7 @@
 #include "BitsManipulation.hpp"
 #include "TcpServer.hpp"
 
-typedef std::vector<std::string>::iterator it_vec;
+typedef std::map<std::string, std::string>::iterator it_map;
 
 class Location;
 class Server: public BitsManipulation, public TcpServer
@@ -16,21 +16,28 @@ class Server: public BitsManipulation, public TcpServer
         ~Server();
 
         /*GETTERS*/
-        const it_vec getCgiPath(const std::string& key);
+        const int& getServSocket(void) const;
+        const std::string& getIp(void) const;
         const unsigned int& getPort(void) const;
+        bool getCgiPath(const std::string& key, std::string& path);
         std::vector<Location> getLocations(void) const;
+        std::map<std::string, std::string> getCgiMap() const {return _cgi;};
         std::vector<std::string> getServerNames(void) const;
 
         /*Setters*/
         void    setPort(const unsigned int& port);
         void    pushNewServerName(const std::string& server_name);
         void    pushNewLocation(const Location& server_name);
-        void    pushNewCGI(const std::string& value);
+        void    pushNewCGI(const std::string& key, const std::string& value);
+        void    setIp(const std::string& ip);
+        void    setServSocket(const int& socket);
 
     private:
+        int _serv_socket;
+        std::string _ip;
         unsigned int    _port;
         std::vector<std::string> _server_names;
-        std::vector<std::string> _cgi;
+        std::map<std::string, std::string> _cgi;
         std::vector<Location> _locations;
 };
 #endif
