@@ -16,16 +16,17 @@ class Parser: public StringUtils
     private:
 
         /*MEMBER FUNC*/
-        Server fillServer(std::ifstream& file, bool bracket);
+
+        bool    validIpFormat(const std::string& ip);
+        Server fillServer(std::ifstream& file, std::string& line, bool bracket);
         Location fillUpLocation(Server *server, std::ifstream& file, std::string& line, bool bracket);
+        Parser& operator=(const Parser& rhs);
         void    SemicolonCheck(std::string& line, size_t i, size_t len);
         void    fillMap(const std::string& line, Server& server, std::map<std::string, std::string>& _serv_conf);
         void    fillMap(const std::string& line, Location& server, std::map<std::string, std::string>& _serv_conf);
         void    checkOpeningLine(std::ifstream& file, std::string& line);
         void    feedingUpLocation(std::map<std::string, std::string>& _map, Location& location);
         void    feedingUpServer(std::map<std::string, std::string>& _serv_conf, Server& server);
-        bool    validIpFormat(const std::string& ip);
         void    setCommonDirectives(std::vector<std::string>& vec, std::map<std::string, std::string>& _map);
-        Parser& operator=(const Parser& rhs);
 };
 #endif

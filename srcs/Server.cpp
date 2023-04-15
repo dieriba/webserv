@@ -25,6 +25,7 @@ Server& Server::operator=(const Server& rhs)
     _server_names = rhs._server_names;
     _locations = rhs._locations;
     _cgi = rhs._cgi;
+    _redirect = rhs._redirect;
     return *this;
 }
 Server::~Server(){};

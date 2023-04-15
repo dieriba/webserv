@@ -34,10 +34,11 @@ class Server: public BitsManipulation, public TcpServer
 
     private:
         int _serv_socket;
-        std::string _ip;
         unsigned int    _port;
+        std::string _ip;
         std::vector<std::string> _server_names;
         std::map<std::string, std::string> _cgi;
         std::vector<Location> _locations;
+
 };
 #endif

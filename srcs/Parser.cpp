@@ -380,9 +380,8 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
         setCommonDirectives(vec, _serv_conf);
 }
 
-Server Parser::fillServer(std::ifstream& file, bool bracket)
+Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
 {
-    std::string line;
     std::map<std::string, std::string> _serv_conf;
     Server  server;
     
@@ -428,6 +427,8 @@ Server Parser::fillServer(std::ifstream& file, bool bracket)
                     throw ExceptionThrower("Opening Bracket Must Be At The End Of The Line");
                 
                 server.pushNewLocation(fillUpLocation(&server, file, line, pos != std::string::npos));
+                if (line.find("}") == std::string::npos)
+                    throw ExceptionThrower("Missing End Bracket");
             }
             else
                 fillMap(line, server, _serv_conf);
@@ -466,7 +467,9 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file)
                 if ((pos != std::string::npos) && *line.rbegin() != '{')
                     throw ExceptionThrower("Opening Bracket Must Be At The End Of The Line");
 
-                server.push_back(fillServer(file, (line.find('{') != std::string::npos)));
+                server.push_back(fillServer(file, line, (line.find('{') != std::string::npos)));
+                if (line.find("}") == std::string::npos)
+                    throw ExceptionThrower("Missing End Bracket");
             }
             else
                 throw ExceptionThrower("Wrong Format of config file: " + line);

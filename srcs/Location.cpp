@@ -20,6 +20,7 @@ Location& Location::operator=(const Location& rhs)
     _index = rhs._index;
     _sub_locations = rhs._sub_locations;
     _server = rhs._server;
+    _redirect = rhs._redirect;
     return *this;
 }
 Location::~Location(){};

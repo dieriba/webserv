@@ -36,13 +36,17 @@ void    print_server_config(const Server server)
         << "METHOD POST: " << (server.checkBits(POST) > 0 ? "Enabled" : "Disabled") << std::endl
         << "METHOD DELETE: " << (server.checkBits(DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
         << "IP: " << (server.getIp().size() > 0 ? server.getIp() : "NO IP SET") << std::endl
+        << "Redirect: " << (server.getRedirect().size() > 0 ? server.getRedirect(): "No redirection") << std::endl
         << "PORT: " << server.getPort() << std::endl
         << "Client Max Body Size: " << server.getBodySize() << std::endl
         << "Root Directory: " << ((server.getRootDir().size()) > 0 ? server.getRootDir() : "No root directory") << std::endl
         << "Index HTML: " << ((server.getIndex().size()) > 0 ? server.getIndex() : "No index html") << std::endl;
-        std::cout << "Server_name: ";
-        for(; serv_it_ != serv_it_end; serv_it_++)
-            std::cout << *serv_it_ << " ";
+        if (serv_it_ != serv_it_end)
+        {
+            std::cout << "Server_name: ";
+            for(; serv_it_ != serv_it_end; serv_it_++)
+                std::cout << *serv_it_ << " ";
+        }
         std::cout << std::endl;
         for (; m_it != m_end; m_it++)
             std::cout << "cgi: " << m_it -> first << " " << m_it -> second << std::endl;
