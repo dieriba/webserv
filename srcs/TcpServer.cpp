@@ -3,10 +3,7 @@
 # include "../includes/ExceptionThrower.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-TcpServer::TcpServer():_body_size(0),_index(""),_root_dir(""),_redirect(""),_epoll_ws(-1)
-{
-    _events.reserve(SOMAXCONN);
-};
+TcpServer::TcpServer():_body_size(0),_index(""),_root_dir(""),_redirect(""),_epoll_ws(-1){};
 
 TcpServer::TcpServer(const TcpServer& rhs)
     :Parser(rhs),_body_size(rhs._body_size),_index(rhs._index),_root_dir(rhs._root_dir),_redirect(rhs._redirect){};
@@ -63,6 +60,16 @@ void    TcpServer::setRedirect(const std::string& redirect)
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
+bool TcpServer::isServerFd(const int& fd)
+{
+    for (size_t i = 0; i < _servers.size(); i++)
+    {
+        if (_servers[i].getServSocket() == fd)
+            return true ;
+    }
+    return false;
+}
+
 void TcpServer::settingUpServer(const char *filename)
 {
     std::ifstream file;   
@@ -88,7 +95,7 @@ void TcpServer::runningUpServer(void)
 
         if (message.size()) throw ExceptionThrower(message);
         
-        event.data.ptr = &_servers[i];
+        event.data.fd = _servers[i].getServSocket();
 
         if (epoll_ctl(_epoll_ws, EPOLL_CTL_ADD, _servers[i].getPort(), &event) == -1)
             throw ExceptionThrower("Failled To Add Socket To EPOLL WATCHERS FD");
@@ -98,11 +105,27 @@ void TcpServer::runningUpServer(void)
 
 void TcpServer::makeServerServe(void)
 {
-    int _wait;
+    int to_proceed;
     
     while (1)
     {
-        _wait = epoll_wait(_epoll_ws, )
+        to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, -1);
+
+        for (int i = 0; i < to_proceed; i++)
+        {
+            if (isServerFd(_events[i].data.fd))
+            {
+                while (1)
+                {
+                    
+                }
+            }
+            else
+            {
+
+            }
+        }
+        
     }
 }
 

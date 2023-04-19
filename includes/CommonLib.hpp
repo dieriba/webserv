@@ -11,11 +11,13 @@
 # include <netinet/in.h>
 # include <cstring>
 # include <unistd.h>
+# include <algorithm>
 
 # define BASE_VEC_ARR 10
 # define WHITESPACES " \n\t\r\f\v"
 # define BASE_10 "0123456789"
 # define DEFAULT_BODY_SIZE 70000
+# define MAXEVENTS 100
 
 /*
 
