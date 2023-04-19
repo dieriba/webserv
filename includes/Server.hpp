@@ -7,6 +7,7 @@
 typedef std::map<std::string, std::string>::iterator it_map;
 
 class Location;
+
 class Server: public BitsManipulation, public TcpServer
 {
     public:
@@ -32,8 +33,11 @@ class Server: public BitsManipulation, public TcpServer
         void    setIp(const std::string& ip);
         void    setServSocket(const int& socket);
 
+        /*MEMBER FUNCTION*/
+        std::string launchServer(void);
     private:
         int _serv_socket;
+        struct sockaddr_in _serv_address;
         unsigned int    _port;
         std::string _ip;
         std::vector<std::string> _server_names;

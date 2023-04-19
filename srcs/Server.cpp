@@ -1,5 +1,6 @@
 # include "../includes/Server.hpp"
 # include "../includes/Location.hpp"
+
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Server::Server():BitsManipulation(),TcpServer(){};
 
@@ -78,6 +79,36 @@ void    Server::setServSocket(const int& socket)
 }
 
 /*----------------------------------------SETTER----------------------------------------*/
+
+/*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+std::string Server::launchServer(void)
+{
+    int option = 1;
+
+    if ((_serv_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        return ("Cannot Create Socket");   
+    
+    memset((char *)&_serv_address, 0, sizeof(_serv_address));
+    
+    _serv_address.sin_family = AF_INET;
+    _serv_address.sin_addr.s_addr = htonl(INADDR_ANY);
+    _serv_address.sin_port = htons(_port);
+
+    if (setsockopt(_serv_socket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &option, sizeof(option)) < 0)
+        return "Failed to set socket options";
+
+    if (bind(_serv_socket,(struct sockaddr *)&_serv_address,sizeof(_serv_address)) < 0)
+        return "Failed to bind socket";
+
+    if (TcpServer::makeNonBlockingFd(_serv_socket) < 0)
+        return "Failled To Set Server Socket As Non Blocking";
+
+    if (listen(_serv_socket, SOMAXCONN))
+        return "Listen System Call Failled";
+
+    return "";
+}
+/*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
 /*----------------------------------------VIRTUAL FUNCTION----------------------------------------*/
 

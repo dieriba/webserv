@@ -1,18 +1,56 @@
 #ifndef __HEADER__HPP_
 #define __HEADER__HPP_
 
-#include <string>
-#include <iostream>
-#include <list>
-#include <vector>
-#include <map>
-#include <fstream>
-
+# include <string>
+# include <iostream>
+# include <list>
+# include <vector>
+# include <map>
+# include <fstream>
+# include <fcntl.h>
+# include <netinet/in.h>
+# include <cstring>
+# include <unistd.h>
 
 # define BASE_VEC_ARR 10
 # define WHITESPACES " \n\t\r\f\v"
 # define BASE_10 "0123456789"
+# define DEFAULT_BODY_SIZE 70000
 
+/*
+
+
+*/
+
+# define HTM ".html"
+# define HTML ".html"
+# define CSS ".css"
+# define CSV ".csv"
+# define JPEG ".jpeg"
+# define JPG ".jpg"
+# define JS ".js"
+# define JSON ".json"
+# define PNG ".png"
+# define PDF ".pdf"
+# define PHP ".php"
+# define SH ".sh"
+# define MPEG ".mpeg"
+# define MP3 ".mp3"
+
+# define MIME_HTM "text/html"
+# define MIME_HTML "text/html"
+# define MIME_CSS "text/css"
+# define MIME_CSV "text/csv"
+# define MIME_JPEG "image/jpeg"
+# define MIME_JPG MIME_JPEG
+# define MIME_JS "text/javascript"
+# define MIME_JSON "application/json"
+# define MIME_PNG "image/png"
+# define MIME_PDF "application/pdf"
+# define MIME_PHP "application/x-httpd-php"
+# define MIME_SH "application/x-sh"
+# define MIME_MPEG "video/mpeg"
+# define MIME_MP3 "audio/mpeg"
 /*
 
 
@@ -63,8 +101,8 @@
 /*
 
 */
-#define bitset(byte,nbit)   (byte |= (1 << nbit))
-#define bitclear(byte,nbit) (byte &= ~(1 << nbit))
-#define bitcheck(byte,nbit) (byte & (1 << nbit))
+# define bitset(byte,nbit)   (byte |= (1 << nbit))
+# define bitclear(byte,nbit) (byte &= ~(1 << nbit))
+# define bitcheck(byte,nbit) (byte & (1 << nbit))
 
 #endif

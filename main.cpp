@@ -63,22 +63,25 @@ int main (int argc, char **argv)
     try
     {
         TcpServer tcp_servers;
+        TcpServer::initMimeTypes();
         TcpServer::initHttpResponses();
         TcpServer::initHttpMethods();
         TcpServer::initKnownDirectives();
         tcp_servers.settingUpServer(argc > 1 ? argv[1] : NULL);
-        std::vector<Server> tmp(tcp_servers.getServers());
+        tcp_servers.runningUpServer();
+        tcp_servers.makeServerServe();
+        /*std::vector<Server> tmp(tcp_servers.getServers());
         std::vector<Server>::iterator it = tmp.begin();
         std::vector<Server>::iterator end = tmp.end();
         for ( ; it != end ; it++)
         {
             std::cout << "-----------SERVER-------------\n\n";
             print_server_config(*it);
-        }
+        }*/
     }
     catch(const std::exception& e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
+        return -1;
     }
-    
 }

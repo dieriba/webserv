@@ -86,6 +86,10 @@ void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Locat
     
     if (it != end) location.setIndex(it -> second);
 
+    it = _map.find(ALLOWED_METHOD);
+
+    if (it == end) location.setOptions(ALL_METHODS, SET);
+
     it = _map.find(CLIENT_BODY);
 
     if (it != end)
@@ -137,6 +141,11 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
     if (ss.fail()) throw ExceptionThrower("PORT VALUE IS TOO HIGH");
 
     server.setPort(val);
+
+    it = _serv_conf.find(ALLOWED_METHOD);
+
+    if (it == end) server.setOptions(ALL_METHODS, SET);
+    
     it = _serv_conf.find(ROOT);
 
     if (it != end) server.setRootDir(it -> second);
@@ -304,6 +313,7 @@ void    Parser::fillMap(const std::string& line, Location& location, std::map<st
                 throw ExceptionThrower("Unknown HTTP Method");
             location.setOptions(method, SET);
         }
+        _serv_conf[vec[0]] = "HTTP METHODS";
     }
     else
         setCommonDirectives(vec, _serv_conf);
@@ -354,7 +364,7 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
         if (vec[1].find(';') != std::string::npos || (StringUtils::count(vec[2], ';') > 1))
             throw ExceptionThrower("Bad Syntax");
         
-        if (*vec.rbegin() -> rbegin() != ';')
+        if (*(vec.rbegin() -> rbegin()) != ';')
             throw ExceptionThrower("Missing Semicolon At the End");
         vec[2].erase(vec[2].size() - 1);
         server.pushNewCGI(vec[1], vec[2]);
@@ -375,6 +385,7 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
                 throw ExceptionThrower("Unknown HTTP Method");
             server.setOptions(method, SET);
         }
+        _serv_conf[vec[0]] = "HTTP METHODS";
     }
     else
         setCommonDirectives(vec, _serv_conf);
