@@ -17,7 +17,7 @@
 # define WHITESPACES " \n\t\r\f\v"
 # define BASE_10 "0123456789"
 # define DEFAULT_BODY_SIZE 70000
-# define MAXEVENTS 100
+# define MAXEVENTS 64
 
 /*
 

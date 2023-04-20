@@ -36,7 +36,6 @@ class TcpServer: public Parser
         void settingUpServer(const char *filename);
         void runningUpServer(void);
         void makeServerServe(void);
-        bool isServerFd(const int& fd);
 
         /*STATIC MEMBER FUNCTION*/
         static void initMimeTypes(void);
@@ -58,8 +57,8 @@ class TcpServer: public Parser
 
     private:
         int _epoll_ws;
-        struct epoll_event *_events;
         std::vector<Server> _servers;
+        std::map<unsigned int, bool> _servers_search;
         static std::map<short int, std::string> _httpResponses;
         static std::map<std::string, bool> _knownDirectives;
         static std::map<std::string, bool> _knownLocationsDirectives;
