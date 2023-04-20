@@ -33,6 +33,9 @@ class TcpServer: public Parser
         void setRedirect(const std::string& redirect);
 
         /*MEMBER FUNCTION*/
+        void acceptNewConnections(const int& fd);
+        void readFromSocket(const int& fd);
+        void writeToSocketClient(const int& fd);
         void settingUpServer(const char *filename);
         void runningUpServer(void);
         void makeServerServe(void);

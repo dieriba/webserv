@@ -95,11 +95,43 @@ void TcpServer::runningUpServer(void)
 
 }
 
+void TcpServer::acceptNewConnections(const int& fd)
+{
+    int client_fd;
+    struct epoll_event event;
+
+    while (1)
+    {
+        client_fd = accept(fd, NULL, NULL);
+
+        if (client_fd == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
+            break ;
+                    
+        event.data.fd = client_fd;
+        event.events = EPOLLIN;
+
+        if (makeNonBlockingFd(client_fd) || epoll_ctl(_epoll_ws, EPOLL_CTL_ADD, client_fd, &event))
+        {
+            close(client_fd);
+            break ;
+        }
+                    
+    }
+}
+
+void TcpServer::readFromSocket(const int& fd)
+{
+
+}
+
+void TcpServer::writeToSocketClient(const int& fd)
+{
+
+}
+
 void TcpServer::makeServerServe(void)
 {
     int to_proceed;
-    int client_fd;
-    struct epoll_event event;
     struct epoll_event * _events;
 
     while (1)
@@ -109,33 +141,11 @@ void TcpServer::makeServerServe(void)
         for (int i = 0; i < to_proceed; i++)
         {
             if (_servers_search.find(_events[i].data.fd) != _servers_search.end())
-            {
-                while (1)
-                {
-                    client_fd = accept(_events[i].data.fd, NULL, NULL);
-
-                    if (client_fd == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
-                        break ;
-                    
-                    event.data.fd = client_fd;
-                    event.events = EPOLLIN;
-
-                    if (makeNonBlockingFd(client_fd) || epoll_ctl(this -> _epoll_ws, EPOLL_CTL_ADD, client_fd, &event))
-                    {
-                        close(client_fd);
-                        break ;
-                    }
-                    
-                }
-            }
+                acceptNewConnections(_events[i].data.fd);
             else if (_events[i].events & EPOLLIN)
-            {
-                
-            }
+                readFromSocket(_events[i].data.fd);
             else
-            {
-                
-            }
+                writeToSocketClient(_events[i].data.fd);
         }
         
     }
