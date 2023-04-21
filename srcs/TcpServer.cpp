@@ -1,6 +1,10 @@
 # include "../includes/TcpServer.hpp"
 # include "../includes/Server.hpp"
 # include "../includes/ExceptionThrower.hpp"
+# include "../includes/IO/IO.hpp"
+# include "../includes/IO/ServerStream.hpp"
+# include "../includes/IO/ClientSocketStream.hpp"
+# include "../includes/IO/CgiStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 TcpServer::TcpServer():_body_size(0),_index(""),_root_dir(""),_redirect(""),_epoll_ws(-1){};
@@ -85,7 +89,7 @@ void TcpServer::runningUpServer(void)
 
         if (message.size()) throw ExceptionThrower(message);
         
-        event.data.fd = _servers[i].getServSocket();
+        event.data.ptr = new ServerStream(_servers[i].getServSocket());
 
         _servers_search[event.data.fd];
 
@@ -119,20 +123,11 @@ void TcpServer::acceptNewConnections(const int& fd)
     }
 }
 
-void TcpServer::readFromSocket(const int& fd)
-{
-
-}
-
-void TcpServer::writeToSocketClient(const int& fd)
-{
-
-}
-
 void TcpServer::makeServerServe(void)
 {
     int to_proceed;
-    struct epoll_event * _events;
+    struct epoll_event * _events = NULL;
+    IO  *events;
 
     while (1)
     {
@@ -140,12 +135,8 @@ void TcpServer::makeServerServe(void)
 
         for (int i = 0; i < to_proceed; i++)
         {
-            if (_servers_search.find(_events[i].data.fd) != _servers_search.end())
-                acceptNewConnections(_events[i].data.fd);
-            else if (_events[i].events & EPOLLIN)
-                readFromSocket(_events[i].data.fd);
-            else
-                writeToSocketClient(_events[i].data.fd);
+            events = (IO *)_events[i].data.ptr;
+            events -> handleIoOperation(_events[i]);
         }
         
     }

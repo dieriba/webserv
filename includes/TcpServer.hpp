@@ -3,7 +3,6 @@
 
 # include "CommonLib.hpp"
 # include "Parser.hpp"
-# include <sys/epoll.h>
 
 
 class Server;
@@ -34,8 +33,6 @@ class TcpServer: public Parser
 
         /*MEMBER FUNCTION*/
         void acceptNewConnections(const int& fd);
-        void readFromSocket(const int& fd);
-        void writeToSocketClient(const int& fd);
         void settingUpServer(const char *filename);
         void runningUpServer(void);
         void makeServerServe(void);

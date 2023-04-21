@@ -1,0 +1,30 @@
+# include "../../includes/IO/CgiStream.hpp"
+
+/*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
+CgiStream::CgiStream(){};
+CgiStream::CgiStream(const int& fd):IO(fd)
+{
+    _type = IO::CGI_PIPE;
+};
+CgiStream::CgiStream(const CgiStream& rhs):IO(rhs._fd){};
+CgiStream& CgiStream::operator=(const CgiStream& rhs)
+{
+    if (this == &rhs) return (*this);
+    _fd = rhs._fd;
+    return (*this);
+};
+CgiStream::~CgiStream(){};
+/*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
+
+/*----------------------------------------GETTER----------------------------------------*/
+/*----------------------------------------GETTER----------------------------------------*/
+
+/*----------------------------------------SETTER----------------------------------------*/
+/*----------------------------------------SETTER----------------------------------------*/
+
+/*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+void CgiStream::handleIoOperation(struct epoll_event event)
+{
+
+}
+/*----------------------------------------MEMBER FUNCTION----------------------------------------*/

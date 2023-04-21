@@ -8,11 +8,18 @@ SRCS_		=	./srcs/TcpServer.cpp \
 				./srcs/Parser.cpp \
 				./srcs/BitsManipulation.cpp \
 
-OBJS	=	$(SRCS_MAIN:.cpp=.o)\
-			$(SRCS_:.cpp=.o)
+SRCS_IO		=	./srcs/IO/IO.cpp \
+				./srcs/IO/ServerStream.cpp \
+				./srcs/IO/ClientSocketStream.cpp \
+				./srcs/IO/CgiStream.cpp \
 
-DEPS 	=	$(SRCS_MAIN:.cpp=.d)\
-			$(SRCS_:.cpp=.d)
+OBJS	=	$(SRCS_MAIN:.cpp=.o) \
+			$(SRCS_:.cpp=.o) \
+			$(SRCS_IO:.cpp=.o)
+
+DEPS 	=	$(SRCS_MAIN:.cpp=.d) \
+			$(SRCS_:.cpp=.d) \
+			$(SRCS_IO:.cpp=.d)
 
 CC		=	c++ -g3
 
