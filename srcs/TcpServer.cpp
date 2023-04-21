@@ -99,30 +99,6 @@ void TcpServer::runningUpServer(void)
 
 }
 
-void TcpServer::acceptNewConnections(const int& fd)
-{
-    int client_fd;
-    struct epoll_event event;
-
-    while (1)
-    {
-        client_fd = accept(fd, NULL, NULL);
-
-        if (client_fd == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
-            break ;
-                    
-        event.data.fd = client_fd;
-        event.events = EPOLLIN;
-
-        if (makeNonBlockingFd(client_fd) || epoll_ctl(_epoll_ws, EPOLL_CTL_ADD, client_fd, &event))
-        {
-            close(client_fd);
-            break ;
-        }
-                    
-    }
-}
-
 void TcpServer::makeServerServe(void)
 {
     int to_proceed;
@@ -136,7 +112,7 @@ void TcpServer::makeServerServe(void)
         for (int i = 0; i < to_proceed; i++)
         {
             events = (IO *)_events[i].data.ptr;
-            events -> handleIoOperation(_events[i]);
+            events -> handleIoOperation(_epoll_ws, _events[i]);
         }
         
     }

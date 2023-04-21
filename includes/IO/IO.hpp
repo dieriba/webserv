@@ -12,7 +12,7 @@ class IO
         IO& operator=(const IO& rhs);
         virtual ~IO();
 
-        virtual void handleIoOperation(struct epoll_event event) = 0;
+        virtual void handleIoOperation(int _ws, struct epoll_event event) = 0;
     
     /*GETTERS*/
     const int& getFd(void) const;

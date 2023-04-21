@@ -23,8 +23,9 @@ ClientSocketStream::~ClientSocketStream(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void ClientSocketStream::handleIoOperation(struct epoll_event event)
+void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event event)
 {
-
+    (void)_ws;
+    (void)event;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
