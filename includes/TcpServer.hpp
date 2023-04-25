@@ -49,6 +49,8 @@ class TcpServer: public Parser
         static const vec_it getHttpResponse(const short int& code);
         static int getHttpMethod(const std::string& method);
         static int makeNonBlockingFd(const int& fd);
+        static void setClientBuffers(int _fd, const std::string& buffer);
+        static const std::string& getClientBuffers(int _fd);
     protected:
         unsigned int _body_size;
         std::string _index;
@@ -59,6 +61,7 @@ class TcpServer: public Parser
         int _epoll_ws;
         std::vector<Server> _servers;
         std::map<unsigned int, bool> _servers_search;
+        static std::map<int , std::string> _client;
         static std::map<short int, std::string> _httpResponses;
         static std::map<std::string, bool> _knownDirectives;
         static std::map<std::string, bool> _knownLocationsDirectives;

@@ -266,9 +266,22 @@ int TcpServer::makeNonBlockingFd(const int& fd)
     return 0;
 }
 
+void TcpServer::setClientBuffers(int _fd, const std::string& buffer)
+{
+    _client[_fd].append(buffer);
+}
+
+const std::string& TcpServer::getClientBuffers(int _fd)
+{
+    std::map<int, std::string>::iterator it = _client.find(_fd);
+    if (it != _client.end()) return "";
+    return it -> second;
+}
+
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 std::map<short int, std::string> TcpServer::_httpResponses;
 std::map<std::string, bool> TcpServer::_knownDirectives;
 std::map<std::string, bool> TcpServer::_knownLocationsDirectives;
 std::map<std::string, short int> TcpServer::_httpMethods;
 std::map<std::string, std::string> TcpServer::_mimeTypes;
+std::map<int, std::string> TcpServer::_client;
