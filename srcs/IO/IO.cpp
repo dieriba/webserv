@@ -27,4 +27,13 @@ void IO::setFD(const int& fd)
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+bool IO::validSocketClient(int _fd, struct epoll_event event)
+{
+    if ((event.events & EPOLLERR) || (event.events & EPOLLHUP) || (!(event.events & EPOLLIN)))
+	{
+	    close (_fd);
+        return false;
+	}
+    return true ;
+}
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

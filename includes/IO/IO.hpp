@@ -22,6 +22,9 @@ class IO
     /*SETTERS*/
     void setFD(const int& fd);
 
+    /*MEMBER FUNCTION*/
+    bool validSocketClient(int _fd, struct epoll_event event);
+
     enum type
     {
         VIRTUAL_SERV,

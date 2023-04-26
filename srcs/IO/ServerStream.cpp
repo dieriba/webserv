@@ -29,12 +29,15 @@ void ServerStream::handleIoOperation(int _ws, struct epoll_event event)
 {
     int client_fd;
     struct epoll_event _ev;
+    IO *io = (IO *)event.data.ptr;
 
+    if (!validSocketClient(io -> getFd(), event))
+        return ;
+    
     if (event.events & EPOLLIN)
     {
         while (1)
         {
-            std::cout << "Entered SERVER SOCKET STREAM" << std::endl;
             client_fd = accept(_fd, NULL, NULL);
 
             if (client_fd == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))

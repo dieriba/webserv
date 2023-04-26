@@ -27,12 +27,13 @@ ClientSocketStream::~ClientSocketStream(){};
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event event)
 {
-    struct epoll_event ev;
-
+    IO *_ev = (IO *)event.data.ptr;
+    
+    if (!validSocketClient(_ev -> getFd(), event)) return ;
+    
     if (event.events & EPOLLIN)
     {
         std::cout << "Entered CLIENT SOCKET STREAM" << std::endl;
-        IO *_ev = (IO *)event.data.ptr;
         char buffer[REQUEST_SIZE] = {0};
         int size = recv(_ev -> getFd(), buffer, REQUEST_SIZE, 0);
         std::string s_buffer(buffer);
@@ -41,14 +42,12 @@ void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event event)
         {
             std::cout << "NEW INCOMING REQUEST" << std::endl;
             std::cout << TcpServer::getClientBuffers(_ev -> getFd());
+            event.events = EPOLLOUT;
+            event.data.ptr = event.data.ptr;
+            if (epoll_ctl(_ws, EPOLL_CTL_MOD, _ev -> getFd(), &event) == -1)
+                close(_ev -> getFd());
         }
-        (void)ev;
-        (void)_ws;
         (void)size;
-        /*ev.events = EPOLLOUT;
-        ev.data.ptr = event.data.ptr;
-        if (epoll_ctl(_ws, EPOLL_CTL_MOD, _ev -> getFd(), &ev) == -1)
-            close(_ev -> getFd());*/
     }
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
