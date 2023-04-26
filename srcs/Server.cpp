@@ -87,7 +87,6 @@ std::string Server::launchServer(void)
 
     if ((_serv_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
         return ("Cannot Create Socket");   
-    
     memset((char *)&_serv_address, 0, sizeof(_serv_address));
     
     _serv_address.sin_family = AF_INET;

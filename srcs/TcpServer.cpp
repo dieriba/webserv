@@ -80,7 +80,7 @@ void TcpServer::runningUpServer(void)
 
     if ((_epoll_ws = epoll_create1(0)) == -1)
         throw ExceptionThrower("Failled to create an epoll instance");
-
+    
     event.events = EPOLLIN;
     
     for (size_t i = 0; i < _servers.size(); i++)
@@ -89,12 +89,10 @@ void TcpServer::runningUpServer(void)
 
         if (message.size()) throw ExceptionThrower(message);
         
-        event.data.ptr = new ServerStream(_servers[i].getServSocket());
-
-        _servers_search[event.data.fd];
-
-        if (epoll_ctl(_epoll_ws, EPOLL_CTL_ADD, _servers[i].getPort(), &event) == -1)
+        event.data.ptr = new ServerStream(_servers[i].getServSocket(), &_servers[i]);
+        if (epoll_ctl(_epoll_ws, EPOLL_CTL_ADD, _servers[i].getServSocket(), &event) == -1)
             throw ExceptionThrower("Failled To Add Socket To EPOLL WATCHERS FD");
+        std::cout << "Server: " << i + 1 << " is listening on PORT: " << _servers[i].getPort() << std::endl; 
     }
 
 }
@@ -114,7 +112,6 @@ void TcpServer::makeServerServe(void)
             events = (IO *)_events[i].data.ptr;
             events -> handleIoOperation(_epoll_ws, _events[i]);
         }
-        
     }
 }
 
@@ -271,7 +268,7 @@ void TcpServer::setClientBuffers(int _fd, const std::string& buffer)
     _client[_fd].append(buffer);
 }
 
-const std::string& TcpServer::getClientBuffers(int _fd)
+std::string TcpServer::getClientBuffers(int _fd)
 {
     std::map<int, std::string>::iterator it = _client.find(_fd);
     if (it != _client.end()) return "";

@@ -2,11 +2,11 @@
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 CgiStream::CgiStream(){};
-CgiStream::CgiStream(const int& fd):IO(fd)
+CgiStream::CgiStream(const int& fd, Server *server):IO(fd, server)
 {
     _type = IO::CGI_PIPE;
 };
-CgiStream::CgiStream(const CgiStream& rhs):IO(rhs._fd){};
+CgiStream::CgiStream(const CgiStream& rhs):IO(rhs){};
 CgiStream& CgiStream::operator=(const CgiStream& rhs)
 {
     if (this == &rhs) return (*this);
