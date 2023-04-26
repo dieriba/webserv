@@ -28,25 +28,24 @@ ClientSocketStream::~ClientSocketStream(){};
 void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event event)
 {
     IO *_ev = (IO *)event.data.ptr;
-    
     if (!validSocketClient(_ev -> getFd(), event)) return ;
     
     if (event.events & EPOLLIN)
     {
-        std::cout << "Entered CLIENT SOCKET STREAM" << std::endl;
         char buffer[REQUEST_SIZE] = {0};
         int size = recv(_ev -> getFd(), buffer, REQUEST_SIZE, 0);
-        s_buffer.append(buffer);
+        _request.appendToBuffer(buffer);
+        std::string s_buffer(buffer);
         if (s_buffer.find(CRLF) != std::string::npos)
         {
-            std::cout << "NEW INCOMING REQUEST: " << _ev -> getFd() << std::endl;
-            std::cout << s_buffer;
-            event.events = EPOLLOUT;
+            std::cout << _request.getBuffer();
+            /*event.events = EPOLLOUT;
             event.data.ptr = event.data.ptr;
             if (epoll_ctl(_ws, EPOLL_CTL_MOD, _ev -> getFd(), &event) == -1)
-                close(_ev -> getFd());
+                close(_ev -> getFd());*/
         }
         (void)size;
+        (void)_ws;
     }
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

@@ -3,6 +3,8 @@
 
 # include "../CommonLib.hpp"
 # include "../Server.hpp"
+# include "../http/HttpRequest.hpp"
+# include "../http/HttpResponse.hpp"
 
 class IO
 {
@@ -35,7 +37,8 @@ class IO
     protected:
         int _fd;
         Server *_server;
-        std::string s_buffer;
+        HttpRequest _request;
+        HttpResponse _response;
         enum type _type;
         std::clock_t _begin;
         std::clock_t _end;
