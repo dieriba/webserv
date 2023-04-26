@@ -8,7 +8,7 @@ class IO
 {
     public:
         IO();
-        IO(const int& fd,Server *server);
+        IO(const int& fd, Server *server);
         IO(const IO& rhs);
         IO& operator=(const IO& rhs);
         virtual ~IO();
@@ -35,6 +35,7 @@ class IO
     protected:
         int _fd;
         Server *_server;
+        std::string s_buffer;
         enum type _type;
         std::clock_t _begin;
         std::clock_t _end;

@@ -36,12 +36,11 @@ void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event event)
         std::cout << "Entered CLIENT SOCKET STREAM" << std::endl;
         char buffer[REQUEST_SIZE] = {0};
         int size = recv(_ev -> getFd(), buffer, REQUEST_SIZE, 0);
-        std::string s_buffer(buffer);
-        TcpServer::setClientBuffers(_ev -> getFd(), s_buffer);
-        if (s_buffer.find("\r\n\r\n") != std::string::npos)
+        s_buffer.append(buffer);
+        if (s_buffer.find(CRLF) != std::string::npos)
         {
-            std::cout << "NEW INCOMING REQUEST" << std::endl;
-            std::cout << TcpServer::getClientBuffers(_ev -> getFd());
+            std::cout << "NEW INCOMING REQUEST: " << _ev -> getFd() << std::endl;
+            std::cout << s_buffer;
             event.events = EPOLLOUT;
             event.data.ptr = event.data.ptr;
             if (epoll_ctl(_ws, EPOLL_CTL_MOD, _ev -> getFd(), &event) == -1)

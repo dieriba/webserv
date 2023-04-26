@@ -34,7 +34,8 @@
 # define BASE_10 "0123456789"
 # define REQUEST_SIZE 70000
 # define MAXEVENTS 64
-
+# define CRLF "\r\n\r\n"
+# define TIMEOUT 1000
 /*
 
 
