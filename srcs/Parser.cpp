@@ -4,7 +4,7 @@
 #include "../includes/Location.hpp"
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Parser::Parser(){};
-Parser::Parser(const Parser& rhs):StringUtils(rhs){(void)rhs;};
+Parser::Parser(const Parser& rhs){(void)rhs;};
 Parser::~Parser(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
@@ -23,7 +23,7 @@ void    Parser::setCommonDirectives(std::vector<std::string>& vec, std::map<std:
         }
         else
         {
-            if (Parser::count(vec[1], ';') > 1 || vec[1].at(vec[1].size() - 1) != ';')
+            if (StringUtils::count(vec[1], ';') > 1 || vec[1].at(vec[1].size() - 1) != ';')
                 throw ExceptionThrower(MISSING_SEMICOLONS);
             vec[1].erase(vec[1].length() - 1);
         }

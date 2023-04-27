@@ -35,17 +35,18 @@ void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event event)
         char buffer[REQUEST_SIZE] = {0};
         int size = recv(_ev -> getFd(), buffer, REQUEST_SIZE, 0);
         _request.appendToBuffer(buffer);
+        if (_request.getBuffer().size() >= MAX_HEADER_SIZE)
+        {
+            switchEvents(_ws, event);
+            setErrorStatus(TOO_LARGE_HEADER);
+            return ;
+        }
         std::string s_buffer(buffer);
         if (s_buffer.find(CRLF) != std::string::npos)
         {
-            std::cout << _request.getBuffer();
-            /*event.events = EPOLLOUT;
-            event.data.ptr = event.data.ptr;
-            if (epoll_ctl(_ws, EPOLL_CTL_MOD, _ev -> getFd(), &event) == -1)
-                close(_ev -> getFd());*/
+            _request.parseRequest();
         }
         (void)size;
-        (void)_ws;
     }
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

@@ -10,8 +10,10 @@ class HttpRequest: public HttpMessage
         HttpRequest(const HttpRequest& rhs);
         HttpRequest& operator=(const HttpRequest& rhs);
         ~HttpRequest();
-    private:
-        /* data */
+
+        /*MEMBER FUNCTION*/
+        void parseRequest(void);
+        int checkValidHeader(int _ws, struct epoll_event event) const;
 };
 
 # endif

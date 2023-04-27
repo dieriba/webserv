@@ -19,13 +19,16 @@ class IO
     
     /*GETTERS*/
     const int& getFd(void) const;
+    const int& getErrStatus(void) const;
     Server* getServer(void) const;
 
     /*SETTERS*/
     void setFD(const int& fd);
+    void setErrorStatus(const int& err);
 
     /*MEMBER FUNCTION*/
     bool validSocketClient(int _fd, struct epoll_event event);
+    void switchEvents(int _ws, struct epoll_event event) const;
 
     enum type
     {
@@ -39,6 +42,7 @@ class IO
         Server *_server;
         HttpRequest _request;
         HttpResponse _response;
+        int _err;
         enum type _type;
         std::clock_t _begin;
         std::clock_t _end;

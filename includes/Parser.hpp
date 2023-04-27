@@ -4,7 +4,7 @@
 #include "StringUtils.hpp"
 class Server;
 class Location;
-class Parser: public StringUtils
+class Parser
 {    
     public:
         Parser();

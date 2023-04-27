@@ -14,6 +14,7 @@
 # include <algorithm>
 # include <ctime>
 # include <sys/epoll.h>
+# include <sstream>
 
 
 
@@ -22,7 +23,7 @@
 
 
 */
-
+# define TOO_LARGE_HEADER 413
 
 /*
 
@@ -36,6 +37,8 @@
 # define MAXEVENTS 64
 # define CRLF "\r\n\r\n"
 # define TIMEOUT 1000
+# define MAX_HEADER_SIZE 4000
+# define CONTENT_LEN "Content-Length"
 /*
 
 
