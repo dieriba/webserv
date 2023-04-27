@@ -17,6 +17,7 @@ HttpMessage::~HttpMessage(){};
 /*----------------------------------------GETTER----------------------------------------*/
 const std::string& HttpMessage::getBuffer(void) const {return s_buffer;}
 const size_t& HttpMessage::getBodySize(void) const {return _body;};
+const std::map<std::string, std::string>& HttpMessage::getHeaders(void) const {return _headers;}
 /*----------------------------------------GETTER----------------------------------------*/
 
 

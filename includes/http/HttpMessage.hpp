@@ -14,6 +14,7 @@ class HttpMessage
         /*GETTER*/
         const std::string& getBuffer(void) const;
         const size_t& getBodySize(void) const;
+        const std::map<std::string, std::string>& getHeaders() const;
 
         /*SETTER*/
         void setBodySize(const std::string& body) ;

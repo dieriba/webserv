@@ -1,5 +1,5 @@
-#ifndef __HEADER__HPP_
-#define __HEADER__HPP_
+#ifndef __COMMONLIB_HPP__
+#define __COMMONLIB_HPP__
 
 # include <string>
 # include <iostream>
