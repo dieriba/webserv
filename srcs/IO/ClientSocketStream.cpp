@@ -30,8 +30,8 @@ void ClientSocketStream::writeToSocket(int _ws, struct epoll_event& event, IO* _
 {
     (void)_ws;
     (void)event;
-    Server *server = _ev -> getServer();
-    std::cout << server -> getRootDir() << std::endl;
+    (void)_ev;
+    //Server *server = _ev -> getServer();
 }
 
 void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *_ev)
@@ -54,6 +54,7 @@ void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *
         
         if (s_buffer.find(CRLF) != std::string::npos)
         {
+            _request.appendToBuffer("\n");
             _request.parseRequest(*this);
             std::cout << _request.getBuffer();
             switchEvents(_ws, event);
