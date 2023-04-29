@@ -31,7 +31,7 @@ bool IO::validSocketClient(int _fd, struct epoll_event event)
 {
     if ((event.events & EPOLLERR) || (event.events & EPOLLHUP) || (!(event.events & EPOLLIN)))
 	{
-	    close (_fd);
+	    close(_fd);
         return false;
 	}
     return true ;

@@ -1,5 +1,7 @@
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/StringUtils.hpp"
+# include "../../includes/TcpServer.hpp"
+# include "../../includes/IO/IO.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 HttpRequest::HttpRequest():HttpMessage(){};
@@ -21,14 +23,25 @@ HttpRequest::~HttpRequest(){};
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-void HttpRequest::parseRequest()
+void HttpRequest::parseRequest(IO& object)
 {
     std::vector<std::string> headers = StringUtils::stringSpliter(s_buffer, "\n");
     std::vector<std::string> header;
-    std::map<std::string, std::string>::const_iterator it;
+    std::map<std::string, std::string>::const_iterator _it_content;
+    std::map<std::string, std::string>::const_iterator _it_transfert;
     size_t len = headers.size() - 1;
+
+    Server *server = object.getServer();
     
-    for (size_t i = 0; i < len - 1; i++)
+    header = StringUtils::stringSpliter(headers[0], " ");
+    
+    _headers["METHOD"] =  header.size() > 0 ? header[0] : NO_VALUE;
+    _headers["PATH"] =  header.size() > 1 ? header[1] : NO_VALUE;
+    _headers["VERSION"] = header.size() > 2 ? header[2] : NO_VALUE;
+
+    setMetod(TcpServer::getHttpMethod(header[0]));
+
+    for (size_t i = 1; i < len - 1; i++)
     {
         header = StringUtils::stringSpliter(headers[i], ":");
 
@@ -38,12 +51,20 @@ void HttpRequest::parseRequest()
                 for (size_t i = 2; i < header.size(); i++)
                     header[1] += ":" + header[i];
 
-            _headers[header[0]] = header.size() >= 2 ? header[1].erase(0, 1) : "NO VALUE";
+            _headers[header[0]] = header.size() >= 2 ? header[1].erase(0, 1) : NO_VALUE;
         }
     }
 
-    it = _headers.find(CONTENT_LEN);
-    setBodySize(it == _headers.end() ? "0" : it -> second);
+    _it_content = _headers.find(CONTENT_LEN);
+    _it_transfert = _headers.find(TRANSFERT_ENCODING);
+
+    if (_it_transfert != _headers.end()) server -> setOptions(T_ENC, SET);
+    
+    if (_it_content != _headers.end())
+    {
+        server -> setOptions(C_LEN, SET);
+        setBodySize(_it_content -> second);
+    }
 }
 
 int HttpRequest::checkValidHeader(int _ws, struct epoll_event event) const

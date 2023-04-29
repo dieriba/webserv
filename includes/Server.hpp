@@ -35,6 +35,7 @@ class Server: public BitsManipulation, public TcpServer
 
         /*MEMBER FUNCTION*/
         std::string launchServer(void);
+
     private:
         int _serv_socket;
         struct sockaddr_in _serv_address;
@@ -43,6 +44,5 @@ class Server: public BitsManipulation, public TcpServer
         std::vector<std::string> _server_names;
         std::map<std::string, std::string> _cgi;
         std::vector<Location> _locations;
-
 };
 #endif

@@ -12,7 +12,7 @@ class ClientSocketStream: public IO
         ClientSocketStream& operator=(const ClientSocketStream& rhs);
         ~ClientSocketStream();
 
-        void handleIoOperation(int _ws, struct epoll_event);
+        void handleIoOperation(int _ws, struct epoll_event&);
 };
 
 # endif

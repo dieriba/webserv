@@ -30,6 +30,13 @@
 
 
 */
+# define CONTENT_LEN "Content-Length"
+# define TRANSFERT_ENCODING "Transfer-Encoding"
+# define CHUNK_REQUEST "-4"
+/*
+
+*/
+# define NO_BODY "-2"
 # define BASE_VEC_ARR 10
 # define WHITESPACES " \n\t\r\f\v"
 # define BASE_10 "0123456789"
@@ -38,7 +45,7 @@
 # define CRLF "\r\n\r\n"
 # define TIMEOUT 1000
 # define MAX_HEADER_SIZE 4000
-# define CONTENT_LEN "Content-Length"
+# define NO_VALUE "NO_VALUE"
 /*
 
 
@@ -112,6 +119,8 @@
 # define GET 0
 # define POST 1
 # define DELETE 2
+# define C_LEN 3
+# define T_ENC 4
 
 /*
 

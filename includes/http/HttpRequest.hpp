@@ -3,6 +3,8 @@
 
 # include "HttpMessage.hpp"
 
+class IO;
+
 class HttpRequest: public HttpMessage
 {
     public:
@@ -12,7 +14,7 @@ class HttpRequest: public HttpMessage
         ~HttpRequest();
 
         /*MEMBER FUNCTION*/
-        void parseRequest(void);
+        void parseRequest(IO& object);
         int checkValidHeader(int _ws, struct epoll_event event) const;
 };
 

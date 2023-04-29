@@ -25,28 +25,35 @@ ClientSocketStream::~ClientSocketStream(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event event)
+void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event& event)
 {
     IO *_ev = (IO *)event.data.ptr;
-    if (!validSocketClient(_ev -> getFd(), event)) return ;
     
     if (event.events & EPOLLIN)
     {
         char buffer[REQUEST_SIZE] = {0};
         int size = recv(_ev -> getFd(), buffer, REQUEST_SIZE, 0);
+
+        if (size <= 0) return ;
+
         _request.appendToBuffer(buffer);
+        
         if (_request.getBuffer().size() >= MAX_HEADER_SIZE)
         {
             switchEvents(_ws, event);
             setErrorStatus(TOO_LARGE_HEADER);
             return ;
         }
+        
         std::string s_buffer(buffer);
+        
         if (s_buffer.find(CRLF) != std::string::npos)
         {
-            _request.parseRequest();
+            _request.parseRequest(*this);
+            std::cout << _request.getBuffer();
+            switchEvents(_ws, event);
         }
-        (void)size;
     }
+    
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

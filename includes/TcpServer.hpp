@@ -49,6 +49,7 @@ class TcpServer: public Parser
         static const vec_it getHttpResponse(const short int& code);
         static int getHttpMethod(const std::string& method);
         static int makeNonBlockingFd(const int& fd);
+        static int getMethodIndex(const std::string& method);
     protected:
         unsigned int _body_size;
         std::string _index;
