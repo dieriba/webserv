@@ -23,7 +23,7 @@ HttpRequest::~HttpRequest(){};
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-void HttpRequest::parseRequest(IO& object)
+int HttpRequest::parseRequest(IO& object)
 {
     std::vector<std::string> headers = StringUtils::stringSpliter(s_buffer, "\n");
     std::vector<std::string> header;
@@ -58,13 +58,22 @@ void HttpRequest::parseRequest(IO& object)
     _it_content = _headers.find(CONTENT_LEN);
     _it_transfert = _headers.find(TRANSFERT_ENCODING);
 
-    if (_it_transfert != _headers.end()) server -> setOptions(T_ENC, SET);
+    s_buffer.erase(0, s_buffer.find(CRLF) + 4);
+
+    if (_it_transfert != _headers.end())
+    {
+        server -> setOptions(T_ENC, SET);
+        
+    }
     
     if (_it_content != _headers.end())
     {
         server -> setOptions(C_LEN, SET);
         setBodySize(_it_content -> second);
+        if ((s_buffer.size()) == _body)
+            server -> setOptions(FINISH_BODY, SET);
     }
+    return 0;
 }
 
 int HttpRequest::checkValidHeader(int _ws, struct epoll_event event) const

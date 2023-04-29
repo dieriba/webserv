@@ -14,7 +14,7 @@ class HttpRequest: public HttpMessage
         ~HttpRequest();
 
         /*MEMBER FUNCTION*/
-        void parseRequest(IO& object);
+        int parseRequest(IO& object);
         int checkValidHeader(int _ws, struct epoll_event event) const;
 };
 

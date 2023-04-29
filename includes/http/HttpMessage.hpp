@@ -22,7 +22,7 @@ class HttpMessage
         void appendToBuffer(const std::string& toAppend);
         void setMetod(const int& _method);
     protected:
-        int  _body;
+        unsigned int  _body;
         short int _method;
         std::string s_buffer;
         std::map <std::string, std::string> _headers;
