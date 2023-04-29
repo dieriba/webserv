@@ -37,9 +37,17 @@ void ClientSocketStream::writeToSocket(int _ws, struct epoll_event& event, IO* _
 void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *_ev)
 {
         char buffer[REQUEST_SIZE] = {0};
+        Server *server = _ev -> getServer();
+
         int size = recv(_ev -> getFd(), buffer, REQUEST_SIZE, 0);
 
-        if (size <= 0) return ;
+        if (size <= 0)
+        {
+            if (epoll_ctl(_ws, EPOLL_CTL_DEL, _ev -> getFd(), NULL) == -1)
+                return ;
+            close(_ev -> getFd());
+            return ;
+        }
 
         _request.appendToBuffer(buffer);
         
@@ -49,18 +57,17 @@ void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *
             setErrorStatus(TOO_LARGE_HEADER);
             return ;
         }
-        
+
         std::string s_buffer(buffer);
         
-        if (s_buffer.find(CRLF) != std::string::npos)
+        if (s_buffer.find(CRLF) != std::string::npos || (server -> checkBits(C_LEN) || server -> checkBits(T_ENC)))
         {
-            Server *server = _ev -> getServer();
 
             s_buffer = _request.getBuffer();
             
             int req = _request.parseRequest(*this);
             
-            if ((req == C_LEN || req == T_ENC) && !server -> checkBits(FINISH_BODY))
+            if ((server -> checkBits(C_LEN) || server -> checkBits(T_ENC)) && !server -> checkBits(FINISH_BODY))
                 return ;
 
             if (server -> checkBits(FINISH_BODY))

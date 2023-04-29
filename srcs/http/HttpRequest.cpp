@@ -25,13 +25,25 @@ HttpRequest::~HttpRequest(){};
 
 int HttpRequest::parseRequest(IO& object)
 {
+    Server *server = object.getServer();
+
+    if (server -> checkBits(C_LEN))
+    {
+        if (s_buffer.size() == _body)
+            server -> setOptions(FINISH_BODY, SET);
+        return 0;
+    }
+    else if (server -> checkBits(T_ENC))
+    {
+        return 0;
+    }
+    
     std::vector<std::string> headers = StringUtils::stringSpliter(s_buffer, "\n");
     std::vector<std::string> header;
     std::map<std::string, std::string>::const_iterator _it_content;
     std::map<std::string, std::string>::const_iterator _it_transfert;
     size_t len = headers.size() - 1;
 
-    Server *server = object.getServer();
     
     header = StringUtils::stringSpliter(headers[0], " ");
     
