@@ -13,6 +13,9 @@ class ClientSocketStream: public IO
         ~ClientSocketStream();
 
         void handleIoOperation(int _ws, struct epoll_event&);
+    private:
+        void readFromSocket(int _ws, struct epoll_event& event, IO *_ev);
+        void writeToSocket(int _ws, struct epoll_event& event, IO* _ev);
 };
 
 # endif

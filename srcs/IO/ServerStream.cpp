@@ -29,7 +29,6 @@ void ServerStream::handleIoOperation(int _ws, struct epoll_event& event)
 {
     int client_fd;
     struct epoll_event _ev;
-    IO *io = (IO *)event.data.ptr;
 
     if (event.events & EPOLLIN)
     {

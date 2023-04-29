@@ -25,12 +25,17 @@ ClientSocketStream::~ClientSocketStream(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event& event)
+
+void ClientSocketStream::writeToSocket(int _ws, struct epoll_event& event, IO* _ev)
 {
-    IO *_ev = (IO *)event.data.ptr;
-    
-    if (event.events & EPOLLIN)
-    {
+    (void)_ws;
+    (void)event;
+    Server *server = _ev -> getServer();
+    std::cout << server -> getRootDir() << std::endl;
+}
+
+void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *_ev)
+{
         char buffer[REQUEST_SIZE] = {0};
         int size = recv(_ev -> getFd(), buffer, REQUEST_SIZE, 0);
 
@@ -53,7 +58,13 @@ void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event& event)
             std::cout << _request.getBuffer();
             switchEvents(_ws, event);
         }
-    }
-    
+}
+
+void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event& event)
+{
+    if (event.events & EPOLLIN)
+        readFromSocket(_ws, event, (IO *)event.data.ptr);
+    else
+        writeToSocket(_ws, event, (IO *)event.data.ptr);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
