@@ -80,7 +80,7 @@ void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Locat
 
     it = _map.find(ROOT);
 
-    if (it != end) location.setRootDir(it -> second);
+    if (it != end) location.setRootDir("." + it -> second);
     
     it = _map.find(INDEX);
     
@@ -148,7 +148,7 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
     
     it = _serv_conf.find(ROOT);
 
-    if (it != end) server.setRootDir(it -> second);
+    if (it != end) server.setRootDir("." + it -> second);
     
     it = _serv_conf.find(INDEX);
     

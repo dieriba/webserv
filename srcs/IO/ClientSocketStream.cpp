@@ -1,5 +1,6 @@
 # include "../../includes/IO/ClientSocketStream.hpp"
 # include "../../includes/TcpServer.hpp"
+# include "../../includes/http/RequestChecker.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 ClientSocketStream::ClientSocketStream(){};
@@ -69,6 +70,8 @@ void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *
             if ((server -> checkBits(C_LEN) || server -> checkBits(T_ENC)) && !server -> checkBits(FINISH_BODY))
                 return ;
             
+            std::cout << RequestChecker::checkAll(*server, _request) << std::endl;
+
             if (server -> checkBits(FINISH_BODY) != 0)
             {
                 _request.appendToBuffer("\n");

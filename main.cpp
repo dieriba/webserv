@@ -59,17 +59,23 @@ void    print_server_config(const Server server)
         }
 }
 
+void    init_static_data(void)
+{
+    RequestChecker::tab[0] = RequestChecker::checkValidPath;
+    RequestChecker::tab[1] = RequestChecker::checkAllowedMethod;
+    RequestChecker::tab[2] = RequestChecker::checkBodySize;
+    TcpServer::initMimeTypes();
+    TcpServer::initHttpResponses();
+    TcpServer::initHttpMethods();
+    TcpServer::initKnownDirectives();
+}
+
 int main (int argc, char **argv)
 {
     try
     {
-        RequestChecker::tab[0] = RequestChecker::checkAllowedMethod;
-        RequestChecker::tab[1] = RequestChecker::checkValidPath;
+        init_static_data();
         TcpServer tcp_servers;
-        TcpServer::initMimeTypes();
-        TcpServer::initHttpResponses();
-        TcpServer::initHttpMethods();
-        TcpServer::initKnownDirectives();
         tcp_servers.settingUpServer(argc > 1 ? argv[1] : NULL);
         tcp_servers.runningUpServer();
         tcp_servers.makeServerServe();
