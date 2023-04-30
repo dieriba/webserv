@@ -16,6 +16,7 @@ SRCS_IO		=	./srcs/IO/IO.cpp \
 SRCS_HTTP	=	./srcs/http/HttpMessage.cpp \
 				./srcs/http/HttpRequest.cpp \
 				./srcs/http/HttpResponse.cpp \
+				./srcs/http/RequestChecker.cpp \
 
 OBJS	=	$(SRCS_MAIN:.cpp=.o) \
 			$(SRCS_:.cpp=.o) \

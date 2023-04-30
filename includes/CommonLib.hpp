@@ -24,7 +24,8 @@
 
 */
 # define TOO_LARGE_HEADER 413
-
+# define NOT_FOUND 404
+# define METHOD_NOT_ALLOWED 405
 /*
 
 

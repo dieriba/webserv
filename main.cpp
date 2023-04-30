@@ -1,8 +1,9 @@
-#include "./includes/CommonLib.hpp"
-#include "./includes/TcpServer.hpp"
-#include "./includes/Server.hpp"
-#include "./includes/ExceptionThrower.hpp"
-#include "./includes/Location.hpp"
+# include "./includes/CommonLib.hpp"
+# include "./includes/TcpServer.hpp"
+# include "./includes/Server.hpp"
+# include "./includes/ExceptionThrower.hpp"
+# include "./includes/Location.hpp"
+# include "./includes/http/RequestChecker.hpp"
 
 void    print_location_config(const Location& location)
 {
@@ -62,6 +63,8 @@ int main (int argc, char **argv)
 {
     try
     {
+        RequestChecker::tab[0] = RequestChecker::checkAllowedMethod;
+        RequestChecker::tab[1] = RequestChecker::checkValidPath;
         TcpServer tcp_servers;
         TcpServer::initMimeTypes();
         TcpServer::initHttpResponses();

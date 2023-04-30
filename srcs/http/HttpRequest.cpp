@@ -48,7 +48,7 @@ int HttpRequest::parseRequest(IO& object)
     header = StringUtils::stringSpliter(headers[0], " ");
     
     _headers["METHOD"] =  header.size() > 0 ? header[0] : NO_VALUE;
-    _headers["ROOT"] =  header.size() > 1 ? header[1] : NO_VALUE;
+    _headers["PATH"] =  header.size() > 1 ? header[1] : NO_VALUE;
     _headers["VERSION"] = header.size() > 2 ? header[2] : NO_VALUE;
 
     setMetod(TcpServer::getHttpMethod(header[0]));

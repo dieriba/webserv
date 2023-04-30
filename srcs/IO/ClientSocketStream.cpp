@@ -62,15 +62,14 @@ void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *
         
         if (s_buffer.find(CRLF) != std::string::npos || (server -> checkBits(C_LEN) || server -> checkBits(T_ENC)))
         {
-
             s_buffer = _request.getBuffer();
             
             int req = _request.parseRequest(*this);
             
             if ((server -> checkBits(C_LEN) || server -> checkBits(T_ENC)) && !server -> checkBits(FINISH_BODY))
                 return ;
-
-            if (server -> checkBits(FINISH_BODY))
+            
+            if (server -> checkBits(FINISH_BODY) != 0)
             {
                 _request.appendToBuffer("\n");
                 std::cout << _request.getBuffer();
@@ -78,6 +77,7 @@ void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *
             }
             else if (_request.getMethod() == 0)
                 std::cout << s_buffer;
+            
             setErrorStatus(req);
             switchEvents(_ws, event);
         }
