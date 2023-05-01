@@ -6,6 +6,7 @@
 
 
 class Server;
+class IO;
 typedef std::map<short int, std::string>::iterator vec_it;
 typedef std::map<std::string, short int>::iterator rev_it;
 class TcpServer: public Parser
@@ -19,17 +20,18 @@ class TcpServer: public Parser
 
         /*GETTERS*/
         std::vector<Server> getServers(void) const;
-        const unsigned int& getBodySize(void) const;
+        const size_t& getBodySize(void) const;
         const std::string& getIndex(void) const;
         const std::string& getRootDir(void) const;
         const std::string& getRedirect(void) const;
 
         /*SETTERS*/
         void pushNewServer(const Server& server);
-        void setBodySize(const unsigned int& body);
+        void setBodySize(const size_t& body);
         void setIndex(const std::string& index);
         void setRootDir(const std::string& root_dir);
         void setRedirect(const std::string& redirect);
+        void addToVectorEvents(const IO* ev);
 
         /*MEMBER FUNCTION*/
         void acceptNewConnections(const int& fd);
@@ -51,7 +53,7 @@ class TcpServer: public Parser
         static int makeNonBlockingFd(const int& fd);
         static int getMethodIndex(const std::string& method);
     protected:
-        unsigned int _body_size;
+        size_t _body_size;
         std::string _index;
         std::string _root_dir;
         std::string _redirect;
@@ -59,6 +61,7 @@ class TcpServer: public Parser
     private:
         int _epoll_ws;
         std::vector<Server> _servers;
+        std::vector<const IO*> _events;
         static std::map<short int, std::string> _httpResponses;
         static std::map<std::string, bool> _knownDirectives;
         static std::map<std::string, bool> _knownLocationsDirectives;

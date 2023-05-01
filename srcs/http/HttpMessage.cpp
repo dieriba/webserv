@@ -18,7 +18,7 @@ HttpMessage::~HttpMessage(){};
 /*----------------------------------------GETTER----------------------------------------*/
 const std::string& HttpMessage::getBuffer(void) const {return s_buffer;}
 const std::map<std::string, std::string>& HttpMessage::getHeaders(void) const {return _headers;}
-int HttpMessage::getBodySize(void) const {return _body;};
+const size_t& HttpMessage::getBodySize(void) const {return _body;};
 int HttpMessage::getMethod(void) const {return _method;}
 /*----------------------------------------GETTER----------------------------------------*/
 
@@ -32,7 +32,7 @@ void HttpMessage::setBodySize(const std::string& body)
 
     ss >> b;
     if (ss.fail())
-        _body = -1;
+        _body = std::string::npos;
     else
         _body = b;
 }

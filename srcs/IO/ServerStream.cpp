@@ -37,15 +37,16 @@ void ServerStream::handleIoOperation(int _ws, struct epoll_event& event)
             client_fd = accept(_fd, NULL, NULL);
 
             if (client_fd == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
-                break ;
+                return ;
                         
             _ev.data.ptr = new ClientSocketStream(client_fd, getServer());
             _ev.events = EPOLLIN;
+            
 
             if (TcpServer::makeNonBlockingFd(client_fd) || epoll_ctl(_ws, EPOLL_CTL_ADD, client_fd, &_ev))
             {
                 close(client_fd);
-                break ;
+                return ;
             }
                         
         }

@@ -7,7 +7,10 @@
 # include "../includes/IO/CgiStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-TcpServer::TcpServer():_body_size(0),_index(""),_root_dir(""),_redirect(""),_epoll_ws(-1){};
+TcpServer::TcpServer():_body_size(0),_index(""),_root_dir(""),_redirect(""),_epoll_ws(-1)
+{
+    _events.reserve(500);
+};
 
 TcpServer::TcpServer(const TcpServer& rhs)
     :Parser(rhs),_body_size(rhs._body_size),_index(rhs._index),_root_dir(rhs._root_dir),_redirect(rhs._redirect),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
@@ -26,24 +29,38 @@ TcpServer& TcpServer::operator=(const TcpServer& rhs)
 TcpServer::~TcpServer()
 {
     if (_epoll_ws != -1) close(_epoll_ws);
+
+    size_t len = _events.size();
+
+    for (size_t i = 0; i < len; i++)
+    {
+        delete _events[i];
+    }
+    
 };
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
 std::vector<Server> TcpServer::getServers(void) const {return _servers; };
-const unsigned int& TcpServer::getBodySize(void) const {return _body_size;};
+const size_t& TcpServer::getBodySize(void) const {return _body_size;};
 const std::string& TcpServer::getRootDir(void) const {return _root_dir;};
 const std::string& TcpServer::getIndex(void) const {return _index;};
 const std::string& TcpServer::getRedirect(void) const {return _redirect;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
+
+void TcpServer::addToVectorEvents(const IO* ev)
+{
+    _events.push_back(ev);
+}
+
 void TcpServer::pushNewServer(const Server& server)
 {
     _servers.push_back(server);
 };
 
-void    TcpServer::setBodySize(const unsigned int& body)
+void    TcpServer::setBodySize(const size_t& body)
 {
     _body_size = body;
 };

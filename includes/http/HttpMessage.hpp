@@ -12,7 +12,7 @@ class HttpMessage
         ~HttpMessage();
 
         /*GETTER*/
-        int getBodySize(void) const;
+        const size_t& getBodySize(void) const;
         int getMethod(void) const;
         const std::string& getBuffer(void) const;
         const std::map<std::string, std::string>& getHeaders() const;
@@ -22,7 +22,7 @@ class HttpMessage
         void appendToBuffer(const std::string& toAppend);
         void setMetod(const int& _method);
     protected:
-        unsigned int  _body;
+        size_t  _body;
         short int _method;
         std::string s_buffer;
         std::map <std::string, std::string> _headers;

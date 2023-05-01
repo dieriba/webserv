@@ -19,31 +19,40 @@ RequestChecker::~RequestChecker(){};
 
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 
-int RequestChecker::serverOrLocation(const Server& server, const std::vector<Location>& location, const HttpRequest& req)
+int RequestChecker::serverOrLocation(const std::vector<Location>& locations, Location& location, const HttpRequest& req)
 {
-    (void) server;
     std::string path = req.getHeaders().find("PATH") -> second;
-    
-    for (size_t i = 0; i < location.size(); i++)
-    {
-        std::cout << location[i].getSubPath() << std::endl;
-        std::cout << location[i].getRootDir() << std::endl;
-    }
 
+    for (size_t i = 0; i < locations.size(); i++)
+    {
+        if (path.size() == 1 && locations[i].getSubPath() == path)
+        {
+            location = locations[i];
+            return i;
+        }
+        else if (path.find(locations[i].getSubPath()) != std::string::npos)
+        {
+            location = locations[i];
+            return i;
+        }
+    }
     return 0;
 }
 
 int RequestChecker::checkAll(const Server& server, const HttpRequest& req)
 {
     int res = checkHeader(req);
+    Location location;
     
     if (res) return res;
 
-    int loc = serverOrLocation(server, server.getLocations(), req);
+    int loc = serverOrLocation(server.getLocations(), location, req);
+
+    std::cout << "I should look to serve data from: " << (loc == 1 ? "Location Block" : "Server Block") << std::endl;
 
     for (size_t i = 0; tab[i] != 0; i++)
     {
-        res = tab[i](loc, server, req);
+        res = tab[i](loc, server, location, req);
     
         if (res) return res;
     }
@@ -56,27 +65,55 @@ int RequestChecker::checkHeader(const HttpRequest& req)
     return 0;
 }
 
-int RequestChecker::checkValidPath(const int& _loc, const Server& server, const HttpRequest& req)
+int RequestChecker::checkValidPath(const int& _loc, const Server& server, const Location& location, const HttpRequest& req)
 {
-    (void)_loc;
-    (void)server;
-    (void)req;
+    std::string root;
+
+    if (location.getRootDir().size() == 0 && server.getRootDir().size() == 0)
+        return NOT_FOUND;
+
+    if (_loc)
+    {
+        root = location.getRootDir();
+        if (*(root.rbegin()) == '/')
+            root.erase(root.end() - 1);
+        root += req.getHeaders().find("PATH") -> second;
+        std::cout << root << std::endl;
+        if (access(root.c_str(), F_OK) != 0)
+            return NOT_FOUND;    
+    }
+    else
+    {
+        root = server.getRootDir();
+        if (*(root.rbegin()) == '/')
+            root.erase(root.end() - 1);
+        root += req.getHeaders().find("PATH") -> second;
+        std::cout << root << std::endl;
+        if (access(root.c_str(), F_OK) != 0)
+            return NOT_FOUND;
+    }
     return 0;
 }
 
-int RequestChecker::checkAllowedMethod(const int& _loc, const Server& server, const HttpRequest& req)
+int RequestChecker::checkAllowedMethod(const int& _loc, const Server& server, const Location& location, const HttpRequest& req)
 {
-    (void)_loc;
-    if (server.checkBits(req.getMethod()) == 0)
+    if (_loc && location.checkBits(req.getMethod()) == 0)
+    {
         return METHOD_NOT_ALLOWED;
+    }
+    else if (_loc == 0 && server.checkBits(req.getMethod()) == 0)
+    {
+        return METHOD_NOT_ALLOWED;
+    }
     return 0;
 }
 
-int RequestChecker::checkBodySize(const int& _loc, const Server& server, const HttpRequest& req)
+int RequestChecker::checkBodySize(const int& _loc, const Server& server, const Location& location, const HttpRequest& req)
 {
-    (void)_loc;
-    (void)server;
-    (void)req;
+    if ((_loc && location.getBodySize() != std::string::npos) && req.getBodySize() > location.getBodySize())
+        return TOO_LARGE_CONTENT;
+    else if ((_loc == 0 && server.getBodySize() != std::string::npos) && req.getBodySize() > server.getBodySize())
+        return TOO_LARGE_CONTENT;
     return 0;
 }
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/

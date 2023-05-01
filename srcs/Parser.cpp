@@ -96,8 +96,13 @@ void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Locat
     {
         ss << it -> second;
         ss >> val;
+
+        if (val == std::string::npos) ExceptionThrower("Body Value insanely huge");
+
         location.setBodySize(val);
     }
+    else
+        location.setBodySize(std::string::npos);
 
     it = _map.find(REDIRECT);
 
@@ -162,8 +167,13 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
         ss.str("");
         ss << it -> second;
         ss >> val;
+
+        if (val == std::string::npos) ExceptionThrower("Body Value insanely huge");
+    
         server.setBodySize(val);
     }
+    else
+        server.setBodySize(std::string::npos);
 
     it = _serv_conf.find(REDIRECT);
 
