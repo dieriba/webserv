@@ -18,15 +18,23 @@ SRCS_HTTP	=	./srcs/http/HttpMessage.cpp \
 				./srcs/http/HttpResponse.cpp \
 				./srcs/http/RequestChecker.cpp \
 
+SRCS_METHOD	=	./srcs/method/Method.cpp \
+				./srcs/method/Get.cpp \
+				./srcs/method/Post.cpp \
+				./srcs/method/Delete.cpp \
+				./srcs/method/Error.cpp \
+
 OBJS	=	$(SRCS_MAIN:.cpp=.o) \
 			$(SRCS_:.cpp=.o) \
 			$(SRCS_IO:.cpp=.o) \
 			$(SRCS_HTTP:.cpp=.o) \
+			$(SRCS_METHOD:.cpp=.o) \
 
 DEPS 	=	$(SRCS_MAIN:.cpp=.d) \
 			$(SRCS_:.cpp=.d) \
 			$(SRCS_IO:.cpp=.d) \
 			$(SRCS_HTTP:.cpp=.d) \
+			$(SRCS_METHOD:.cpp=.d) \
 
 CC		=	c++ -g3
 

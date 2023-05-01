@@ -32,6 +32,7 @@ void ClientSocketStream::writeToSocket(int _ws, struct epoll_event& event, IO* _
     (void)_ws;
     (void)event;
     (void)_ev;
+    _response.serveResponse((*this), getRequest());
     //Server *server = _ev -> getServer();
 }
 
@@ -61,7 +62,7 @@ void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *
 
         std::string s_buffer(buffer);
         
-        if (s_buffer.find(CRLF) != std::string::npos || (server -> checkBits(C_LEN) || server -> checkBits(T_ENC)))
+        if (s_buffer.find(CRLF CRLF) != std::string::npos || (server -> checkBits(C_LEN) || server -> checkBits(T_ENC)))
         {
             s_buffer = _request.getBuffer();
             
@@ -70,16 +71,16 @@ void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *
             if ((server -> checkBits(C_LEN) || server -> checkBits(T_ENC)) && !server -> checkBits(FINISH_BODY))
                 return ;
             
-            std::cout << RequestChecker::checkAll(*server, _request) << std::endl;
+            req = RequestChecker::checkAll(*server, _request);
+
+            _response.setMethodObj((_request.getMethod() < 3 ? Method::_tab[_request.getMethod()]() : Method::_tab[3]()));
 
             if (server -> checkBits(FINISH_BODY) != 0)
             {
-                _request.appendToBuffer("\n");
+                _request.appendToBuffer(NEW_LINE);
                 std::cout << _request.getBuffer();
                 server -> setOptions(FINISH_BODY, CLEAR);
             }
-            else if (_request.getMethod() == 0)
-                std::cout << s_buffer;
             
             setErrorStatus(req);
             switchEvents(_ws, event);

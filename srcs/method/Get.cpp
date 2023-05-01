@@ -1,40 +1,31 @@
-# include "../../includes/http/HttpResponse.hpp"
+# include "../../includes/method/Get.hpp"
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/IO/IO.hpp"
-# include "../../includes/TcpServer.hpp"
-
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-HttpResponse::HttpResponse():HttpMessage(){};
-HttpResponse::HttpResponse(const HttpResponse& rhs):HttpMessage(rhs){};
-HttpResponse& HttpResponse::operator=(const HttpResponse& rhs)
+Get::Get(){};
+Get::Get(const Get& rhs):Method(rhs){};
+Get& Get::operator=(const Get& rhs)
 {
     if (this == &rhs) return *this;
-    s_buffer = rhs.s_buffer;
+    
     return *this;
 };
-HttpResponse::~HttpResponse(){};
+Get::~Get(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
 /*----------------------------------------GETTER----------------------------------------*/
 
+
 /*----------------------------------------SETTER----------------------------------------*/
-void HttpResponse::setMethodObj(Method *method)
-{
-    _method = method;
-}
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void HttpResponse::makeStatusLine(const std::string& version, const std::string& method)
+void Get::sendResponse(const IO& event, const HttpRequest& req)
 {
-    s_buffer = version + " " + method + " " + TcpServer::getHttpResponse(OK) -> second + CRLF;
-}
-
-
-void HttpResponse::serveResponse(const IO& event, const HttpRequest& req)
-{
-    _method -> sendResponse(event, req);
+    if (_response.size() == 0) makeStatusLine(event.getErrStatus(), req.getHeaders().find(METHOD) -> second);
+    std::cout << _response;
+    exit(1);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

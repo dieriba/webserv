@@ -19,6 +19,7 @@ IO::~IO(){};
 const int& IO::getFd(void) const { return _fd ;};
 const int& IO::getErrStatus(void) const {return _err;}
 Server* IO::getServer(void) const { return _server;}
+const HttpRequest& IO::getRequest(void) const {return _request;}
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/

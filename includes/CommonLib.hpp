@@ -23,9 +23,13 @@
 
 
 */
-# define TOO_LARGE_CONTENT 413
+# define OK 200
+# define CREATED 201
+# define BAD_REQUEST 400
+# define FORBIDEN 403
 # define NOT_FOUND 404
 # define METHOD_NOT_ALLOWED 405
+# define TOO_LARGE_CONTENT 413
 /*
 
 
@@ -34,16 +38,22 @@
 # define CONTENT_LEN "Content-Length"
 # define TRANSFERT_ENCODING "Transfer-Encoding"
 # define CHUNK_REQUEST "-4"
+# define VERSION "VERSION"
+# define METHOD "METHOD"
+# define HTTP_VERSION "HTTP/1.1"
+# define PATH "PATH"
+
 /*
 
 */
 # define NO_BODY "-2"
 # define BASE_VEC_ARR 10
 # define WHITESPACES " \n\t\r\f\v"
+# define NEW_LINE "\n"
 # define BASE_10 "0123456789"
 # define REQUEST_SIZE 70000
 # define MAXEVENTS 64
-# define CRLF "\r\n\r\n"
+# define CRLF "\r\n"
 # define TIMEOUT 1000
 # define MAX_HEADER_SIZE 4000
 # define NO_VALUE "NO_VALUE"
@@ -123,6 +133,8 @@
 # define C_LEN 3
 # define T_ENC 4
 # define FINISH_BODY 5
+# define RESPONSE_HEADER_FINISHED 6
+# define LOCATION_BLOCK 7
 /*
 
 */

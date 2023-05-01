@@ -39,7 +39,7 @@ int RequestChecker::serverOrLocation(const std::vector<Location>& locations, Loc
     return 0;
 }
 
-int RequestChecker::checkAll(const Server& server, const HttpRequest& req)
+int RequestChecker::checkAll(Server& server, const HttpRequest& req)
 {
     int res = checkHeader(req);
     Location location;
@@ -48,7 +48,9 @@ int RequestChecker::checkAll(const Server& server, const HttpRequest& req)
 
     int loc = serverOrLocation(server.getLocations(), location, req);
 
-    std::cout << "I should look to serve data from: " << (loc == 1 ? "Location Block" : "Server Block") << std::endl;
+    if (loc) server.setOptions(LOCATION_BLOCK, SET);
+
+    //std::cout << "I should look to serve data from: " << (loc == 1 ? "Location Block" : "Server Block") << std::endl;
 
     for (size_t i = 0; tab[i] != 0; i++)
     {
@@ -78,7 +80,6 @@ int RequestChecker::checkValidPath(const int& _loc, const Server& server, const 
         if (*(root.rbegin()) == '/')
             root.erase(root.end() - 1);
         root += req.getHeaders().find("PATH") -> second;
-        std::cout << root << std::endl;
         if (access(root.c_str(), F_OK) != 0)
             return NOT_FOUND;    
     }
@@ -88,7 +89,6 @@ int RequestChecker::checkValidPath(const int& _loc, const Server& server, const 
         if (*(root.rbegin()) == '/')
             root.erase(root.end() - 1);
         root += req.getHeaders().find("PATH") -> second;
-        std::cout << root << std::endl;
         if (access(root.c_str(), F_OK) != 0)
             return NOT_FOUND;
     }

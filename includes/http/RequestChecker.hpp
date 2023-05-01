@@ -19,7 +19,7 @@ class RequestChecker
         static int checkValidPath(const int& loc, const Server& server, const Location&, const HttpRequest& req);
         static int checkAllowedMethod(const int& loc, const Server& server, const Location&, const HttpRequest& req);
         static int checkBodySize(const int& loc, const Server& server, const Location&, const HttpRequest& req);
-        static int checkAll(const Server& server, const HttpRequest& req);
+        static int checkAll(Server& server, const HttpRequest& req);
         static int checkHeader(const HttpRequest& req);
         static Checker tab[10];
     

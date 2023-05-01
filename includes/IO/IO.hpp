@@ -19,6 +19,7 @@ class IO
     
     /*GETTERS*/
     const int& getFd(void) const;
+    const HttpRequest& getRequest(void) const;
     const int& getErrStatus(void) const;
     Server* getServer(void) const;
 

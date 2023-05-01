@@ -4,6 +4,7 @@
 # include "./includes/ExceptionThrower.hpp"
 # include "./includes/Location.hpp"
 # include "./includes/http/RequestChecker.hpp"
+# include "./includes/method/Method.hpp"
 
 void    print_location_config(const Location& location)
 {
@@ -68,6 +69,10 @@ void    init_static_data(void)
     TcpServer::initHttpResponses();
     TcpServer::initHttpMethods();
     TcpServer::initKnownDirectives();
+    Method::_tab[0] = Method::createGet;
+    Method::_tab[1] = Method::createPost;
+    Method::_tab[2] = Method::createDelete;
+    Method::_tab[3] = Method::createError;
 }
 
 int main (int argc, char **argv)
