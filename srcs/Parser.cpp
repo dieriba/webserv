@@ -71,7 +71,7 @@ bool    Parser::validIpFormat(const std::string& ip)
 
 void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Location& location)
 {
-    unsigned int val;
+    size_t val;
     std::vector<std::string> vec;
     std::stringstream ss;
 
@@ -111,7 +111,7 @@ void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Locat
 
 void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, Server& server)
 {
-    unsigned int val;
+    size_t val;
     std::vector<std::string> vec;
     std::stringstream ss;
     std::map<std::string, std::string>::iterator it = _serv_conf.find(LISTEN);

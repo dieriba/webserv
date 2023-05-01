@@ -26,6 +26,5 @@ void Get::sendResponse(const IO& event, const HttpRequest& req)
 {
     if (_response.size() == 0) makeStatusLine(event.getErrStatus(), req.getHeaders().find(METHOD) -> second);
     std::cout << _response;
-    exit(1);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

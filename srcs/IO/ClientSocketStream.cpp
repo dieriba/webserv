@@ -81,7 +81,8 @@ void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *
                 std::cout << _request.getBuffer();
                 server -> setOptions(FINISH_BODY, CLEAR);
             }
-            
+            else if (server -> checkBits(GET) != 0)
+                std::cout << s_buffer;
             setErrorStatus(req);
             switchEvents(_ws, event);
         }
@@ -91,7 +92,7 @@ void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event& event)
 {
     if (event.events & EPOLLIN)
         readFromSocket(_ws, event, (IO *)event.data.ptr);
-    else
-        writeToSocket(_ws, event, (IO *)event.data.ptr);
+    /*else
+        writeToSocket(_ws, event, (IO *)event.data.ptr);*/
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
