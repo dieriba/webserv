@@ -92,7 +92,7 @@ void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event& event)
 {
     if (event.events & EPOLLIN)
         readFromSocket(_ws, event, (IO *)event.data.ptr);
-    /*else
-        writeToSocket(_ws, event, (IO *)event.data.ptr);*/
+    else
+        writeToSocket(_ws, event, (IO *)event.data.ptr);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
