@@ -128,7 +128,7 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
     if (vec.size() == 2 && ((vec[0].find_first_not_of(BASE_10".") != std::string::npos) || (vec[1].find_first_not_of(BASE_10";") != std::string::npos)))
         throw ExceptionThrower(LISTEN_FORMAT);
 
-    if (vec.size() > 2) throw ExceptionThrower(LISTEN_FORMAT);
+    if (vec.size() > 2 || vec.size() == 0) throw ExceptionThrower(LISTEN_FORMAT);
     
     if (vec.size() == 1 && (vec[0].find_first_not_of(BASE_10) != std::string::npos))
         throw ExceptionThrower(LISTEN_FORMAT);

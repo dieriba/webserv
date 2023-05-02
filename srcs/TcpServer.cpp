@@ -13,7 +13,8 @@ TcpServer::TcpServer():BitsManipulation(),_body_size(0),_index(""),_root_dir("")
 };
 
 TcpServer::TcpServer(const TcpServer& rhs)
-    :Parser(rhs),BitsManipulation(rhs),_body_size(rhs._body_size),_index(rhs._index),_root_dir(rhs._root_dir),_redirect(rhs._redirect),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
+    :Parser(rhs),BitsManipulation(rhs),_body_size(rhs._body_size),_index(rhs._index),
+    _root_dir(rhs._root_dir),_redirect(rhs._redirect),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
 
 TcpServer& TcpServer::operator=(const TcpServer& rhs)
 {
@@ -26,6 +27,7 @@ TcpServer& TcpServer::operator=(const TcpServer& rhs)
     _servers = rhs._servers;
     return *this;
 }
+
 TcpServer::~TcpServer()
 {
     if (_epoll_ws != -1) close(_epoll_ws);
@@ -41,7 +43,7 @@ TcpServer::~TcpServer()
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
-std::vector<Server> TcpServer::getServers(void) const {return _servers; };
+std::vector<Server> TcpServer::getServers(void) const {return _servers;};
 const size_t& TcpServer::getBodySize(void) const {return _body_size;};
 const std::string& TcpServer::getRootDir(void) const {return _root_dir;};
 const std::string& TcpServer::getIndex(void) const {return _index;};
@@ -79,6 +81,7 @@ void    TcpServer::setRedirect(const std::string& redirect)
 {
     _redirect = redirect;    
 }
+
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
@@ -100,8 +103,6 @@ void TcpServer::runningUpServer(void)
     if ((_epoll_ws = epoll_create1(0)) == -1)
         throw ExceptionThrower("Failled to create an epoll instance");
     
-
-
     for (size_t i = 0; i < _servers.size(); i++)
     {
         message = _servers[i].launchServer();
@@ -111,6 +112,8 @@ void TcpServer::runningUpServer(void)
         if (message.size()) throw ExceptionThrower(message);
         
         event.data.ptr = new ServerStream(_servers[i].getServSocket(), &_servers[i]);
+
+        addToVectorEvents((const IO*)event.data.ptr);
         
         if (epoll_ctl(_epoll_ws, EPOLL_CTL_ADD, _servers[i].getServSocket(), &event) == -1)
             throw ExceptionThrower("Failled To Add Socket To EPOLL WATCHERS FD");
