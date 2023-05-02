@@ -44,6 +44,7 @@ bool Server::getCgiPath(const std::string& key, std::string& path)
 };
 const std::vector<Location>& Server::getLocations(void) const {return _locations;};
 std::vector<std::string> Server::getServerNames(void) const {return _server_names;};
+TcpServer *Server::getInstance(void) const {return _instance;}
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
@@ -78,6 +79,10 @@ void    Server::setServSocket(const int& socket)
     _serv_socket = socket;
 }
 
+void Server::setInstance(TcpServer* instance)
+{
+    _instance = instance;
+}
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

@@ -23,6 +23,7 @@ class Server: public TcpServer
         const std::vector<Location>& getLocations(void) const;
         std::map<std::string, std::string> getCgiMap() const {return _cgi;};
         std::vector<std::string> getServerNames(void) const;
+        TcpServer *getInstance(void) const;
 
         /*Setters*/
         void    setPort(const unsigned int& port);
@@ -31,6 +32,7 @@ class Server: public TcpServer
         void    pushNewCGI(const std::string& key, const std::string& value);
         void    setIp(const std::string& ip);
         void    setServSocket(const int& socket);
+        void    setInstance(TcpServer* instance);
 
         /*MEMBER FUNCTION*/
         std::string launchServer(void);
@@ -40,6 +42,7 @@ class Server: public TcpServer
         struct sockaddr_in _serv_address;
         unsigned int    _port;
         std::string _ip;
+        TcpServer *_instance;
         std::vector<std::string> _server_names;
         std::map<std::string, std::string> _cgi;
         std::vector<Location> _locations;
