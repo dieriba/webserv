@@ -1,10 +1,9 @@
 #ifndef __LOCATION_HPP_
 #define __LOCATION_HPP_
 #include "CommonLib.hpp"
-#include "BitsManipulation.hpp"
 #include "TcpServer.hpp"
 class Server;
-class Location: public BitsManipulation, public TcpServer
+class Location: public TcpServer
 {
     public:
         Location();

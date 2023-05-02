@@ -1,14 +1,13 @@
 #ifndef __SERVER_HPP_
 #define __SERVER_HPP_
 #include "CommonLib.hpp"
-#include "BitsManipulation.hpp"
 #include "TcpServer.hpp"
 
 typedef std::map<std::string, std::string>::iterator it_map;
 
 class Location;
 
-class Server: public BitsManipulation, public TcpServer
+class Server: public TcpServer
 {
     public:
         Server();
@@ -21,7 +20,7 @@ class Server: public BitsManipulation, public TcpServer
         const std::string& getIp(void) const;
         const unsigned int& getPort(void) const;
         bool getCgiPath(const std::string& key, std::string& path);
-        std::vector<Location> getLocations(void) const;
+        const std::vector<Location>& getLocations(void) const;
         std::map<std::string, std::string> getCgiMap() const {return _cgi;};
         std::vector<std::string> getServerNames(void) const;
 

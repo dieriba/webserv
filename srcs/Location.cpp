@@ -1,9 +1,9 @@
 # include "../includes/Location.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-Location::Location():BitsManipulation(),TcpServer(),_server(0){};
+Location::Location():TcpServer(),_server(0){};
 
-Location::Location(const Location& rhs):BitsManipulation(rhs),TcpServer(rhs)
+Location::Location(const Location& rhs):TcpServer(rhs)
 {
     _sub_path = rhs._sub_path;
     _sub_locations = rhs._sub_locations;

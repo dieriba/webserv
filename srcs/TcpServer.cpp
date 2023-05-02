@@ -7,13 +7,13 @@
 # include "../includes/IO/CgiStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-TcpServer::TcpServer():_body_size(0),_index(""),_root_dir(""),_redirect(""),_epoll_ws(-1)
+TcpServer::TcpServer():BitsManipulation(),_body_size(0),_index(""),_root_dir(""),_redirect(""),_epoll_ws(-1)
 {
     _events.reserve(500);
 };
 
 TcpServer::TcpServer(const TcpServer& rhs)
-    :Parser(rhs),_body_size(rhs._body_size),_index(rhs._index),_root_dir(rhs._root_dir),_redirect(rhs._redirect),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
+    :Parser(rhs),BitsManipulation(rhs),_body_size(rhs._body_size),_index(rhs._index),_root_dir(rhs._root_dir),_redirect(rhs._redirect),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
 
 TcpServer& TcpServer::operator=(const TcpServer& rhs)
 {

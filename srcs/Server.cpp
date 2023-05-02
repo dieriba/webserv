@@ -2,9 +2,9 @@
 # include "../includes/Location.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-Server::Server():BitsManipulation(),TcpServer(){};
+Server::Server():TcpServer(){};
 
-Server::Server(const Server& rhs):BitsManipulation(rhs),TcpServer(rhs)
+Server::Server(const Server& rhs):TcpServer(rhs)
 {
     _serv_socket = rhs._serv_socket;
     _ip = rhs._ip;
@@ -42,7 +42,7 @@ bool Server::getCgiPath(const std::string& key, std::string& path)
     path = (it != _cgi.end()) ? it -> second : "";
     return it != _cgi.end();
 };
-std::vector<Location> Server::getLocations(void) const {return _locations;};
+const std::vector<Location>& Server::getLocations(void) const {return _locations;};
 std::vector<std::string> Server::getServerNames(void) const {return _server_names;};
 /*----------------------------------------GETTER----------------------------------------*/
 

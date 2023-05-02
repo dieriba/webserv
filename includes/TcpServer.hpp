@@ -3,13 +3,14 @@
 
 # include "CommonLib.hpp"
 # include "Parser.hpp"
+# include "BitsManipulation.hpp"
 
 
 class Server;
 class IO;
 typedef std::map<short int, std::string>::iterator vec_it;
 typedef std::map<std::string, short int>::iterator rev_it;
-class TcpServer: public Parser
+class TcpServer: public Parser, public BitsManipulation
 {
     public:
         /*CONSTRUCTOR/DESTRUCTOR/COPY/ASSIGNEMENT*/
