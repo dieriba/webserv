@@ -26,5 +26,8 @@ void Error::sendResponse(const IO& event, const HttpRequest& req)
 {
     (void)event;
     (void)req;
+    makeStatusLine(event.getErrStatus());
+    std::cout << _response;
+    exit(1);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

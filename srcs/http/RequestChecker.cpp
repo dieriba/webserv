@@ -65,15 +65,26 @@ int RequestChecker::checkHeader(const HttpRequest& req)
 int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest& req)
 {
     std::string root;
-
     if (instance -> getRootDir().size() == 0) return NOT_FOUND;
 
     root = instance -> getRootDir();
     if (*(root.rbegin()) == '/')
         root.erase(root.end() - 1);
     root += req.getHeaders().find("PATH") -> second;
-    if (access(root.c_str(), F_OK) != 0)
-        return NOT_FOUND;
+    const char *root_c = root.c_str();
+    
+    if (req.getMethod() != POST)
+    {
+        if (access(root_c, F_OK) != 0)
+            return NOT_FOUND;
+        
+        if (req.getMethod() == GET && (access(root_c, R_OK) != 0))
+            return FORBIDEN;
+    }
+    
+    if (req.getMethod() == POST && (access(root_c, W_OK) != 0))
+        return FORBIDEN;
+
     return 0;
 }
 

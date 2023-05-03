@@ -71,7 +71,7 @@ void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *
             
             req = RequestChecker::checkAll(*server, _request);
 
-            _response.setMethodObj((_request.getMethod() < 3 ? Method::_tab[_request.getMethod()]() : Method::_tab[3]()));
+            _response.setMethodObj((req == 0 ? Method::_tab[_request.getMethod()]() : Method::_tab[3]()));
 
             if (server -> checkBits(FINISH_BODY) != 0)
             {
