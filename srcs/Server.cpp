@@ -2,7 +2,7 @@
 # include "../includes/Location.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-Server::Server():TcpServer(),_serv_socket(-1){};
+Server::Server():TcpServer(),_serv_socket(-1),_tcp_server(NULL){};
 
 Server::Server(const Server& rhs):TcpServer(rhs)
 {
@@ -12,11 +12,13 @@ Server::Server(const Server& rhs):TcpServer(rhs)
     _server_names = rhs._server_names;
     _locations = rhs._locations;
     _cgi = rhs._cgi;
+    _tcp_server = rhs._tcp_server;
 }
 Server& Server::operator=(const Server& rhs)
 {
     if (this == &rhs) return *this;
     _serv_socket = rhs._serv_socket;
+    _tcp_server = rhs._tcp_server;
     _ip = rhs._ip;
     _options = rhs._options;
     _body_size = rhs._body_size;
@@ -46,6 +48,7 @@ bool Server::getCgiPath(const std::string& key, std::string& path)
     return it != _cgi.end();
 };
 const std::vector<Location>& Server::getLocations(void) const {return _locations;};
+TcpServer *Server::getTcpServer(void) const {return _tcp_server;};
 std::vector<Location>& Server::getLocations(void) {return _locations;}
 std::vector<std::string> Server::getServerNames(void) const {return _server_names;};
 TcpServer *Server::getInstance(void) const {return _instance;}
@@ -86,6 +89,11 @@ void    Server::setServSocket(const int& socket)
 void Server::setInstance(TcpServer* instance)
 {
     _instance = instance;
+}
+
+void Server::setTcpServer(TcpServer *tcp_server) 
+{
+    _tcp_server = tcp_server;
 }
 /*----------------------------------------SETTER----------------------------------------*/
 

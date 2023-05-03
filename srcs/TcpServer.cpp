@@ -34,8 +34,11 @@ TcpServer::~TcpServer()
 
     size_t len = _events.size();
 
+    std::cout << _events.size() << std::endl;
     for (size_t i = 0; i < len; i++)
     {
+        epoll_ctl(_epoll_ws, EPOLL_CTL_DEL, _events[i] -> getFd(), NULL);
+        close(_events[i] -> getFd());
         delete _events[i];
     }
     
@@ -92,7 +95,7 @@ void TcpServer::settingUpServer(const char *filename)
     _servers.reserve(BASE_VEC_ARR);
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     filename != NULL ? file.open(filename) : file.open(DEFAULT_CONF_FILE);
-    _servers = Parser::getServerConfig(file);
+    _servers = Parser::getServerConfig(file, this);
 }
 
 void TcpServer::runningUpServer(void)
@@ -130,13 +133,29 @@ void TcpServer::makeServerServe(void)
 
     IO  *events;
 
-    while (1)
-    {
+    
         to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, -1);
         for (int i = 0; i < to_proceed; i++)
         {
             events = (IO *)_events[i].data.ptr;
             events -> handleIoOperation(_epoll_ws, _events[i]);
+        }
+}
+
+void TcpServer::deleteFromVectorEvents(int _ws, const IO* event)
+{
+    std::vector<const IO*>::iterator it = _events.begin();
+    std::vector<const IO*>::iterator end = _events.end();
+
+    for (; it != end; it++)
+    {
+        if ((*it) == event)
+        {
+            if (epoll_ctl(_ws, EPOLL_CTL_DEL, (*it) -> getFd(), NULL) == -1)
+                return ;
+            _events.erase(it);
+            delete (*it);
+            break ;
         }
     }
 }

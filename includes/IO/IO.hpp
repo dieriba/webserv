@@ -19,14 +19,13 @@ class IO
         virtual void handleIoOperation(int _ws, struct epoll_event& event) = 0;
     
     /*GETTERS*/
-    TcpServer *getTcpServer(void) const;
     const int& getFd(void) const;
     const HttpRequest& getRequest(void) const;
+    const HttpResponse& getReponse(void) const;
     const int& getErrStatus(void) const;
     Server* getServer(void) const;
 
     /*SETTERS*/
-    void setTcpServer(TcpServer *tcp_server);
     void setFD(const int& fd);
     void setErrorStatus(const int& err);
 
@@ -44,7 +43,6 @@ class IO
     protected:
         int _fd;
         int _err;
-        TcpServer *_tcp_server;
         Server *_server;
         HttpRequest _request;
         HttpResponse _response;

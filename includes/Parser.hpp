@@ -1,9 +1,11 @@
-#ifndef __PARSER_HPP__
-#define __PARSER_HPP__
-#include "CommonLib.hpp"
-#include "StringUtils.hpp"
+# ifndef __PARSER_HPP__
+# define __PARSER_HPP__
+# include "CommonLib.hpp"
+# include "StringUtils.hpp"
 class Server;
 class Location;
+class TcpServer;
+
 class Parser
 {    
     public:
@@ -12,7 +14,7 @@ class Parser
         ~Parser();
 
         /*MEMBER FUNCTION*/
-        std::vector<Server> getServerConfig(std::ifstream& file);
+        std::vector<Server> getServerConfig(std::ifstream& file, TcpServer *tcp_server);
     private:
 
         /*MEMBER FUNC*/
@@ -29,4 +31,5 @@ class Parser
         void    feedingUpServer(std::map<std::string, std::string>& _serv_conf, Server& server);
         void    setCommonDirectives(std::vector<std::string>& vec, std::map<std::string, std::string>& _map);
 };
+
 #endif

@@ -15,16 +15,15 @@ class HttpResponse: public HttpMessage
         HttpResponse& operator=(const HttpResponse& rhs);
         ~HttpResponse();
 
-        /*MEMBER FUNCTION*/
-        void Get_(const IO&, const HttpRequest&);
-        void Post_(const IO&, const HttpRequest&);
-        void Delete_(const IO&, const HttpRequest&);
-        void serveResponse(const IO&, const HttpRequest&);
-        void makeStatusLine(const std::string& version, const std::string& method);
+        /*GETTER*/
+        Method *getHttpMethod(void) const;
 
         /*SETTER*/
         void setMethodObj(Method *method);
     
+        /*MEMBER FUNCTION*/
+        void serveResponse(const IO&, const HttpRequest&);
+
     private:
         Method  *_method;
 };

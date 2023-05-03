@@ -16,6 +16,7 @@ class Server: public TcpServer
         ~Server();
 
         /*GETTERS*/
+        TcpServer *getTcpServer(void) const;
         const int& getServSocket(void) const;
         const std::string& getIp(void) const;
         const unsigned int& getPort(void) const;
@@ -27,6 +28,7 @@ class Server: public TcpServer
         TcpServer *getInstance(void) const;
 
         /*Setters*/
+        void    setTcpServer(TcpServer *tcp_server);
         void    setPort(const unsigned int& port);
         void    pushNewServerName(const std::string& server_name);
         void    pushNewLocation(const Location& server_name);
@@ -43,7 +45,8 @@ class Server: public TcpServer
         struct sockaddr_in _serv_address;
         unsigned int    _port;
         std::string _ip;
-        TcpServer *_instance;
+        TcpServer *_instance; //POLYMORPHISM
+        TcpServer *_tcp_server; //REAL TCP SERVER POINTER
         std::vector<std::string> _server_names;
         std::map<std::string, std::string> _cgi;
         std::vector<Location> _locations;

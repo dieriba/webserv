@@ -32,10 +32,10 @@ class TcpServer: public Parser, public BitsManipulation
         void setIndex(const std::string& index);
         void setRootDir(const std::string& root_dir);
         void setRedirect(const std::string& redirect);
-        void addToVectorEvents(const IO* ev);
 
         /*MEMBER FUNCTION*/
-        void acceptNewConnections(const int& fd);
+        void addToVectorEvents(const IO* ev);
+        void deleteFromVectorEvents(int _ws, const IO* ev);
         void settingUpServer(const char *filename);
         void runningUpServer(void);
         void makeServerServe(void);
@@ -69,4 +69,4 @@ class TcpServer: public Parser, public BitsManipulation
         static std::map<std::string, short int> _httpMethods;
         static std::map<std::string, std::string> _mimeTypes;
 };
-#endif
+# endif

@@ -5,18 +5,25 @@
 
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-HttpResponse::HttpResponse():HttpMessage(){};
-HttpResponse::HttpResponse(const HttpResponse& rhs):HttpMessage(rhs){};
+HttpResponse::HttpResponse():HttpMessage(),_method(NULL){};
+HttpResponse::HttpResponse(const HttpResponse& rhs):HttpMessage(rhs),_method(rhs._method){};
 HttpResponse& HttpResponse::operator=(const HttpResponse& rhs)
 {
     if (this == &rhs) return *this;
     s_buffer = rhs.s_buffer;
+    _body = rhs._body;
+    _headers = rhs._headers;
+    _method = rhs._method;
     return *this;
 };
-HttpResponse::~HttpResponse(){};
+HttpResponse::~HttpResponse()
+{
+    delete _method;
+};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
+Method *HttpResponse::getHttpMethod(void) const {return _method;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
@@ -27,11 +34,6 @@ void HttpResponse::setMethodObj(Method *method)
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void HttpResponse::makeStatusLine(const std::string& version, const std::string& method)
-{
-    s_buffer = version + " " + method + " " + TcpServer::getHttpResponse(OK) -> second + CRLF;
-}
-
 
 void HttpResponse::serveResponse(const IO& event, const HttpRequest& req)
 {

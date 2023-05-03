@@ -1,7 +1,8 @@
-#include "../includes/Parser.hpp"
-#include "../includes/Server.hpp"
-#include "../includes/ExceptionThrower.hpp"
-#include "../includes/Location.hpp"
+# include "../includes/Parser.hpp"
+# include "../includes/TcpServer.hpp"
+# include "../includes/Server.hpp"
+# include "../includes/ExceptionThrower.hpp"
+# include "../includes/Location.hpp"
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Parser::Parser(){};
 Parser::Parser(const Parser& rhs){(void)rhs;};
@@ -284,7 +285,7 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
     feedingUpLocation(_map, _location);
 
     _location.setServer(server);
-    
+
     return _location;
 }
 
@@ -463,6 +464,7 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
             else
                 fillMap(line, server, _serv_conf);
         }
+        
         if (file.eof()) break ;
     }
 
@@ -480,13 +482,15 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
 }
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-std::vector<Server> Parser::getServerConfig(std::ifstream& file)
+std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_serv)
 {
     std::string line;
+    Server serv;
     std::vector<Server> server;
     size_t  pos;
 
     server.reserve(10);
+
     while (std::getline(file, line))
     {
         line = StringUtils::trimBothEnd(line, WHITESPACES);
@@ -505,8 +509,12 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file)
 
                 if ((pos != std::string::npos) && *line.rbegin() != '{')
                     throw ExceptionThrower("Opening Bracket Must Be At The End Of The Line");
-
-                server.push_back(fillServer(file, line, (line.find('{') != std::string::npos)));
+                
+                serv = fillServer(file, line, (line.find('{') != std::string::npos));
+                
+                serv.setTcpServer(tcp_serv);
+                
+                server.push_back(serv);
                 if (line.find("}") == std::string::npos)
                     throw ExceptionThrower("Missing End Bracket");
                 else
@@ -515,6 +523,7 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file)
             else
                 throw ExceptionThrower("Wrong Format of config file: " + line);
         }
+
         if (file.eof()) break ;
     }
     return server;

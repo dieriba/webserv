@@ -45,9 +45,7 @@ void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *
 
         if (size <= 0)
         {
-            if (epoll_ctl(_ws, EPOLL_CTL_DEL, _ev -> getFd(), NULL) == -1)
-                return ;
-            close(_ev -> getFd());
+            server -> getTcpServer() -> deleteFromVectorEvents(_ws, _ev);
             return ;
         }
 
