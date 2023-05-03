@@ -23,7 +23,7 @@ class Method
         void makeStatusLine(int status);
 
         /*VIRTUAL FUNCTION*/
-        virtual void sendResponse(const IO&, const HttpRequest&) = 0;
+        virtual void sendResponse(IO&, const HttpRequest&) = 0;
 
         /*STATIC MEMBER FUNCTION*/
         static Method* createGet();

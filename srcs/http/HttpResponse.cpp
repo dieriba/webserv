@@ -24,6 +24,7 @@ HttpResponse::~HttpResponse()
 
 /*----------------------------------------GETTER----------------------------------------*/
 Method *HttpResponse::getHttpMethod(void) const {return _method;};
+Error& HttpResponse::getErrorMethod(void) {return _error;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
@@ -35,7 +36,7 @@ void HttpResponse::setMethodObj(Method *method)
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-void HttpResponse::serveResponse(const IO& event, const HttpRequest& req)
+void HttpResponse::serveResponse(IO& event, const HttpRequest& req)
 {
     _method -> sendResponse(event, req);
 }

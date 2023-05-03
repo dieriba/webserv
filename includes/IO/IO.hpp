@@ -22,6 +22,7 @@ class IO
     const int& getFd(void) const;
     const HttpRequest& getRequest(void) const;
     const HttpResponse& getReponse(void) const;
+    HttpResponse& getReponse(void);
     const int& getErrStatus(void) const;
     Server* getServer(void) const;
 

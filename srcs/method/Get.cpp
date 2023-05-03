@@ -23,22 +23,25 @@ Get::~Get(){};
 
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void Get::handleFileRessource(const IO& event, const HttpRequest& req, std::string& ressource)
+int Get::handleFileRessource(IO& event, const HttpRequest& req, std::string& ressource)
 {
     (void)event;
     (void)req;
     std::ifstream file;
     file.open(ressource.c_str(), std::ios::binary);
+    if (!file) return (event.getReponse().getErrorMethod().sendResponse(event, req), 1);
     ressource.clear();
+    return 0;
 }
 
-void Get::handleDirectoryRessource(const IO& event, DIR *directory)
+int Get::handleDirectoryRessource(IO& event, DIR *directory)
 {
     (void)event;
     (void)directory;
+    return (0);
 }
 
-void Get::sendResponse(const IO& event, const HttpRequest& req)
+void Get::sendResponse(IO& event, const HttpRequest& req)
 {
     TcpServer& instance = *(event.getServer() -> getInstance());
     std::string ressource(instance.getRootDir() + req.getHeaders().find(PATH) -> second);

@@ -3,6 +3,7 @@
 
 # include "HttpMessage.hpp"
 # include "../method/Method.hpp"
+# include "../method/Error.hpp"
 
 class HttpRequest;
 class IO;
@@ -16,16 +17,18 @@ class HttpResponse: public HttpMessage
         ~HttpResponse();
 
         /*GETTER*/
+        Error& getErrorMethod(void);
         Method *getHttpMethod(void) const;
 
         /*SETTER*/
         void setMethodObj(Method *method);
     
         /*MEMBER FUNCTION*/
-        void serveResponse(const IO&, const HttpRequest&);
+        void serveResponse(IO&, const HttpRequest&);
 
     private:
         Method  *_method;
+        Error   _error;
 };
 
 # endif

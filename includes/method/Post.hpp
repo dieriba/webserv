@@ -14,7 +14,7 @@ class Post: public Method
         Post& operator=(const Post& rhs);
         virtual ~Post();
 
-        void sendResponse(const IO&, const HttpRequest&);
+        void sendResponse(IO&, const HttpRequest&);
 };
 
 # endif

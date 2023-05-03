@@ -14,7 +14,7 @@ class Delete: public Method
         Delete& operator=(const Delete& rhs);
         ~Delete();
 
-        void sendResponse(const IO&, const HttpRequest&);
+        void sendResponse(IO&, const HttpRequest&);
 };
 
 

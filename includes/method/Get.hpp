@@ -14,10 +14,10 @@ class Get: public Method
         Get& operator=(const Get& rhs);
         virtual ~Get();
 
-        void sendResponse(const IO&, const HttpRequest&);
+        void sendResponse(IO&, const HttpRequest&);
     private:
-        void handleFileRessource(const IO& event, const HttpRequest& req, std::string& ressource);
-        void handleDirectoryRessource(const IO& event, DIR *directory);
+        int handleFileRessource(IO& event, const HttpRequest& req, std::string& ressource);
+        int handleDirectoryRessource(IO& event, DIR *directory);
 };
 
 

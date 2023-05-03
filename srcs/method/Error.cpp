@@ -22,7 +22,7 @@ Error::~Error(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void Error::sendResponse(const IO& event, const HttpRequest& req)
+void Error::sendResponse(IO& event, const HttpRequest& req)
 {
     (void)event;
     (void)req;

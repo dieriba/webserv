@@ -22,7 +22,7 @@ Post::~Post(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void Post::sendResponse(const IO& event, const HttpRequest& req)
+void Post::sendResponse(IO& event, const HttpRequest& req)
 {
     (void)event;
     (void)req;

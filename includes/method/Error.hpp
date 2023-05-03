@@ -14,7 +14,7 @@ class Error: public Method
         Error& operator=(const Error& rhs);
         ~Error();
 
-        void sendResponse(const IO&, const HttpRequest&);
+        void sendResponse(IO&, const HttpRequest&);
 };
 
 # endif
