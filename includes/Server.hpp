@@ -21,6 +21,7 @@ class Server: public TcpServer
         const unsigned int& getPort(void) const;
         bool getCgiPath(const std::string& key, std::string& path);
         const std::vector<Location>& getLocations(void) const;
+        std::vector<Location>& getLocations(void);
         std::map<std::string, std::string> getCgiMap() const {return _cgi;};
         std::vector<std::string> getServerNames(void) const;
         TcpServer *getInstance(void) const;

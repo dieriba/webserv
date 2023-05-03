@@ -280,8 +280,11 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
 
         if (file.eof()) break ;
     }
+
     feedingUpLocation(_map, _location);
+
     _location.setServer(server);
+    
     return _location;
 }
 
@@ -462,7 +465,17 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
         }
         if (file.eof()) break ;
     }
+
     feedingUpServer(_serv_conf, server);
+    
+    std::vector<Location>& serv_locations(server.getLocations());
+
+    for (size_t i = 0; i < serv_locations.size(); i++)
+    {
+        if (serv_locations[i].getRootDir().size() == 0)
+            serv_locations[i].setRootDir(server.getRootDir());
+    }
+    
     return server;
 }
 

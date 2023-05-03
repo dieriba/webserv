@@ -2,7 +2,7 @@
 # include "../includes/Location.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-Server::Server():TcpServer(){};
+Server::Server():TcpServer(),_serv_socket(-1){};
 
 Server::Server(const Server& rhs):TcpServer(rhs)
 {
@@ -29,7 +29,10 @@ Server& Server::operator=(const Server& rhs)
     _redirect = rhs._redirect;
     return *this;
 }
-Server::~Server(){};
+Server::~Server()
+{
+    if (_serv_socket != -1) close(_serv_socket);
+};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
@@ -43,6 +46,7 @@ bool Server::getCgiPath(const std::string& key, std::string& path)
     return it != _cgi.end();
 };
 const std::vector<Location>& Server::getLocations(void) const {return _locations;};
+std::vector<Location>& Server::getLocations(void) {return _locations;}
 std::vector<std::string> Server::getServerNames(void) const {return _server_names;};
 TcpServer *Server::getInstance(void) const {return _instance;}
 /*----------------------------------------GETTER----------------------------------------*/

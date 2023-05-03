@@ -24,8 +24,9 @@ Get::~Get(){};
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 void Get::sendResponse(const IO& event, const HttpRequest& req)
 {
-    if (_response.size() == 0) makeStatusLine(event.getErrStatus(), req.getHeaders().find(METHOD) -> second);
-    std::cout << _response;
+    TcpServer& instance = *(event.getServer() -> getInstance());
+    std::string ressource(instance.getRootDir() + req.getHeaders().find(PATH) -> second);
+    std::cout << ressource << std::endl;
     exit(1);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
