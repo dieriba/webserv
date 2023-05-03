@@ -1,14 +1,14 @@
-#include "../includes/StringUtils.hpp"
+#include "../includes/utilityMethod.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-StringUtils::StringUtils(){};
-StringUtils::StringUtils(const StringUtils& rhs){(void)rhs;};
-StringUtils::~StringUtils(){};
+utilityMethod::utilityMethod(){};
+utilityMethod::utilityMethod(const utilityMethod& rhs){(void)rhs;};
+utilityMethod::~utilityMethod(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
 
-std::vector<std::string> StringUtils::stringSpliter(const std::string& line, const std::string& delim) 
+std::vector<std::string> utilityMethod::stringSpliter(const std::string& line, const std::string& delim) 
 {
     size_t pos_start = 0, pos_end;
     std::string token;
@@ -30,24 +30,24 @@ std::vector<std::string> StringUtils::stringSpliter(const std::string& line, con
     return res;
 }
 
-std::string StringUtils::ltrim(const std::string &line, const char *toTrim)
+std::string utilityMethod::ltrim(const std::string &line, const char *toTrim)
 {
     size_t  start = line.find_first_not_of(toTrim);
     return (start == std::string::npos) ? "" : line.substr(start);
 }
 
-std::string StringUtils::rtrim(const std::string &line, const char *toTrim)
+std::string utilityMethod::rtrim(const std::string &line, const char *toTrim)
 {
     size_t  end = line.find_last_not_of(toTrim);
     return (end == std::string::npos) ? "" : line.substr(0, end + 1);
 }
 
-std::string StringUtils::trimBothEnd(std::string& line, const char *toTrim)
+std::string utilityMethod::trimBothEnd(std::string& line, const char *toTrim)
 {
     return rtrim(ltrim(line, toTrim), toTrim);
 }
 
-size_t  StringUtils::count(const std::string& line, char to_find)
+size_t  utilityMethod::count(const std::string& line, char to_find)
 {
     size_t  i = 0, count = 0, len = line.size();
     for (; i < len; i++)
@@ -57,4 +57,5 @@ size_t  StringUtils::count(const std::string& line, char to_find)
     }
     return count;
 }
+
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/

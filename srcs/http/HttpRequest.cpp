@@ -1,5 +1,5 @@
 # include "../../includes/http/HttpRequest.hpp"
-# include "../../includes/StringUtils.hpp"
+# include "../../includes/utilityMethod.hpp"
 # include "../../includes/TcpServer.hpp"
 # include "../../includes/IO/IO.hpp"
 
@@ -38,24 +38,24 @@ int HttpRequest::parseRequest(IO& object)
         return 0;
     }
     
-    std::vector<std::string> headers = StringUtils::stringSpliter(s_buffer, NEW_LINE);
+    std::vector<std::string> headers = utilityMethod::stringSpliter(s_buffer, CRLF);
     std::vector<std::string> header;
     std::map<std::string, std::string>::const_iterator _it_content;
     std::map<std::string, std::string>::const_iterator _it_transfert;
     size_t len = headers.size() - 1;
 
     
-    header = StringUtils::stringSpliter(headers[0], " ");
+    header = utilityMethod::stringSpliter(headers[0], " ");
     
     _headers[METHOD] =  header.size() > 0 ? header[0] : NO_VALUE;
     _headers[PATH] =  header.size() > 1 ? header[1] : NO_VALUE;
-    _headers[VERSION] = header.size() > 2 ? header[2].substr(0, header[2].size() - 1) : NO_VALUE;
+    _headers[VERSION] = header.size() > 2 ? header[2] : NO_VALUE;
 
     setMetod(TcpServer::getHttpMethod(header[0]));
 
     for (size_t i = 1; i < len - 1; i++)
     {
-        header = StringUtils::stringSpliter(headers[i], ":");
+        header = utilityMethod::stringSpliter(headers[i], ":");
 
         if (header.size())
         {

@@ -4,7 +4,7 @@ SRCS_		=	./srcs/TcpServer.cpp \
 				./srcs/Server.cpp \
 				./srcs/ExceptionThrower.cpp \
 				./srcs/Location.cpp \
-				./srcs/StringUtils.cpp \
+				./srcs/utilityMethod.cpp \
 				./srcs/Parser.cpp \
 				./srcs/BitsManipulation.cpp \
 

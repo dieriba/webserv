@@ -15,7 +15,8 @@
 # include <ctime>
 # include <sys/epoll.h>
 # include <sstream>
-
+# include <sys/types.h>
+# include <dirent.h>
 
 
 

@@ -1,21 +1,24 @@
-#ifndef __STRING_UTILS__
-#define __STRING_UTILS__
+#ifndef _UTILITY_METHOD_HPP__
+#define _UTILITY_METHOD_HPP__
 #include "CommonLib.hpp"
 
-class StringUtils
+class utilityMethod
 {
     public:
-        StringUtils();
-        StringUtils(const StringUtils& rhs);
-        ~StringUtils();
+        utilityMethod();
+        utilityMethod(const utilityMethod& rhs);
+        ~utilityMethod();
         
+        /*STRING MANIPULATION*/
         static std::string rtrim(const std::string &line, const char *toTrim);
         static std::string ltrim(const std::string &line, const char *toTrim);
         static std::string trimBothEnd(std::string& line, const char *toTrim);
         static std::vector<std::string> stringSpliter(const std::string& line, const std::string& delim);
         static size_t  count(const std::string& line, char to_count);
+
+    
     private:
-        StringUtils& operator=(const StringUtils& rhs);        
+        utilityMethod& operator=(const utilityMethod& rhs);        
 };
 
 #endif

@@ -26,7 +26,12 @@ void Get::sendResponse(const IO& event, const HttpRequest& req)
 {
     TcpServer& instance = *(event.getServer() -> getInstance());
     std::string ressource(instance.getRootDir() + req.getHeaders().find(PATH) -> second);
+    DIR *directory = opendir(ressource.c_str());
     std::cout << ressource << std::endl;
+    if (directory == NULL && errno == ENOENT)
+        std::cout << "The Given path: " << ressource << " ain't a directory" << std::endl;
+    else
+        std::cout << "Directory at: " << ressource << " openened" << std::endl;
     exit(1);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

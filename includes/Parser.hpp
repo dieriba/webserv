@@ -1,7 +1,7 @@
 # ifndef __PARSER_HPP__
 # define __PARSER_HPP__
 # include "CommonLib.hpp"
-# include "StringUtils.hpp"
+# include "utilityMethod.hpp"
 class Server;
 class Location;
 class TcpServer;
