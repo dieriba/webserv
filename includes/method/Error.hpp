@@ -14,6 +14,7 @@ class Error: public Method
         Error& operator=(const Error& rhs);
         ~Error();
 
+        /*MEMBER FUNCTION*/
         void sendResponse(IO&, const HttpRequest&);
 };
 

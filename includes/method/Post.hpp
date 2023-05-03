@@ -14,6 +14,7 @@ class Post: public Method
         Post& operator=(const Post& rhs);
         virtual ~Post();
 
+        /*MEMBER FUNCTION*/
         void sendResponse(IO&, const HttpRequest&);
 };
 

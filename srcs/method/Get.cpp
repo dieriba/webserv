@@ -25,12 +25,15 @@ Get::~Get(){};
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 int Get::handleFileRessource(IO& event, const HttpRequest& req, std::string& ressource)
 {
-    (void)event;
-    (void)req;
     std::ifstream file;
-    file.open(ressource.c_str(), std::ios::binary);
+    std::stringstream buffer;
+    
+    file.open(ressource.c_str(), std::ifstream::in | std::ifstream::binary);
+    
     if (!file) return (event.getReponse().getErrorMethod().sendResponse(event, req), 1);
-    ressource.clear();
+
+    buffer << file.rdbuf();
+
     return 0;
 }
 
@@ -44,14 +47,20 @@ int Get::handleDirectoryRessource(IO& event, DIR *directory)
 void Get::sendResponse(IO& event, const HttpRequest& req)
 {
     TcpServer& instance = *(event.getServer() -> getInstance());
+    
     std::string ressource(instance.getRootDir() + req.getHeaders().find(PATH) -> second);
+
     DIR *directory = opendir(ressource.c_str());
+    
     makeStatusLine(OK);
-    if (directory == NULL && (errno == ENOENT || errno == ENOTDIR))
-        handleFileRessource(event, req, ressource);
-    else
+    
+    if (directory == NULL && (errno == ENOENT || errno == ENOTDIR) && handleFileRessource(event, req, ressource))
+        return ;
+    else if (directory)
         handleDirectoryRessource(event, directory);
+    
     std::cout << _response;
+    
     exit(1);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

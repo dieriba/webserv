@@ -14,6 +14,7 @@ class Get: public Method
         Get& operator=(const Get& rhs);
         virtual ~Get();
 
+        /*MEMBER FUNCTION*/
         void sendResponse(IO&, const HttpRequest&);
     private:
         int handleFileRessource(IO& event, const HttpRequest& req, std::string& ressource);
