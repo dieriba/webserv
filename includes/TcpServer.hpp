@@ -25,6 +25,7 @@ class TcpServer: public Parser, public BitsManipulation
         const std::string& getIndex(void) const;
         const std::string& getRootDir(void) const;
         const std::string& getRedirect(void) const;
+        const int& getEpollWs(void) const ;
 
         /*SETTERS*/
         void pushNewServer(const Server& server);
@@ -34,8 +35,6 @@ class TcpServer: public Parser, public BitsManipulation
         void setRedirect(const std::string& redirect);
 
         /*MEMBER FUNCTION*/
-        void addToVectorEvents(const IO* ev);
-        void deleteFromVectorEvents(int _ws, const IO* ev);
         void settingUpServer(const char *filename);
         void runningUpServer(void);
         void makeServerServe(void);
@@ -62,7 +61,6 @@ class TcpServer: public Parser, public BitsManipulation
     private:
         int _epoll_ws;
         std::vector<Server> _servers;
-        std::vector<const IO*> _events;
         static std::map<short int, std::string> _httpResponses;
         static std::map<std::string, bool> _knownDirectives;
         static std::map<std::string, bool> _knownLocationsDirectives;

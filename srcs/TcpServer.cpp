@@ -7,10 +7,8 @@
 # include "../includes/IO/CgiStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-TcpServer::TcpServer():BitsManipulation(),_body_size(0),_index(""),_root_dir(""),_redirect(""),_epoll_ws(-1)
-{
-    _events.reserve(500);
-};
+TcpServer::TcpServer():BitsManipulation(),_body_size(0),
+            _index(""),_root_dir(""),_redirect(""),_epoll_ws(-1){};
 
 TcpServer::TcpServer(const TcpServer& rhs)
     :Parser(rhs),BitsManipulation(rhs),_body_size(rhs._body_size),_index(rhs._index),
@@ -31,21 +29,11 @@ TcpServer& TcpServer::operator=(const TcpServer& rhs)
 TcpServer::~TcpServer()
 {
     if (_epoll_ws != -1) close(_epoll_ws);
-
-    size_t len = _events.size();
-
-    std::cout << _events.size() << std::endl;
-    for (size_t i = 0; i < len; i++)
-    {
-        epoll_ctl(_epoll_ws, EPOLL_CTL_DEL, _events[i] -> getFd(), NULL);
-        close(_events[i] -> getFd());
-        delete _events[i];
-    }
-    
 };
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
+const int& TcpServer::getEpollWs(void) const {return _epoll_ws;}
 std::vector<Server> TcpServer::getServers(void) const {return _servers;};
 const size_t& TcpServer::getBodySize(void) const {return _body_size;};
 const std::string& TcpServer::getRootDir(void) const {return _root_dir;};
@@ -54,11 +42,6 @@ const std::string& TcpServer::getRedirect(void) const {return _redirect;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
-
-void TcpServer::addToVectorEvents(const IO* ev)
-{
-    _events.push_back(ev);
-}
 
 void TcpServer::pushNewServer(const Server& server)
 {
@@ -116,7 +99,7 @@ void TcpServer::runningUpServer(void)
         
         event.data.ptr = new ServerStream(_servers[i].getServSocket(), &_servers[i]);
 
-        addToVectorEvents((const IO*)event.data.ptr);
+        _servers[i].addToEventsMap((const IO *)event.data.ptr);
         
         if (epoll_ctl(_epoll_ws, EPOLL_CTL_ADD, _servers[i].getServSocket(), &event) == -1)
             throw ExceptionThrower("Failled To Add Socket To EPOLL WATCHERS FD");
@@ -133,32 +116,17 @@ void TcpServer::makeServerServe(void)
 
     IO  *events;
 
-    
+    while (1)
+    {
         to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, -1);
         for (int i = 0; i < to_proceed; i++)
         {
             events = (IO *)_events[i].data.ptr;
             events -> handleIoOperation(_epoll_ws, _events[i]);
         }
-}
-
-void TcpServer::deleteFromVectorEvents(int _ws, const IO* event)
-{
-    std::vector<const IO*>::iterator it = _events.begin();
-    std::vector<const IO*>::iterator end = _events.end();
-
-    for (; it != end; it++)
-    {
-        if ((*it) == event)
-        {
-            if (epoll_ctl(_ws, EPOLL_CTL_DEL, (*it) -> getFd(), NULL) == -1)
-                return ;
-            _events.erase(it);
-            delete (*it);
-            break ;
-        }
     }
 }
+
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 

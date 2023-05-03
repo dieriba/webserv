@@ -34,6 +34,20 @@ Server& Server::operator=(const Server& rhs)
 Server::~Server()
 {
     if (_serv_socket != -1) close(_serv_socket);
+    
+    if (getTcpServer() != NULL)
+    {
+        std::map<const IO*, const IO*>::const_iterator it = _events.begin();
+        std::map<const IO*, const IO*>::const_iterator end = _events.end();
+        int _ws = getTcpServer() -> getEpollWs();
+        
+        for ( ; it != end; it++)
+        {
+            epoll_ctl(_ws, EPOLL_CTL_DEL, (it -> first) -> getFd(), NULL);
+            close((it -> first) -> getFd());
+            delete it -> first;
+        }
+    }
 };
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
@@ -124,6 +138,20 @@ std::string Server::launchServer(void)
 
     return "";
 }
+
+void Server::addToEventsMap(const IO* event)
+{
+    _events[event];
+}
+
+void Server::deleteFromEventsMap(const IO *event)
+{
+    if (_events.find(event) == _events.end()) return;
+    _events.erase(event);
+    epoll_ctl(getEpollWs(), EPOLL_CTL_DEL, event -> getFd(), NULL);
+    delete event;
+}
+
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
 /*----------------------------------------VIRTUAL FUNCTION----------------------------------------*/

@@ -1,7 +1,9 @@
 #ifndef __SERVER_HPP_
 #define __SERVER_HPP_
-#include "CommonLib.hpp"
-#include "TcpServer.hpp"
+
+# include "CommonLib.hpp"
+# include "TcpServer.hpp"
+# include "./IO/IO.hpp"
 
 typedef std::map<std::string, std::string>::iterator it_map;
 
@@ -38,6 +40,8 @@ class Server: public TcpServer
         void    setInstance(TcpServer* instance);
 
         /*MEMBER FUNCTION*/
+        void addToEventsMap(const IO* event);
+        void deleteFromEventsMap(const IO* event);
         std::string launchServer(void);
 
     private:
@@ -47,6 +51,7 @@ class Server: public TcpServer
         std::string _ip;
         TcpServer *_instance; //POLYMORPHISM
         TcpServer *_tcp_server; //REAL TCP SERVER POINTER
+        std::map<const IO*, const IO*> _events;
         std::vector<std::string> _server_names;
         std::map<std::string, std::string> _cgi;
         std::vector<Location> _locations;
