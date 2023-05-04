@@ -25,7 +25,7 @@ ServerStream::~ServerStream(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void ServerStream::handleIoOperation(int _ws, struct epoll_event& event)
+void ServerStream::handleIoOperation(const int& _ws, struct epoll_event& event)
 {
     int client_fd;
     struct epoll_event _ev;

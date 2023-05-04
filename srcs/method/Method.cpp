@@ -26,7 +26,7 @@ std::string& Method::getResponse(void) {return _response;}
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void Method::makeStatusLine(int status)
+void Method::makeStatusLine(const int& status)
 {
     std::string version(HTTP_VERSION);
     std::ostringstream ss;
@@ -35,6 +35,11 @@ void Method::makeStatusLine(int status)
     std::string code(ss.str());
     
     _response = version + " " + code + " " + TcpServer::getHttpResponse(status) -> second + CRLF;
+}
+
+void Method::appendToResponse(const std::string& key, const std::string& value)
+{
+    _response += key + ": " + value + CRLF;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

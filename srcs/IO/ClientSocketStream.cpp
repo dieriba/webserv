@@ -27,16 +27,13 @@ ClientSocketStream::~ClientSocketStream(){};
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-void ClientSocketStream::writeToSocket(int _ws, struct epoll_event& event, IO* _ev)
+void ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event, IO& _ev)
 {
-    (void)_ws;
-    (void)event;
-    (void)_ev;
     _response.serveResponse((*this), getRequest());
-    //Server *server = _ev -> getServer();
+    utilityMethod::switchEvents(_ws, EPOLLIN, event, _ev);
 }
 
-void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *_ev)
+void ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event, IO *_ev)
 {
         char buffer[REQUEST_SIZE] = {0};
         Server *server = _ev -> getServer();
@@ -53,7 +50,7 @@ void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *
         
         if (_request.getBuffer().size() >= MAX_HEADER_SIZE)
         {
-            switchEvents(_ws, event);
+            utilityMethod::switchEvents(_ws, EPOLLOUT, event, *(_ev));
             setErrorStatus(TOO_LARGE_CONTENT);
             return ;
         }
@@ -82,15 +79,15 @@ void ClientSocketStream::readFromSocket(int _ws, struct epoll_event& event, IO *
             else if (server -> checkBits(GET) != 0)
                 std::cout << s_buffer;
             setErrorStatus(req);
-            switchEvents(_ws, event);
+            utilityMethod::switchEvents(_ws, EPOLLOUT, event, *(_ev));
         }
 }
 
-void ClientSocketStream::handleIoOperation(int _ws, struct epoll_event& event)
+void ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& event)
 {
     if (event.events & EPOLLIN)
         readFromSocket(_ws, event, (IO *)event.data.ptr);
     else
-        writeToSocket(_ws, event, (IO *)event.data.ptr);
+        writeToSocket(_ws, event, *((IO *)event.data.ptr));
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

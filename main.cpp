@@ -16,7 +16,7 @@ void    print_location_config(const Location& location)
         << "METHOD DELETE: " << (location.checkBits(DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
         << "Client Max Body Size: " << location.getBodySize() << std::endl
         << "Index HTML: " << (location.getIndex().size() > 0 ? location.getIndex() : "No root index") << std::endl
-        << "Sub Path: " << location.getSubPath() << std::endl
+        << "Sub Path: " << location.getIndexPath() << std::endl
         << "Root Directory: " << (location.getRootDir().size() > 0 ? location.getRootDir() : "No root directory") << std::endl
         << "Redirect: "  << (location.getRedirect().size() > 0 ? location.getRedirect() : "No redirect") << std::endl
         << "Server: " << location.getServer() << std::endl;

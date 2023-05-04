@@ -13,13 +13,11 @@ class Location: public TcpServer
     
         /*GETTERS*/
         const Server* getServer(void) const;
-        const std::string& getSubPath() const;
         std::list<Location> getSubLocations(void) const;
 
         /*Setters*/
         void    pushNewLocation(const Location& location);
         void    setServer(Server *server);
-        void    setSubPath(const std::string& sub_path);
 
     private:
         std::list<Location> _sub_locations;

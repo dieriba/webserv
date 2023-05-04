@@ -36,6 +36,7 @@
 
 
 */
+# define CONTENT_TYP "Content-Type"
 # define CONTENT_LEN "Content-Length"
 # define TRANSFERT_ENCODING "Transfer-Encoding"
 # define CHUNK_REQUEST "-4"
@@ -63,6 +64,7 @@
 
 */
 
+# define DEFAULT "default"
 # define HTM ".html"
 # define HTML ".html"
 # define CSS ".css"
@@ -78,6 +80,7 @@
 # define MPEG ".mpeg"
 # define MP3 ".mp3"
 
+# define MIME_PLAIN "text/plain"
 # define MIME_HTM "text/html"
 # define MIME_HTML "text/html"
 # define MIME_CSS "text/css"

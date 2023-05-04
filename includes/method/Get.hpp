@@ -5,6 +5,7 @@
 
 class IO;
 class HttpRequest;
+class TcpServer;
 
 class Get: public Method
 {
@@ -17,7 +18,7 @@ class Get: public Method
         /*MEMBER FUNCTION*/
         void sendResponse(IO&, const HttpRequest&);
     private:
-        int handleFileRessource(IO& event, const HttpRequest& req, std::string& ressource);
+        int handleFileRessource(TcpServer& instance, IO& event, const HttpRequest& req, std::string& ressource);
         int handleDirectoryRessource(IO& event, DIR *directory);
 };
 

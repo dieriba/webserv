@@ -243,7 +243,7 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
     if (bracket && vec.size() == 2)
         vec[1].erase(vec[1].length() - 1);
 
-    _location.setSubPath(vec[1]);
+    _location.setIndexPath(vec[1]);
     if (!bracket)
     {
         /*CHECKS IF FIRST LINE MEET PARSING REQUIREMENTS*/
@@ -285,7 +285,6 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
     feedingUpLocation(_map, _location);
 
     _location.setServer(server);
-
     return _location;
 }
 
@@ -512,6 +511,8 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_
                 
                 serv = fillServer(file, line, (line.find('{') != std::string::npos));
                 
+                serv.setIndexPath("/");
+
                 serv.setTcpServer(tcp_serv);
                 
                 server.push_back(serv);

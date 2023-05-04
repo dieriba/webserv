@@ -1,6 +1,8 @@
-#ifndef _UTILITY_METHOD_HPP__
-#define _UTILITY_METHOD_HPP__
-#include "CommonLib.hpp"
+# ifndef _UTILITY_METHOD_HPP__
+# define _UTILITY_METHOD_HPP__
+# include "CommonLib.hpp"
+
+class IO;
 
 class utilityMethod
 {
@@ -15,6 +17,9 @@ class utilityMethod
         static std::string trimBothEnd(std::string& line, const char *toTrim);
         static std::vector<std::string> stringSpliter(const std::string& line, const std::string& delim);
         static size_t  count(const std::string& line, char to_count);
+        static void switchEvents(const int& _ws, uint32_t mode, struct epoll_event& event, const IO& ev);
+        static std::string numberToString(const int& number);
+        static const std::string& getMimeType(std::string& path, const std::string& index_path, const std::string& index);
 
     
     private:

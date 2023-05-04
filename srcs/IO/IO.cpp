@@ -43,11 +43,4 @@ bool IO::validSocketClient(int _fd, struct epoll_event event)
     return true ;
 }
 
-void IO::switchEvents(int _ws, struct epoll_event event) const
-{
-    event.events = EPOLLOUT;
-    event.data.ptr = event.data.ptr;
-    if (epoll_ctl(_ws, EPOLL_CTL_MOD, getFd(), &event) == -1)
-        close(getFd());
-}
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

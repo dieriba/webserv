@@ -21,6 +21,7 @@ Location& Location::operator=(const Location& rhs)
     _sub_locations = rhs._sub_locations;
     _server = rhs._server;
     _redirect = rhs._redirect;
+    _index_path = rhs._index_path;
     return *this;
 }
 Location::~Location(){};
@@ -29,7 +30,6 @@ Location::~Location(){};
 /*----------------------------------------GETTER----------------------------------------*/
 std::list<Location> Location::getSubLocations(void) const {return _sub_locations;};
 const Server* Location::getServer(void) const {return _server; };
-const std::string& Location::getSubPath(void) const {return _sub_path;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
@@ -41,11 +41,6 @@ void    Location::setServer(Server *server)
 {
     _server = server;
 };
-
-void    Location::setSubPath(const std::string& sub_path)
-{
-    _sub_path = sub_path;
-}
 
 /*----------------------------------------SETTER----------------------------------------*/
 

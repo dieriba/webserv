@@ -16,7 +16,7 @@ class IO
         IO& operator=(const IO& rhs);
         virtual ~IO();
 
-        virtual void handleIoOperation(int _ws, struct epoll_event& event) = 0;
+        virtual void handleIoOperation(const int& _ws, struct epoll_event& event) = 0;
     
     /*GETTERS*/
     const int& getFd(void) const;
@@ -32,7 +32,6 @@ class IO
 
     /*MEMBER FUNCTION*/
     bool validSocketClient(int _fd, struct epoll_event event);
-    void switchEvents(int _ws, struct epoll_event event) const;
 
     enum type
     {

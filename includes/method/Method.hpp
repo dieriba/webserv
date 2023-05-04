@@ -20,7 +20,8 @@ class Method
         std::string& getResponse(void);
 
         /*MEMBER FUNCTION*/
-        void makeStatusLine(int status);
+        void makeStatusLine(const int& status);
+        void appendToResponse(const std::string& key, const std::string& value);
 
         /*VIRTUAL FUNCTION*/
         virtual void sendResponse(IO&, const HttpRequest&) = 0;

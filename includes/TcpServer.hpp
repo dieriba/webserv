@@ -25,6 +25,7 @@ class TcpServer: public Parser, public BitsManipulation
         const std::string& getIndex(void) const;
         const std::string& getRootDir(void) const;
         const std::string& getRedirect(void) const;
+        const std::string& getIndexPath(void) const;
         const int& getEpollWs(void) const ;
 
         /*SETTERS*/
@@ -33,6 +34,7 @@ class TcpServer: public Parser, public BitsManipulation
         void setIndex(const std::string& index);
         void setRootDir(const std::string& root_dir);
         void setRedirect(const std::string& redirect);
+        void setIndexPath(const std::string& path);
 
         /*MEMBER FUNCTION*/
         void settingUpServer(const char *filename);
@@ -45,7 +47,7 @@ class TcpServer: public Parser, public BitsManipulation
         static void initHttpMethods(void);
         static void initKnownDirectives(void);
         static void initknownLocationsDirectives(void);
-        static const std::string& getMimeTypes(void);
+        static const std::string& getMimeType(const std::string& key);
         static bool isKnownDirective(const std::string& directive);
         static bool isKnownLocationDirectives(const std::string& directive);
         static const vec_it getHttpResponse(const short int& code);
@@ -57,6 +59,7 @@ class TcpServer: public Parser, public BitsManipulation
         std::string _index;
         std::string _root_dir;
         std::string _redirect;
+        std::string _index_path;
 
     private:
         int _epoll_ws;

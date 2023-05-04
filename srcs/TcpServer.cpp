@@ -12,7 +12,7 @@ TcpServer::TcpServer():BitsManipulation(),_body_size(0),
 
 TcpServer::TcpServer(const TcpServer& rhs)
     :Parser(rhs),BitsManipulation(rhs),_body_size(rhs._body_size),_index(rhs._index),
-    _root_dir(rhs._root_dir),_redirect(rhs._redirect),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
+    _root_dir(rhs._root_dir),_redirect(rhs._redirect),_index_path(rhs._index_path),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
 
 TcpServer& TcpServer::operator=(const TcpServer& rhs)
 {
@@ -38,6 +38,7 @@ std::vector<Server> TcpServer::getServers(void) const {return _servers;};
 const size_t& TcpServer::getBodySize(void) const {return _body_size;};
 const std::string& TcpServer::getRootDir(void) const {return _root_dir;};
 const std::string& TcpServer::getIndex(void) const {return _index;};
+const std::string& TcpServer::getIndexPath(void) const {return _index_path;};
 const std::string& TcpServer::getRedirect(void) const {return _redirect;};
 /*----------------------------------------GETTER----------------------------------------*/
 
@@ -67,6 +68,12 @@ void    TcpServer::setRedirect(const std::string& redirect)
 {
     _redirect = redirect;    
 }
+
+void    TcpServer::setIndexPath(const std::string& path)
+{
+    _index_path = path;    
+}
+
 
 /*----------------------------------------SETTER----------------------------------------*/
 
@@ -138,6 +145,11 @@ int TcpServer::getHttpMethod(const std::string& method)
     if (it == _httpMethods.end())
         return (-1);
     return (it -> second);
+}
+
+const std::string& TcpServer::getMimeType(const std::string& key)
+{
+    return _mimeTypes.find(key) -> second;
 }
 
 const vec_it TcpServer::getHttpResponse(const short int& response)
@@ -244,6 +256,7 @@ void TcpServer::initHttpResponses(void)
 
 void TcpServer::initMimeTypes(void)
 {
+    _mimeTypes[DEFAULT] = MIME_PLAIN;
     _mimeTypes[HTM] = MIME_HTM;
     _mimeTypes[HTML] = MIME_HTML;
     _mimeTypes[CSS] = MIME_CSS;

@@ -27,7 +27,7 @@ const TcpServer *RequestChecker::serverOrLocation(const Server& server, const Ht
 
     for (size_t i = 0; i < locations.size(); i++)
     {
-        if ((path.size() == 1 && locations[i].getSubPath() == path) || path.find(locations[i].getSubPath()) != std::string::npos)
+        if ((path.size() == 1 && locations[i].getIndexPath() == path) || path.find(locations[i].getIndexPath()) != std::string::npos)
             return &locations[i];
     }
 

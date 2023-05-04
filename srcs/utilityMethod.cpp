@@ -1,4 +1,5 @@
-#include "../includes/utilityMethod.hpp"
+# include "../includes/utilityMethod.hpp"
+# include "../includes/IO/IO.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 utilityMethod::utilityMethod(){};
@@ -56,6 +57,40 @@ size_t  utilityMethod::count(const std::string& line, char to_find)
             count++;
     }
     return count;
+}
+
+
+void utilityMethod::switchEvents(const int& _ws, uint32_t mode, struct epoll_event& event, const IO& ev)
+{
+    event.events = mode;
+    event.data.ptr = event.data.ptr;
+    if (epoll_ctl(_ws, EPOLL_CTL_MOD, ev.getFd(), &event) == -1)
+        close(ev.getFd());
+}
+
+std::string utilityMethod::numberToString(const int& number)
+{
+    std::ostringstream ss;
+
+    ss << number;
+    
+    return ss.str();
+}
+
+const std::string& utilityMethod::getMimeType(std::string& path, const std::string& index_path, const std::string& index)
+{
+    if (path == index_path) path = index;
+    
+    int  i = path.size() - 1;
+
+
+    for (; i >= 0; i--)
+    {
+        if (path[i] == '/' || path[i] == '.')
+            break ;
+    }
+    
+    return path[i] == '/' ? TcpServer::getMimeType(DEFAULT) : TcpServer::getMimeType(&path[i]);
 }
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
