@@ -77,7 +77,6 @@ std::string utilityMethod::numberToString(const int& number)
     return ss.str();
 }
 
-<<<<<<< HEAD
 std::string utilityMethod::decimalToHex(const int& number)
 {
     std::stringstream ss;
@@ -85,18 +84,12 @@ std::string utilityMethod::decimalToHex(const int& number)
     return ss.str();
 }
 
-=======
->>>>>>> origin/main
 const std::string& utilityMethod::getMimeType(std::string& path, const std::string& index_path, const std::string& index)
 {
     if (path == index_path) path = index;
     
     int  i = path.size() - 1;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
     for (; i >= 0; i--)
     {
         if (path[i] == '/' || path[i] == '.')

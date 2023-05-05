@@ -17,7 +17,6 @@
 # include <sstream>
 # include <sys/types.h>
 # include <dirent.h>
-<<<<<<< HEAD
 # include <signal.h>
 
 
@@ -25,10 +24,6 @@
 
 */
 
-=======
-
-
->>>>>>> origin/main
 
 /*
 

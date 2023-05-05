@@ -2,7 +2,6 @@
 # define __HTTP_RESPONSE_HPP__
 
 # include "HttpMessage.hpp"
-<<<<<<< HEAD
 # include "../BitsManipulation.hpp"
 # include "../method/Method.hpp"
 # include "../method/Error.hpp"
@@ -12,15 +11,6 @@ class HttpRequest;
 class IO;
 
 class HttpResponse: public HttpMessage, public BitsManipulation
-=======
-# include "../method/Method.hpp"
-# include "../method/Error.hpp"
-
-class HttpRequest;
-class IO;
-
-class HttpResponse: public HttpMessage
->>>>>>> origin/main
 {
     public:
         HttpResponse();
@@ -28,7 +18,6 @@ class HttpResponse: public HttpMessage
         HttpResponse& operator=(const HttpResponse& rhs);
         ~HttpResponse();
 
-<<<<<<< HEAD
         /*ENUM OPTIONS*/
         enum options
         {
@@ -61,21 +50,6 @@ class HttpResponse: public HttpMessage
         Error   _error;
         DIR     *_directory;
         std::ifstream _file;
-=======
-        /*GETTER*/
-        Error& getErrorMethod(void);
-        Method *getHttpMethod(void) const;
-
-        /*SETTER*/
-        void setMethodObj(Method *method);
-    
-        /*MEMBER FUNCTION*/
-        void serveResponse(IO&, const HttpRequest&);
-
-    private:
-        Method  *_method;
-        Error   _error;
->>>>>>> origin/main
 };
 
 # endif

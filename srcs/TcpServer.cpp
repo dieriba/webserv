@@ -39,10 +39,7 @@ const size_t& TcpServer::getBodySize(void) const {return _body_size;};
 const std::string& TcpServer::getRootDir(void) const {return _root_dir;};
 const std::string& TcpServer::getIndex(void) const {return _index;};
 const std::string& TcpServer::getIndexPath(void) const {return _index_path;};
-<<<<<<< HEAD
 const std::string& TcpServer::getFullIndexPath(void) const {return _full_index_path;};
-=======
->>>>>>> origin/main
 const std::string& TcpServer::getRedirect(void) const {return _redirect;};
 /*----------------------------------------GETTER----------------------------------------*/
 
@@ -78,14 +75,11 @@ void    TcpServer::setIndexPath(const std::string& path)
     _index_path = path;    
 }
 
-<<<<<<< HEAD
 void    TcpServer::setFullIndexPath(const std::string& path)
 {
     _full_index_path = path;
 }
 
-=======
->>>>>>> origin/main
 
 /*----------------------------------------SETTER----------------------------------------*/
 

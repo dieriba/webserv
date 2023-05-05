@@ -1,9 +1,6 @@
 # include "../../includes/method/Error.hpp"
 # include "../../includes/http/HttpRequest.hpp"
-<<<<<<< HEAD
 # include "../../includes/http/HttpResponse.hpp"
-=======
->>>>>>> origin/main
 # include "../../includes/IO/IO.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
@@ -26,7 +23,6 @@ Error::~Error(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-<<<<<<< HEAD
 void Error::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
 {
     (void)event;
@@ -38,14 +34,5 @@ void Error::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
     _response += CRLF;
     std::cout << _response;
     send(event.getFd(), _response.data(), _response.size(), 0);
-=======
-void Error::sendResponse(IO& event, const HttpRequest& req)
-{
-    (void)event;
-    (void)req;
-    makeStatusLine(event.getErrStatus());
-    std::cout << _response;
-    exit(1);
->>>>>>> origin/main
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

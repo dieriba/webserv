@@ -1,9 +1,6 @@
 # include "../../includes/method/Delete.hpp"
 # include "../../includes/http/HttpRequest.hpp"
-<<<<<<< HEAD
 # include "../../includes/http/HttpResponse.hpp"
-=======
->>>>>>> origin/main
 # include "../../includes/IO/IO.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
@@ -26,17 +23,10 @@ Delete::~Delete(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-<<<<<<< HEAD
 void Delete::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
 {
     (void)event;
     (void)req;
     (void)res;
-=======
-void Delete::sendResponse(IO& event, const HttpRequest& req)
-{
-(   void)event;
-    (void)req;
->>>>>>> origin/main
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

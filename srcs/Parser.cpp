@@ -81,16 +81,10 @@ void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Locat
 
     it = _map.find(ROOT);
 
-<<<<<<< HEAD
-=======
-    if (it != end) location.setRootDir("." + it -> second);
-    
->>>>>>> origin/main
     it = _map.find(INDEX);
     
     if (it != end) location.setIndex(it -> second);
 
-<<<<<<< HEAD
     if (it != end)
     {
         if (*(it -> second.rbegin()) == '/')
@@ -100,8 +94,6 @@ void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Locat
 
     }
 
-=======
->>>>>>> origin/main
     it = _map.find(ALLOWED_METHOD);
 
     if (it == end) location.setOptions(ALL_METHODS, SET);
@@ -169,7 +161,6 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
     
     it = _serv_conf.find(ROOT);
 
-<<<<<<< HEAD
     if (it != end) 
     {
         if (*(it -> second.rbegin()) == '/')
@@ -177,9 +168,6 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
         server.setRootDir("." + it -> second);
         server.setFullIndexPath(server.getRootDir() + "/");
     }
-=======
-    if (it != end) server.setRootDir("." + it -> second);
->>>>>>> origin/main
     
     it = _serv_conf.find(INDEX);
     

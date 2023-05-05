@@ -26,10 +26,7 @@ class TcpServer: public Parser, public BitsManipulation
         const std::string& getRootDir(void) const;
         const std::string& getRedirect(void) const;
         const std::string& getIndexPath(void) const;
-<<<<<<< HEAD
         const std::string& getFullIndexPath(void) const;
-=======
->>>>>>> origin/main
         const int& getEpollWs(void) const ;
 
         /*SETTERS*/
@@ -39,10 +36,7 @@ class TcpServer: public Parser, public BitsManipulation
         void setRootDir(const std::string& root_dir);
         void setRedirect(const std::string& redirect);
         void setIndexPath(const std::string& path);
-<<<<<<< HEAD
         void setFullIndexPath(const std::string& full_index_path);
-=======
->>>>>>> origin/main
 
         /*MEMBER FUNCTION*/
         void settingUpServer(const char *filename);
@@ -68,10 +62,7 @@ class TcpServer: public Parser, public BitsManipulation
         std::string _root_dir;
         std::string _redirect;
         std::string _index_path;
-<<<<<<< HEAD
         std::string _full_index_path;
-=======
->>>>>>> origin/main
 
     private:
         int _epoll_ws;
