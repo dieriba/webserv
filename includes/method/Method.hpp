@@ -5,6 +5,10 @@
 
 class IO;
 class HttpRequest;
+<<<<<<< HEAD
+class HttpResponse;
+=======
+>>>>>>> origin/main
 
 class Method
 {
@@ -24,7 +28,11 @@ class Method
         void appendToResponse(const std::string& key, const std::string& value);
 
         /*VIRTUAL FUNCTION*/
+<<<<<<< HEAD
+        virtual void sendResponse(IO&, const HttpRequest&, HttpResponse&) = 0;
+=======
         virtual void sendResponse(IO&, const HttpRequest&) = 0;
+>>>>>>> origin/main
 
         /*STATIC MEMBER FUNCTION*/
         static Method* createGet();

@@ -15,7 +15,11 @@ class Error: public Method
         ~Error();
 
         /*MEMBER FUNCTION*/
+<<<<<<< HEAD
+        void sendResponse(IO&, const HttpRequest&, HttpResponse&);
+=======
         void sendResponse(IO&, const HttpRequest&);
+>>>>>>> origin/main
 };
 
 # endif

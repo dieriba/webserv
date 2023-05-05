@@ -36,4 +36,12 @@ bool    BitsManipulation::checkBits(const unsigned int& nbit) const
 {
     return (bitcheck(_options, nbit) > 0);
 }
+<<<<<<< HEAD
+
+void    BitsManipulation::resetOptions(void)
+{
+    _options = 0;
+}
+=======
+>>>>>>> origin/main
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/

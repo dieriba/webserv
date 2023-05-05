@@ -27,6 +27,29 @@ ClientSocketStream::~ClientSocketStream(){};
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
+<<<<<<< HEAD
+void ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
+{
+    _response.serveResponse((*this), getRequest());
+    if (_response.checkBits(HttpResponse::FINISHED_RESPONSE))
+    {
+        utilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
+        _response.resetOptions();
+    }
+}
+
+void ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event)
+{
+        char buffer[REQUEST_SIZE] = {0};
+
+        Server *server = this -> getServer();
+
+        int size = recv(this -> getFd(), buffer, REQUEST_SIZE, 0);
+
+        if (size <= 0)
+        {
+            server  -> deleteFromEventsMap(this);
+=======
 void ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event, IO& _ev)
 {
     _response.serveResponse((*this), getRequest());
@@ -43,6 +66,7 @@ void ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& even
         if (size <= 0)
         {
             server  -> deleteFromEventsMap(_ev);
+>>>>>>> origin/main
             return ;
         }
 
@@ -50,7 +74,11 @@ void ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& even
         
         if (_request.getBuffer().size() >= MAX_HEADER_SIZE)
         {
+<<<<<<< HEAD
+            utilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
+=======
             utilityMethod::switchEvents(_ws, EPOLLOUT, event, *(_ev));
+>>>>>>> origin/main
             setErrorStatus(TOO_LARGE_CONTENT);
             return ;
         }
@@ -63,8 +91,13 @@ void ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& even
             
             int req = _request.parseRequest(*this);
             
+<<<<<<< HEAD
+            /*if ((server -> checkBits(C_LEN) || server -> checkBits(T_ENC)) && !server -> checkBits(FINISH_BODY))
+                return ;*/
+=======
             if ((server -> checkBits(C_LEN) || server -> checkBits(T_ENC)) && !server -> checkBits(FINISH_BODY))
                 return ;
+>>>>>>> origin/main
             
             req = RequestChecker::checkAll(*server, _request);
 
@@ -76,18 +109,31 @@ void ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& even
                 std::cout << _request.getBuffer();
                 server -> setOptions(FINISH_BODY, CLEAR);
             }
+<<<<<<< HEAD
+            /*else if (server -> checkBits(GET) != 0)
+                std::cout << s_buffer;*/
+            setErrorStatus(req);
+            utilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
+=======
             else if (server -> checkBits(GET) != 0)
                 std::cout << s_buffer;
             setErrorStatus(req);
             utilityMethod::switchEvents(_ws, EPOLLOUT, event, *(_ev));
+>>>>>>> origin/main
         }
 }
 
 void ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& event)
 {
     if (event.events & EPOLLIN)
+<<<<<<< HEAD
+        readFromSocket(_ws, event);
+    else
+        writeToSocket(_ws, event);
+=======
         readFromSocket(_ws, event, (IO *)event.data.ptr);
     else
         writeToSocket(_ws, event, *((IO *)event.data.ptr));
+>>>>>>> origin/main
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

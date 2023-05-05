@@ -68,8 +68,11 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
     if (instance -> getRootDir().size() == 0) return NOT_FOUND;
 
     root = instance -> getRootDir();
+<<<<<<< HEAD
+=======
     if (*(root.rbegin()) == '/')
         root.erase(root.end() - 1);
+>>>>>>> origin/main
     root += req.getHeaders().find("PATH") -> second;
     const char *root_c = root.c_str();
     

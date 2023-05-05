@@ -14,8 +14,13 @@ class ClientSocketStream: public IO
 
         void handleIoOperation(const int& _ws, struct epoll_event&);
     private:
+<<<<<<< HEAD
+        void readFromSocket(const int& _ws, struct epoll_event& event);
+        void writeToSocket(const int& _ws, struct epoll_event& event);
+=======
         void readFromSocket(const int& _ws, struct epoll_event& event, IO *_ev);
         void writeToSocket(const int& _ws, struct epoll_event& event, IO& _ev);
+>>>>>>> origin/main
 };
 
 # endif

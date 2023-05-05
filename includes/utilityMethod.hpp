@@ -20,7 +20,11 @@ class utilityMethod
         static void switchEvents(const int& _ws, uint32_t mode, struct epoll_event& event, const IO& ev);
         static std::string numberToString(const int& number);
         static const std::string& getMimeType(std::string& path, const std::string& index_path, const std::string& index);
+<<<<<<< HEAD
+        static std::string decimalToHex(const int& number);
+=======
 
+>>>>>>> origin/main
     
     private:
         utilityMethod& operator=(const utilityMethod& rhs);        

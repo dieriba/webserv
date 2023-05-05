@@ -15,10 +15,18 @@ class BitsManipulation
         void    setOptions(const unsigned int& nbit, char actions);
         /*MEMBER FUNCTION*/
         bool    checkBits(const unsigned int& nbit) const;
+<<<<<<< HEAD
+        void    resetOptions(void);
+
+    protected:
+        unsigned int _options;
+
+=======
 
     protected:
         unsigned int _options;
         
     private:
+>>>>>>> origin/main
 };
 #endif
