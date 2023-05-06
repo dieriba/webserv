@@ -37,7 +37,7 @@ int ServerStream::handleIoOperation(const int& _ws, struct epoll_event& event)
             client_fd = accept(_fd, NULL, NULL);
 
             if (client_fd == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
-                return -1;
+                return 1;
                         
             _ev.data.ptr = new ClientSocketStream(client_fd, getServer());
             _ev.events = EPOLLIN;
@@ -46,9 +46,8 @@ int ServerStream::handleIoOperation(const int& _ws, struct epoll_event& event)
                 
             if (TcpServer::makeNonBlockingFd(client_fd) || epoll_ctl(_ws, EPOLL_CTL_ADD, client_fd, &_ev))
             {
-                this -> getServer() -> deleteFromEventsMap(static_cast<const IO*>(_ev.data.ptr));
+                return IO::IO_ERROR;
             }
-                        
         }
     }
     return 0;
