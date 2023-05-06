@@ -22,10 +22,8 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         enum options
         {
             STARTED,
-            FIRST_READ,
             FILE,
             DIRECTORY,
-            TRANSFERT_ENC,
             FINISHED_RESPONSE
         };
         

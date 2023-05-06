@@ -48,43 +48,23 @@ int Get::handleFileRessource(IO& event, const HttpRequest& req, HttpResponse& re
 {
     try
     {
-        TcpServer& instance = *(event.getServer() -> getInstance());
-        bool f_read = res.checkBits(HttpResponse::FIRST_READ);
-        (void)req;
-        std::string s_buffer;
-        std::string ressource(res.getPath());
-
         char buffer[REQUEST_SIZE + 1] = {0};
+
+        std::ifstream& file = res.getFile();
         
-        res.getFile().read(buffer, REQUEST_SIZE);
-        s_buffer = buffer;
-        
-        /**/
-        appendToResponse(CONTENT_TYP, utilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex()));
-        if (f_read && (res.getFile().eof() && res.getFile().fail()))
+        file.read(buffer, REQUEST_SIZE);
+    
+        if (sendBuffer(event.getFd(), buffer, file.gcount()))
         {
-            appendToResponse(CONTENT_LEN, utilityMethod::numberToString(s_buffer.size()));
-            _response += CRLF;
-            _response += s_buffer;
-            send(event.getFd(), _response.c_str(), _response.size(), MSG_NOSIGNAL);
+            std::cout << "Socket Ended" << std::endl;
+            return (-1);
+        }
+
+        if (file.fail() && file.eof())
+        {
             res.resetOptions();
-            res.getFile().close();
+            file.close();
             res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
-        }
-        else if (f_read)
-        {
-            std::cout << "1" << std::endl;
-            res.setOptions(HttpResponse::TRANSFERT_ENC, SET);
-            appendToResponse(TRANSFERT_ENCODING, "chunked");
-            _response += CRLF;
-            send(event.getFd(), _response.c_str(), _response.size(), MSG_NOSIGNAL);
-            //std::cout << _response;
-        }
-        if (res.checkBits(HttpResponse::TRANSFERT_ENC))
-        {
-            std::cout << "3" << std::endl;
-            handleChunkedRequest(res, s_buffer);
-            send(event.getFd(), _response.c_str(), _response.size(), MSG_NOSIGNAL);
         }
     }
     catch(const std::exception& e)
@@ -103,20 +83,41 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     TcpServer& instance = *(event.getServer() -> getInstance());
     std::string path(req.getHeaders().find(PATH) -> second);
     res.setPath(instance.getRootDir() + req.getHeaders().find(PATH) -> second);
+    std::string ressource(res.getPath());
     DIR *directory = NULL;
 
     if (path != "/") directory = opendir(res.getPath().c_str());
-    
-    makeStatusLine(OK);
-    
+        
     if ((path == instance.getIndexPath() || (directory == NULL && (errno == ENOENT || errno == ENOTDIR))))
     {
         std::ifstream& file = res.getFile();
+
         if (req.getHeaders().find(PATH) -> second == instance.getIndexPath())
             res.setPath(instance.getRootDir() + "/" + instance.getIndex());
+
         file.open(res.getPath().c_str(), std::ifstream::in | std::ifstream::binary);
             
         if (!file) return (res.getErrorMethod().sendResponse(event, req, res), 1);
+        
+        file.seekg(0, std::ios::end);
+        res.setBodySize(file.tellg());
+        file.seekg(0, std::ios::beg);
+
+        if (file.fail()) return (res.getErrorMethod().sendResponse(event, req, res), 1);
+        
+        makeStatusLine(OK);
+
+        appendToResponse(CONTENT_TYP, utilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex()));
+        appendToResponse(CONTENT_LEN, utilityMethod::numberToString(res.getBodySize()));
+        _response += CRLF;
+
+        if (sendBuffer(event.getFd(), _response.c_str(), _response.size()))
+        {
+            std::cout << "Socket Ended" << std::endl;
+            return (-1);
+        }
+
+        _response.clear();
         
         res.setOptions(HttpResponse::FILE, SET);
     }
@@ -124,7 +125,6 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     {
         res.setOptions(HttpResponse::DIRECTORY, SET);
     }
-    res.setOptions(HttpResponse::FIRST_READ, SET);
     res.setOptions(HttpResponse::STARTED, SET);
     return 0;
 }
@@ -139,15 +139,11 @@ int Get::handleDirectoryRessource(IO& event, DIR *directory)
 void Get::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
 {
 
-
-    if (res.checkBits(HttpResponse::FIRST_READ)) res.setOptions(HttpResponse::FIRST_READ, CLEAR);
-
     if (!res.checkBits(HttpResponse::STARTED) && firstStep(event, req, res)) return ;
 
     if (res.checkBits(HttpResponse::FILE))
     {
         handleFileRessource(event, req, res);
     }
-    //send(event.getFd(), _response.data(), _response.size(), 0);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

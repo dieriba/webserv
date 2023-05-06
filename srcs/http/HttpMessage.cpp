@@ -36,6 +36,12 @@ void HttpMessage::setBodySize(const std::string& body)
     else
         _body = b;
 }
+
+void HttpMessage::setBodySize(const size_t& size)
+{
+    _body = size;
+}
+
 void HttpMessage::setMetod(const int& method) {_method = method;}
 /*----------------------------------------SETTER----------------------------------------*/
 

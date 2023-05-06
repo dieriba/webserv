@@ -18,7 +18,8 @@ class HttpMessage
         const std::map<std::string, std::string>& getHeaders() const;
 
         /*SETTER*/
-        void setBodySize(const std::string& body) ;
+        void setBodySize(const std::string& body);
+        void setBodySize(const size_t& size);
         void appendToBuffer(const std::string& toAppend);
         void setMetod(const int& _method);
     protected:

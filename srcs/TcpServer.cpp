@@ -155,7 +155,11 @@ int TcpServer::getHttpMethod(const std::string& method)
 
 const std::string& TcpServer::getMimeType(const std::string& key)
 {
-    return _mimeTypes.find(key) -> second;
+    std::map<std::string, std::string>::iterator it = _mimeTypes.find(key);
+
+    if (it == _mimeTypes.end())
+        return _mimeTypes.find(DEFAULT) -> second;
+    return it -> second;
 }
 
 const vec_it TcpServer::getHttpResponse(const short int& response)
@@ -265,6 +269,7 @@ void TcpServer::initMimeTypes(void)
     _mimeTypes[DEFAULT] = MIME_PLAIN;
     _mimeTypes[HTM] = MIME_HTM;
     _mimeTypes[HTML] = MIME_HTML;
+    _mimeTypes[SLASH] = MIME_HTML;
     _mimeTypes[CSS] = MIME_CSS;
     _mimeTypes[CSV] = MIME_CSV;
     _mimeTypes[JPEG] = MIME_JPEG;

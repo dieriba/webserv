@@ -69,6 +69,7 @@
 
 */
 
+# define SLASH "/"
 # define DEFAULT "default"
 # define HTM ".html"
 # define HTML ".html"

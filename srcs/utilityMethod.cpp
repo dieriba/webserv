@@ -95,8 +95,7 @@ const std::string& utilityMethod::getMimeType(std::string& path, const std::stri
         if (path[i] == '/' || path[i] == '.')
             break ;
     }
-    
-    return path[i] == '/' ? TcpServer::getMimeType(DEFAULT) : TcpServer::getMimeType(&path[i]);
+    return TcpServer::getMimeType(&path[i]);
 }
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/

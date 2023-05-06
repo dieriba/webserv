@@ -21,6 +21,7 @@ class Method
         std::string& getResponse(void);
 
         /*MEMBER FUNCTION*/
+        int sendBuffer(int client_socket, const char *buffer, int bytes);
         void makeStatusLine(const int& status);
         void appendToResponse(const std::string& key, const std::string& value);
 
