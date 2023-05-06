@@ -73,7 +73,9 @@ int HttpRequest::parseRequest(IO& object)
     if (_it_transfert != _headers.end())
     {
         object.setOptions(TcpServer::TRANSFER_ENCODING, SET);
-        
+
+        if (s_buffer.find(END_CHUNK) != std::string::npos)
+            object.setOptions(TcpServer::FINISH_BODY, SET);
     }
     
     if (_it_content != _headers.end())
@@ -83,6 +85,7 @@ int HttpRequest::parseRequest(IO& object)
         if ((s_buffer.size()) == _body)
             object.setOptions(TcpServer::FINISH_BODY, SET);
     }
+
     return 0;
 }
 

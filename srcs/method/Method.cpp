@@ -4,6 +4,8 @@
 # include "../../includes/method/Post.hpp"
 # include "../../includes/method/Delete.hpp"
 # include "../../includes/method/Error.hpp"
+# include "../../includes/IO/IO.hpp"
+
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Method::Method(){};
 Method::Method(const Method& rhs){(void)rhs;};
@@ -32,13 +34,13 @@ int Method::sendBuffer(int client_socket, const char *buffer, int bytes)
     while (bytes > 0)
     {
         int bytesSent = send(client_socket, buffer, bytes, 0);
-        if (bytesSent <= 0) return -1;
+        if (bytesSent <= 0) return IO::IO_ERROR;
 
         bytes -= bytesSent;
 
         buffer += bytesSent;
     }
-    return 0;
+    return IO::IO_SUCCESS;
 }
 
 void Method::makeStatusLine(const int& status)

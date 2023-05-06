@@ -52,8 +52,8 @@ void HttpResponse::setDirectory(DIR *directory)
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-void HttpResponse::serveResponse(IO& event, const HttpRequest& req)
+int HttpResponse::serveResponse(IO& event, const HttpRequest& req)
 {
-    _method -> sendResponse(event, req, *this);
+    return _method -> sendResponse(event, req, *this);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

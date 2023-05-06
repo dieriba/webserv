@@ -29,14 +29,16 @@ ClientSocketStream::~ClientSocketStream(){};
 
 int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
 {
-    _response.serveResponse((*this), getRequest());
+    int res = _response.serveResponse((*this), getRequest());
+    
     if (_response.checkBits(HttpResponse::FINISHED_RESPONSE))
     {
         this -> resetOptions();
         utilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
         _response.resetOptions();
     }
-    return 0;
+
+    return res;
 }
 
 int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event)
@@ -69,7 +71,6 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
             
         req = RequestChecker::checkAll(*(this -> getServer()), _request);
 
-
         _response.setMethodObj((req == 0 ? Method::_tab[_request.getMethod()]() : Method::_tab[3]()));
 
         if (this -> checkBits(TcpServer::FINISH_BODY) != 0)
@@ -84,6 +85,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         setErrorStatus(req);
         utilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
     }
+    
     return IO::IO_SUCCESS;
 }
 

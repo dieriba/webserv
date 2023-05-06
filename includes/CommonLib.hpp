@@ -61,6 +61,7 @@
 # define REQUEST_SIZE 70000
 # define MAXEVENTS 64
 # define CRLF "\r\n"
+# define END_CHUNK "0\r\n\r\n"
 # define TIMEOUT 1000
 # define MAX_HEADER_SIZE 4000
 # define NO_VALUE "NO_VALUE"

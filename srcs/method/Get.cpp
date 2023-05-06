@@ -83,8 +83,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     TcpServer& instance = *(event.getServer() -> getInstance());
     std::string path(req.getHeaders().find(PATH) -> second);
     res.setPath(instance.getRootDir() + req.getHeaders().find(PATH) -> second);
-    std::string ressource(res.getPath());
-    DIR *directory = NULL;
+    DIR *directory;
 
     if (path != "/") directory = opendir(res.getPath().c_str());
         
@@ -97,24 +96,36 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 
         file.open(res.getPath().c_str(), std::ifstream::in | std::ifstream::binary);
             
-        if (!file) return (res.getErrorMethod().sendResponse(event, req, res), 1);
-        
+        if (!file) 
+        {
+            delete res.getHttpMethod();
+            res.setMethodObj(new Error);
+            return (1);
+        }
+    
         file.seekg(0, std::ios::end);
         res.setBodySize(file.tellg());
         file.seekg(0, std::ios::beg);
 
-        if (file.fail()) return (res.getErrorMethod().sendResponse(event, req, res), 1);
-        
+        if (file.fail())
+        {
+            delete res.getHttpMethod();
+            res.setMethodObj(new Error);
+            return (1);
+        }
+
         makeStatusLine(OK);
 
+        std::string ressource(res.getPath());
+        
         appendToResponse(CONTENT_TYP, utilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex()));
         appendToResponse(CONTENT_LEN, utilityMethod::numberToString(res.getBodySize()));
         _response += CRLF;
 
         if (sendBuffer(event.getFd(), _response.c_str(), _response.size()))
         {
-            std::cout << "Socket Ended" << std::endl;
-            return (-1);
+            std::cout << "Closing socket: " << event.getFd() << std::endl;
+            return (IO::IO_ERROR);
         }
 
         _response.clear();
@@ -138,8 +149,12 @@ int Get::handleDirectoryRessource(IO& event, DIR *directory)
 
 int Get::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
 {
+    if (!res.checkBits(HttpResponse::STARTED))
+    {
+        int err = firstStep(event, req, res);
 
-    if (!res.checkBits(HttpResponse::STARTED) && firstStep(event, req, res)) return 0;
+        if (err) return err;
+    }
 
     if (res.checkBits(HttpResponse::FILE))
     {

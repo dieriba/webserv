@@ -40,7 +40,7 @@ class HttpResponse: public HttpMessage, public BitsManipulation
     
         /*MEMBER FUNCTION*/
         void setDirectory(DIR* directory);
-        void serveResponse(IO&, const HttpRequest&);
+        int serveResponse(IO&, const HttpRequest&);
 
     private:
         std::string _path_req;
