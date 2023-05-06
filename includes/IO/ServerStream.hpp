@@ -12,7 +12,7 @@ class ServerStream: public IO
         ServerStream& operator=(const ServerStream& rhs);
         ~ServerStream();
 
-        void handleIoOperation(const int& _ws, struct epoll_event&);
+        int handleIoOperation(const int& _ws, struct epoll_event&);
 };
 
 # endif

@@ -11,9 +11,9 @@ void    print_location_config(const Location& location)
     std::cout << std::endl << std::endl ;
     std::cout << "----------Location----------";
     std::cout << std::endl << std::endl
-        << "METHOD GET: " << (location.checkBits(GET) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD POST: " << (location.checkBits(POST) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD DELETE: " << (location.checkBits(DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
+        << "METHOD GET: " << (location.checkBits(TcpServer::GET) > 0 ? "Enabled" : "Disabled") << std::endl
+        << "METHOD POST: " << (location.checkBits(TcpServer::POST) > 0 ? "Enabled" : "Disabled") << std::endl
+        << "METHOD DELETE: " << (location.checkBits(TcpServer::DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
         << "Client Max Body Size: " << location.getBodySize() << std::endl
         << "Index HTML: " << (location.getIndex().size() > 0 ? location.getIndex() : "No root index") << std::endl
         << "Sub Path: " << location.getIndexPath() << std::endl
@@ -34,9 +34,9 @@ void    print_server_config(const Server server)
     std::map<std::string, std::string>::iterator m_it = map.begin();
     std::map<std::string, std::string>::iterator m_end = map.end();
     std::cout
-        << "METHOD GET: " << (server.checkBits(GET) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD POST: " << (server.checkBits(POST) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD DELETE: " << (server.checkBits(DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
+        << "METHOD GET: " << (server.checkBits(TcpServer::GET) > 0 ? "Enabled" : "Disabled") << std::endl
+        << "METHOD POST: " << (server.checkBits(TcpServer::POST) > 0 ? "Enabled" : "Disabled") << std::endl
+        << "METHOD DELETE: " << (server.checkBits(TcpServer::DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
         << "IP: " << (server.getIp().size() > 0 ? server.getIp() : "NO IP SET") << std::endl
         << "Redirect: " << (server.getRedirect().size() > 0 ? server.getRedirect(): "No redirection") << std::endl
         << "PORT: " << server.getPort() << std::endl

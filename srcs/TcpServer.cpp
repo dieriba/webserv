@@ -18,6 +18,7 @@ TcpServer& TcpServer::operator=(const TcpServer& rhs)
 {
     if (this == &rhs) return *this;
     _body_size = rhs._body_size;
+    _options = rhs._options;
     _index = rhs._index;
     _root_dir = rhs._root_dir;
     _redirect = rhs._redirect;
@@ -125,6 +126,8 @@ void TcpServer::runningUpServer(void)
 void TcpServer::makeServerServe(void)
 {
     int to_proceed;
+    int res;
+
     struct epoll_event _events[MAXEVENTS];
 
     IO  *events;
@@ -134,8 +137,13 @@ void TcpServer::makeServerServe(void)
         to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, -1);
         for (int i = 0; i < to_proceed; i++)
         {
-            events = (IO *)_events[i].data.ptr;
-            events -> handleIoOperation(_epoll_ws, _events[i]);
+            events = static_cast<IO *>(_events[i].data.ptr);
+            res = events -> handleIoOperation(_epoll_ws, _events[i]) == IO::IO_ERROR;
+            if (res == IO::IO_ERROR)
+            {
+                Server *server = events -> getServer();
+                server -> deleteFromEventsMap(events);
+            }
         }
     }
 }

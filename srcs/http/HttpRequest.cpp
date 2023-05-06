@@ -25,15 +25,13 @@ HttpRequest::~HttpRequest(){};
 
 int HttpRequest::parseRequest(IO& object)
 {
-    Server *server = object.getServer();
-
-    if (server -> checkBits(C_LEN))
+    if (object.checkBits(TcpServer::CONTENT_LENGTH))
     {
-        if (s_buffer.size() == _body)
-            server -> setOptions(FINISH_BODY, SET);
+        if (s_buffer.size() >= _body)
+            object.setOptions(TcpServer::FINISH_BODY, SET);
         return 0;
     }
-    else if (server -> checkBits(T_ENC))
+    else if (object.checkBits(TcpServer::TRANSFER_ENCODING))
     {
         return 0;
     }
@@ -74,16 +72,16 @@ int HttpRequest::parseRequest(IO& object)
 
     if (_it_transfert != _headers.end())
     {
-        server -> setOptions(T_ENC, SET);
+        object.setOptions(TcpServer::TRANSFER_ENCODING, SET);
         
     }
     
     if (_it_content != _headers.end())
     {
-        server -> setOptions(C_LEN, SET);
+        object.setOptions(TcpServer::CONTENT_LENGTH, SET);
         setBodySize(_it_content -> second);
         if ((s_buffer.size()) == _body)
-            server -> setOptions(FINISH_BODY, SET);
+            object.setOptions(TcpServer::FINISH_BODY, SET);
     }
     return 0;
 }

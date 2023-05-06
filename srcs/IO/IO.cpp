@@ -2,11 +2,12 @@
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 IO::IO(){};
-IO::IO(const int& fd, Server *server):_fd(fd),_err(0),_server(server){};
-IO::IO(const IO& rhs):_fd(rhs._fd),_server(rhs._server){};
+IO::IO(const int& fd, Server *server):BitsManipulation(),_fd(fd),_err(0),_server(server){};
+IO::IO(const IO& rhs):BitsManipulation(rhs),_fd(rhs._fd),_server(rhs._server){};
 IO& IO::operator=(const IO& rhs)
 {
     if (this == &rhs) return (*this);
+    _options = rhs._options;
     _fd = rhs._fd;
     _server = rhs._server;
     _err = rhs._err;

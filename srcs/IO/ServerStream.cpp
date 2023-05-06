@@ -25,7 +25,7 @@ ServerStream::~ServerStream(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void ServerStream::handleIoOperation(const int& _ws, struct epoll_event& event)
+int ServerStream::handleIoOperation(const int& _ws, struct epoll_event& event)
 {
     int client_fd;
     struct epoll_event _ev;
@@ -37,7 +37,7 @@ void ServerStream::handleIoOperation(const int& _ws, struct epoll_event& event)
             client_fd = accept(_fd, NULL, NULL);
 
             if (client_fd == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
-                return ;
+                return -1;
                         
             _ev.data.ptr = new ClientSocketStream(client_fd, getServer());
             _ev.events = EPOLLIN;
@@ -46,12 +46,11 @@ void ServerStream::handleIoOperation(const int& _ws, struct epoll_event& event)
                 
             if (TcpServer::makeNonBlockingFd(client_fd) || epoll_ctl(_ws, EPOLL_CTL_ADD, client_fd, &_ev))
             {
-                close(client_fd);
-                return ;
+                this -> getServer() -> deleteFromEventsMap(static_cast<const IO*>(_ev.data.ptr));
             }
                         
         }
     }
-    
+    return 0;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

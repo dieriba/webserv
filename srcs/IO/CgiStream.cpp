@@ -23,9 +23,10 @@ CgiStream::~CgiStream(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void CgiStream::handleIoOperation(const int& _ws, struct epoll_event& event)
+int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& event)
 {
     (void)_ws;
     (void)event;
+    return 0;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

@@ -71,16 +71,16 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
     root += req.getHeaders().find("PATH") -> second;
     const char *root_c = root.c_str();
     
-    if (req.getMethod() != POST)
+    if (req.getMethod() != TcpServer::POST)
     {
         if (access(root_c, F_OK) != 0)
             return NOT_FOUND;
         
-        if (req.getMethod() == GET && (access(root_c, R_OK) != 0))
+        if (req.getMethod() == TcpServer::GET && (access(root_c, R_OK) != 0))
             return FORBIDEN;
     }
     
-    if (req.getMethod() == POST && (access(root_c, W_OK) != 0))
+    if (req.getMethod() == TcpServer::POST && (access(root_c, W_OK) != 0))
         return FORBIDEN;
 
     return 0;

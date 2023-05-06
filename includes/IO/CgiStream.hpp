@@ -12,7 +12,7 @@ class CgiStream: public IO
         CgiStream& operator=(const CgiStream& rhs);
         ~CgiStream();
 
-        void handleIoOperation(const int& _ws, struct epoll_event&);
+        int handleIoOperation(const int& _ws, struct epoll_event&);
 };
 
 # endif

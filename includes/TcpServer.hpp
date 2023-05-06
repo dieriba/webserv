@@ -19,6 +19,18 @@ class TcpServer: public Parser, public BitsManipulation
         TcpServer& operator=(const TcpServer& rhs);
         ~TcpServer();
 
+        enum
+        {
+            GET,
+            POST,
+            DELETE,
+            CONTENT_LENGTH,
+            TRANSFER_ENCODING,
+            FINISH_BODY,
+            RESPONSE_HEADER_FINISHED,
+            LOCATION_BLOCK
+        };
+
         /*GETTERS*/
         std::vector<Server> getServers(void) const;
         const size_t& getBodySize(void) const;

@@ -15,6 +15,7 @@ HttpResponse& HttpResponse::operator=(const HttpResponse& rhs)
     _headers = rhs._headers;
     _method = rhs._method;
     _directory = rhs._directory;
+    _options = rhs._options;
     return *this;
 };
 HttpResponse::~HttpResponse()

@@ -12,10 +12,10 @@ class ClientSocketStream: public IO
         ClientSocketStream& operator=(const ClientSocketStream& rhs);
         ~ClientSocketStream();
 
-        void handleIoOperation(const int& _ws, struct epoll_event&);
+        int handleIoOperation(const int& _ws, struct epoll_event&);
     private:
-        void readFromSocket(const int& _ws, struct epoll_event& event);
-        void writeToSocket(const int& _ws, struct epoll_event& event);
+        int readFromSocket(const int& _ws, struct epoll_event& event);
+        int writeToSocket(const int& _ws, struct epoll_event& event);
 };
 
 # endif

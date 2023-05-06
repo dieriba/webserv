@@ -6,8 +6,9 @@
 # include "../Server.hpp"
 # include "../http/HttpRequest.hpp"
 # include "../http/HttpResponse.hpp"
+# include "../BitsManipulation.hpp"
 
-class IO
+class IO: public BitsManipulation
 {
     public:
         IO();
@@ -16,39 +17,47 @@ class IO
         IO& operator=(const IO& rhs);
         virtual ~IO();
 
-        virtual void handleIoOperation(const int& _ws, struct epoll_event& event) = 0;
+        virtual int handleIoOperation(const int& _ws, struct epoll_event& event) = 0;
+
+        
     
-    /*GETTERS*/
-    const int& getFd(void) const;
-    const HttpRequest& getRequest(void) const;
-    const HttpResponse& getReponse(void) const;
-    HttpResponse& getReponse(void);
-    const int& getErrStatus(void) const;
-    Server* getServer(void) const;
+        /*GETTERS*/
+        const int& getFd(void) const;
+        const HttpRequest& getRequest(void) const;
+        const HttpResponse& getReponse(void) const;
+        HttpResponse& getReponse(void);
+        const int& getErrStatus(void) const;
+        Server* getServer(void) const;
 
-    /*SETTERS*/
-    void setFD(const int& fd);
-    void setErrorStatus(const int& err);
+        /*SETTERS*/
+        void setFD(const int& fd);
+        void setErrorStatus(const int& err);
 
-    /*MEMBER FUNCTION*/
-    bool validSocketClient(int _fd, struct epoll_event event);
+        /*MEMBER FUNCTION*/
+        bool validSocketClient(int _fd, struct epoll_event event);
 
-    enum type
-    {
-        VIRTUAL_SERV,
-        CLIENT_SOCKET,
-        CGI_PIPE
-    };
-    
-    protected:
-        int _fd;
-        int _err;
-        Server *_server;
-        HttpRequest _request;
-        HttpResponse _response;
-        enum type _type;
-        std::clock_t _begin;
-        std::clock_t _end;
+        enum
+        {
+            IO_ERROR = -1,
+            IO_SUCCESS
+        };
+
+        enum type
+        {
+            VIRTUAL_SERV,
+            CLIENT_SOCKET,
+            CGI_PIPE
+        };
+        
+        protected:
+            int _fd;
+            int _err;
+            Server *_server;
+            HttpRequest _request;
+            HttpResponse _response;
+            enum type _type;
+            std::clock_t _begin;
+            std::clock_t _end;
 };
 
 # endif
