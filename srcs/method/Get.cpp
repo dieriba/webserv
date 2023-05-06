@@ -136,14 +136,16 @@ int Get::handleDirectoryRessource(IO& event, DIR *directory)
     return (0);
 }
 
-void Get::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
+int Get::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
 {
 
-    if (!res.checkBits(HttpResponse::STARTED) && firstStep(event, req, res)) return ;
+    if (!res.checkBits(HttpResponse::STARTED) && firstStep(event, req, res)) return 0;
 
     if (res.checkBits(HttpResponse::FILE))
     {
         handleFileRessource(event, req, res);
     }
+
+    return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

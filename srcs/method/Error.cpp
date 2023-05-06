@@ -23,16 +23,17 @@ Error::~Error(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void Error::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
+int Error::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
 {
-    (void)event;
     (void)req;
-    (void)res;
     makeStatusLine(event.getErrStatus());
     appendToResponse(CONTENT_LEN, utilityMethod::numberToString(0));
     appendToResponse(CONTENT_TYP, "text/plain");
     _response += CRLF;
     std::cout << _response;
-    send(event.getFd(), _response.data(), _response.size(), 0);
+    if (sendBuffer(event.getFd(), _response.c_str(), _response.size()))
+        return IO::IO_ERROR;
+    res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+    return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

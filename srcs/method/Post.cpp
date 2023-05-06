@@ -23,10 +23,12 @@ Post::~Post(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void Post::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
+int Post::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
 {
     (void)event;
     (void)req;
     (void)res;
+
+    return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

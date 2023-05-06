@@ -23,10 +23,12 @@ Delete::~Delete(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-void Delete::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
+int Delete::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
 {
     (void)event;
     (void)req;
     (void)res;
+
+    return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

@@ -16,7 +16,7 @@ class Get: public Method
         virtual ~Get();
 
         /*MEMBER FUNCTION*/
-        void sendResponse(IO&, const HttpRequest&, HttpResponse&);
+        int sendResponse(IO&, const HttpRequest&, HttpResponse&);
         int firstStep(IO& event, const HttpRequest& req, HttpResponse& res);
         int handleChunkedRequest(HttpResponse& res, std::string& s_buffer);
     private:

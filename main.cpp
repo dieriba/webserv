@@ -79,6 +79,7 @@ int main (int argc, char **argv)
 {
     try
     {
+        signal(SIGPIPE, SIG_IGN);
         init_static_data();
         TcpServer tcp_servers;
         tcp_servers.settingUpServer(argc > 1 ? argv[1] : NULL);

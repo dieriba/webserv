@@ -15,7 +15,7 @@ class Error: public Method
         ~Error();
 
         /*MEMBER FUNCTION*/
-        void sendResponse(IO&, const HttpRequest&, HttpResponse&);
+        int sendResponse(IO&, const HttpRequest&, HttpResponse&);
 };
 
 # endif

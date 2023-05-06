@@ -32,7 +32,6 @@ int Method::sendBuffer(int client_socket, const char *buffer, int bytes)
     while (bytes > 0)
     {
         int bytesSent = send(client_socket, buffer, bytes, 0);
-        
         if (bytesSent <= 0) return -1;
 
         bytes -= bytesSent;

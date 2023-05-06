@@ -69,6 +69,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
             
         req = RequestChecker::checkAll(*(this -> getServer()), _request);
 
+
         _response.setMethodObj((req == 0 ? Method::_tab[_request.getMethod()]() : Method::_tab[3]()));
 
         if (this -> checkBits(TcpServer::FINISH_BODY) != 0)
