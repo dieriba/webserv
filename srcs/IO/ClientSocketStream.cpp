@@ -66,8 +66,8 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
             
         int req = _request.parseRequest(*this);
 
-        /*if ((this -> checkBits(TcpServer::CONTENT_LENGTH) || this -> checkBits(TcpServer::TRANSFER_ENCODING)) && !this -> checkBits(TcpServer::FINISH_BODY))
-            return ;*/
+        if ((this -> checkBits(TcpServer::CONTENT_LENGTH) || this -> checkBits(TcpServer::TRANSFER_ENCODING)) && !this -> checkBits(TcpServer::FINISH_BODY))
+            return ;
             
         req = RequestChecker::checkAll(*(this -> getServer()), _request);
 

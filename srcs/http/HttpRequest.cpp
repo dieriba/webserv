@@ -82,7 +82,7 @@ int HttpRequest::parseRequest(IO& object)
     {
         object.setOptions(TcpServer::CONTENT_LENGTH, SET);
         setBodySize(_it_content -> second);
-        if ((s_buffer.size()) == _body)
+        if ((s_buffer.size()) >= _body)
             object.setOptions(TcpServer::FINISH_BODY, SET);
     }
 
