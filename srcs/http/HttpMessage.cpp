@@ -24,7 +24,11 @@ int HttpMessage::getMethod(void) const {return _method;}
 
 
 /*----------------------------------------SETTER----------------------------------------*/
-void HttpMessage::appendToBuffer(const std::string& toAppend) {s_buffer.append(toAppend);}
+void HttpMessage::appendToBuffer(const char *toAppend, ssize_t size) 
+{
+    s_buffer.append(toAppend, size);
+}
+
 void HttpMessage::setBodySize(const std::string& body) 
 {
     std::stringstream ss(body);
