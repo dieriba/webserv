@@ -4,24 +4,40 @@
 # include "../../includes/IO/IO.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-HttpRequest::HttpRequest():HttpMessage(){};
-HttpRequest::HttpRequest(const HttpRequest& rhs):HttpMessage(rhs){};
+HttpRequest::HttpRequest():HttpMessage(),_header_size(0){};
+HttpRequest::HttpRequest(const HttpRequest& rhs):HttpMessage(rhs)
+{
+    _header_size = rhs._header_size;
+};
 HttpRequest& HttpRequest::operator=(const HttpRequest& rhs)
 {
     if (this == &rhs) return *this;
+    _header_size = rhs._header_size;
     s_buffer = rhs.s_buffer;
+    _method = rhs._method;
+    _body = rhs._body;
     return *this;
 };
 HttpRequest::~HttpRequest(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
+const size_t& HttpRequest::getHeaderSize(void) const {return _header_size;}
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
 /*----------------------------------------SETTER----------------------------------------*/
 
+
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+void HttpRequest::appendToBuffer(const char *toAppend, ssize_t size)
+{
+    size_t  len;
+    s_buffer.append(toAppend, size);
+    if (_header_size == 0 && ((len = s_buffer.find(CRLF CRLF)) != std::string::npos))
+        _header_size = len + 1;
+}
 
 int HttpRequest::parseRequest(IO& object)
 {
