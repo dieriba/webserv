@@ -4,7 +4,7 @@
 # include "../../includes/IO/IO.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-HttpRequest::HttpRequest():HttpMessage(),_header_size(0){};
+HttpRequest::HttpRequest():HttpMessage(),_header_size(0),_start(true){};
 HttpRequest::HttpRequest(const HttpRequest& rhs):HttpMessage(rhs)
 {
     _header_size = rhs._header_size;
@@ -12,6 +12,7 @@ HttpRequest::HttpRequest(const HttpRequest& rhs):HttpMessage(rhs)
 HttpRequest& HttpRequest::operator=(const HttpRequest& rhs)
 {
     if (this == &rhs) return *this;
+    _start = rhs._start;
     _header_size = rhs._header_size;
     s_buffer = rhs.s_buffer;
     _method = rhs._method;
@@ -39,12 +40,29 @@ void HttpRequest::appendToBuffer(const char *toAppend, ssize_t size)
         _header_size = len + 1;
 }
 
+void HttpRequest::handlePostMethod(IO& object)
+{
+    if (_start == true)
+    {
+        outfile.open("image.png");
+        _start = false;
+    }
+    outfile.write(s_buffer.data(), s_buffer.size());
+    if (object.checkBits(TcpServer::FINISH_BODY))
+    {
+        outfile.close();
+        _start = true;
+    }
+}
+
 int HttpRequest::parseRequest(IO& object)
 {
     if (object.checkBits(TcpServer::CONTENT_LENGTH))
     {
         if (s_buffer.size() >= _body)
             object.setOptions(TcpServer::FINISH_BODY, SET);
+        std::cout << "Enter: "  << s_buffer.size() << std::endl;
+        handlePostMethod(object);
         return 0;
     }
     else if (object.checkBits(TcpServer::TRANSFER_ENCODING))
@@ -83,8 +101,10 @@ int HttpRequest::parseRequest(IO& object)
 
     _it_content = _headers.find(CONTENT_LEN);
     _it_transfert = _headers.find(TRANSFERT_ENCODING);
-
-    s_buffer.erase(0, s_buffer.find(CRLF CRLF) + 4);
+    //std::cout << "Req Size " << s_buffer.size() << std::endl;
+    //std::cout << s_buffer.substr(0, s_buffer.find(CRLF CRLF)) ;
+    if (s_buffer.find(CRLF CRLF) != std::string::npos)
+        s_buffer.erase(0, s_buffer.find(CRLF CRLF) + 4);
 
     if (_it_transfert != _headers.end())
     {
@@ -100,6 +120,8 @@ int HttpRequest::parseRequest(IO& object)
         setBodySize(_it_content -> second);
         if ((s_buffer.size()) >= _body)
             object.setOptions(TcpServer::FINISH_BODY, SET);
+        handlePostMethod(object);
+        s_buffer.clear();
     }
 
     return 0;

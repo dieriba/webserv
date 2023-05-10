@@ -48,7 +48,6 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
     int size = recv(this -> getFd(), buffer, REQUEST_SIZE, 0);
 
     if (size <= 0) return IO::IO_ERROR;
-        
     _request.appendToBuffer(buffer, size);
         
     if (_request.getHeaderSize() >= MAX_HEADER_SIZE)
@@ -62,7 +61,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
     if (s_buffer.find(CRLF CRLF) != std::string::npos || (this -> checkBits(TcpServer::CONTENT_LENGTH) || this -> checkBits(TcpServer::TRANSFER_ENCODING)))
     {
         s_buffer = _request.getBuffer();
-            
+
         int req = _request.parseRequest(*this);
 
         if ((this -> checkBits(TcpServer::CONTENT_LENGTH) || this -> checkBits(TcpServer::TRANSFER_ENCODING)) && !this -> checkBits(TcpServer::FINISH_BODY))
@@ -75,7 +74,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         if (this -> checkBits(TcpServer::FINISH_BODY) != 0)
         {
             _request.appendToBuffer(NEW_LINE, 1);
-            std::cout << _request.getBuffer();
+            //std::cout << _request.getBuffer();
             this -> setOptions(TcpServer::FINISH_BODY, CLEAR);
             exit(1);
         }

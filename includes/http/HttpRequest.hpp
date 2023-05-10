@@ -16,12 +16,15 @@ class HttpRequest: public HttpMessage
         /*GETTERS*/
         const size_t& getHeaderSize(void) const;
         /*MEMBER FUNCTION*/
+        void handlePostMethod(IO& object);
         void appendToBuffer(const char *toAppend, ssize_t size);
         int parseRequest(IO& object);
         int checkValidHeader(int _ws, struct epoll_event event) const;
 
     private:
         size_t _header_size;
+        std::ofstream outfile;
+        bool _start;
 };
 
 # endif
