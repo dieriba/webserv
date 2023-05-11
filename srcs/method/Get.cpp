@@ -2,7 +2,7 @@
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/http/HttpResponse.hpp"
 # include "../../includes/IO/IO.hpp"
-# include "../../includes/utilityMethod.hpp"
+# include "../../includes/UtilityMethod.hpp"
 # include "../../includes/TcpServer.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
@@ -29,7 +29,7 @@ Get::~Get(){};
 
 int Get::handleChunkedRequest(HttpResponse& res, std::string& s_buffer)
 {
-    _response = utilityMethod::decimalToHex(s_buffer.size()) + CRLF + s_buffer + CRLF;
+    _response = UtilityMethod::decimalToHex(s_buffer.size()) + CRLF + s_buffer + CRLF;
 
     if (res.getFile().eof() && res.getFile().fail())
     {
@@ -118,8 +118,8 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 
         std::string ressource(res.getPath());
         
-        appendToResponse(CONTENT_TYP, utilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex()));
-        appendToResponse(CONTENT_LEN, utilityMethod::numberToString(res.getBodySize()));
+        appendToResponse(CONTENT_TYP, UtilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex()));
+        appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()));
         _response += CRLF;
 
         if (sendBuffer(event.getFd(), _response.c_str(), _response.size()))

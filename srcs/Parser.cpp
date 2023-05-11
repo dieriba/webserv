@@ -24,7 +24,7 @@ void    Parser::setCommonDirectives(std::vector<std::string>& vec, std::map<std:
         }
         else
         {
-            if (utilityMethod::count(vec[1], ';') > 1 || vec[1].at(vec[1].size() - 1) != ';')
+            if (UtilityMethod::count(vec[1], ';') > 1 || vec[1].at(vec[1].size() - 1) != ';')
                 throw ExceptionThrower(MISSING_SEMICOLONS);
             vec[1].erase(vec[1].length() - 1);
         }
@@ -128,10 +128,10 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
     if (it == end)
         throw ExceptionThrower("Missing \"listen\" Directive");
     
-    if ((it -> second.find(':') != std::string::npos) && utilityMethod::count(it -> second, ':') != 2)
+    if ((it -> second.find(':') != std::string::npos) && UtilityMethod::count(it -> second, ':') != 2)
         throw ExceptionThrower(IP_FORMAT);
     
-    vec = utilityMethod::stringSpliter(it -> second, ":");
+    vec = UtilityMethod::stringSpliter(it -> second, ":");
     
     if (vec.size() == 2 && ((vec[0].find_first_not_of(BASE_10".") != std::string::npos) || (vec[1].find_first_not_of(BASE_10";") != std::string::npos)))
         throw ExceptionThrower(LISTEN_FORMAT);
@@ -198,7 +198,7 @@ void    Parser::checkOpeningLine(std::ifstream& file, std::string& line)
 {
     while (std::getline(file, line))
     {
-        line = utilityMethod::trimBothEnd(line, WHITESPACES);
+        line = UtilityMethod::trimBothEnd(line, WHITESPACES);
             
         if (line.size())
         {
@@ -208,7 +208,7 @@ void    Parser::checkOpeningLine(std::ifstream& file, std::string& line)
             if (line.size() == 1)
                 throw ExceptionThrower("Missing Opening Bracket");
                 
-            if (utilityMethod::count(line, '{') > 1)
+            if (UtilityMethod::count(line, '{') > 1)
                 throw ExceptionThrower("Too Many Opening Bracket");
                 
             if (line.at(0) != '{')
@@ -229,7 +229,7 @@ void    Parser::SemicolonCheck(std::string& line, size_t i, size_t len)
             
     if (i == len)
     {
-        if (utilityMethod::count(line, ';') > 1)
+        if (UtilityMethod::count(line, ';') > 1)
             throw ExceptionThrower("Too Many Semicolons");
                 
         if (*(line.rbegin()) != ';')
@@ -245,7 +245,7 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
     std::map<std::string, std::string> _map;
     Location _location;
     
-    vec = utilityMethod::stringSpliter(line, WHITESPACES);
+    vec = UtilityMethod::stringSpliter(line, WHITESPACES);
     
     if (vec.size() != 2 && vec.size() != 3)
         throw ExceptionThrower("Too Many/Not Enough Arguments");
@@ -268,7 +268,7 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
     
     while (std::getline(file, line))
     {
-        line = utilityMethod::trimBothEnd(line, WHITESPACES);
+        line = UtilityMethod::trimBothEnd(line, WHITESPACES);
 
         if (line.size())
         {
@@ -277,7 +277,7 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
                 if (line.size() == 1)
                     break ;
 
-                if (utilityMethod::count(line, '}') > 1)
+                if (UtilityMethod::count(line, '}') > 1)
                     throw ExceptionThrower("Too Many Closing Bracket");
                 
                 if (*(line.rbegin()) != '}')
@@ -306,7 +306,7 @@ void    Parser::fillMap(const std::string& line, Location& location, std::map<st
     std::vector<std::string> vec;
     size_t len;
     
-    vec = utilityMethod::stringSpliter(line, WHITESPACES);
+    vec = UtilityMethod::stringSpliter(line, WHITESPACES);
     
     /*
         CHECK IF DIRECTIVES EXIST
@@ -350,7 +350,7 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
     std::vector<std::string> vec;
     size_t len;
     
-    vec = utilityMethod::stringSpliter(line, WHITESPACES);
+    vec = UtilityMethod::stringSpliter(line, WHITESPACES);
     
     /*
         CHECK IF DIRECTIVES EXIST
@@ -387,7 +387,7 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
         if (server.getCgiPath(vec[1], path))
             throw ExceptionThrower("CGI " + vec[1] + " already exists with path: " + vec[2]);
 
-        if (vec[1].find(';') != std::string::npos || (utilityMethod::count(vec[2], ';') > 1))
+        if (vec[1].find(';') != std::string::npos || (UtilityMethod::count(vec[2], ';') > 1))
             throw ExceptionThrower("Bad Syntax");
         
         if (*(vec.rbegin() -> rbegin()) != ';')
@@ -434,7 +434,7 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
     
     while (std::getline(file, line))
     {
-        line = utilityMethod::trimBothEnd(line, WHITESPACES);
+        line = UtilityMethod::trimBothEnd(line, WHITESPACES);
 
         if (line.size())
         {
@@ -443,7 +443,7 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
                 if (line.size() == 1)
                     break ;
 
-                if (utilityMethod::count(line, '}') > 1)
+                if (UtilityMethod::count(line, '}') > 1)
                     throw ExceptionThrower("Too Many Closing Bracket");
                 
                 if (*(line.rbegin()) != '}')
@@ -458,7 +458,7 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
             {
                 size_t pos = line.find('{');
                 
-                if (utilityMethod::count(line, '{') > 1)
+                if (UtilityMethod::count(line, '{') > 1)
                     throw ExceptionThrower("Too Many Opening Bracket");
                 
                 if ((pos != std::string::npos) && *(line.rbegin()) != '{')
@@ -505,7 +505,7 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_
 
     while (std::getline(file, line))
     {
-        line = utilityMethod::trimBothEnd(line, WHITESPACES);
+        line = UtilityMethod::trimBothEnd(line, WHITESPACES);
 
         if (line.size())
         {
@@ -514,7 +514,7 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_
             
             if (line.find(SERVER_CONTEXT, 0, 6) != std::string::npos)
             {
-                if (utilityMethod::count(line, '{') > 1)
+                if (UtilityMethod::count(line, '{') > 1)
                     throw ExceptionThrower("Too Many Opening Bracket");
 
                 pos = line.find('{');

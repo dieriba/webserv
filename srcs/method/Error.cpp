@@ -27,7 +27,7 @@ int Error::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
 {
     (void)req;
     makeStatusLine(event.getErrStatus());
-    appendToResponse(CONTENT_LEN, utilityMethod::numberToString(0));
+    appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(0));
     appendToResponse(CONTENT_TYP, "text/plain");
     _response += CRLF;
     std::cout << _response;

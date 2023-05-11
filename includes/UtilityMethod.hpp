@@ -4,12 +4,12 @@
 
 class IO;
 
-class utilityMethod
+class UtilityMethod
 {
     public:
-        utilityMethod();
-        utilityMethod(const utilityMethod& rhs);
-        ~utilityMethod();
+        UtilityMethod();
+        UtilityMethod(const UtilityMethod& rhs);
+        ~UtilityMethod();
         
         /*STRING MANIPULATION*/
         static std::string rtrim(const std::string &line, const char *toTrim);
@@ -21,9 +21,10 @@ class utilityMethod
         static std::string numberToString(const int& number);
         static const std::string& getMimeType(std::string& path, const std::string& index_path, const std::string& index);
         static std::string decimalToHex(const int& number);
+        static char *mystrstr(const char *big, const char *needle);
     
     private:
-        utilityMethod& operator=(const utilityMethod& rhs);        
+        UtilityMethod& operator=(const UtilityMethod& rhs);        
 };
 
 #endif

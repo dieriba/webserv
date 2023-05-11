@@ -1,15 +1,15 @@
-# include "../includes/utilityMethod.hpp"
+# include "../includes/UtilityMethod.hpp"
 # include "../includes/IO/IO.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-utilityMethod::utilityMethod(){};
-utilityMethod::utilityMethod(const utilityMethod& rhs){(void)rhs;};
-utilityMethod::~utilityMethod(){};
+UtilityMethod::UtilityMethod(){};
+UtilityMethod::UtilityMethod(const UtilityMethod& rhs){(void)rhs;};
+UtilityMethod::~UtilityMethod(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
 
-std::vector<std::string> utilityMethod::stringSpliter(const std::string& line, const std::string& delim) 
+std::vector<std::string> UtilityMethod::stringSpliter(const std::string& line, const std::string& delim) 
 {
     size_t pos_start = 0, pos_end;
     std::string token;
@@ -31,24 +31,24 @@ std::vector<std::string> utilityMethod::stringSpliter(const std::string& line, c
     return res;
 }
 
-std::string utilityMethod::ltrim(const std::string &line, const char *toTrim)
+std::string UtilityMethod::ltrim(const std::string &line, const char *toTrim)
 {
     size_t  start = line.find_first_not_of(toTrim);
     return (start == std::string::npos) ? "" : line.substr(start);
 }
 
-std::string utilityMethod::rtrim(const std::string &line, const char *toTrim)
+std::string UtilityMethod::rtrim(const std::string &line, const char *toTrim)
 {
     size_t  end = line.find_last_not_of(toTrim);
     return (end == std::string::npos) ? "" : line.substr(0, end + 1);
 }
 
-std::string utilityMethod::trimBothEnd(std::string& line, const char *toTrim)
+std::string UtilityMethod::trimBothEnd(std::string& line, const char *toTrim)
 {
     return rtrim(ltrim(line, toTrim), toTrim);
 }
 
-size_t  utilityMethod::count(const std::string& line, char to_find)
+size_t  UtilityMethod::count(const std::string& line, char to_find)
 {
     size_t  i = 0, count = 0, len = line.size();
     for (; i < len; i++)
@@ -60,7 +60,7 @@ size_t  utilityMethod::count(const std::string& line, char to_find)
 }
 
 
-void utilityMethod::switchEvents(const int& _ws, uint32_t mode, struct epoll_event& event, const IO& ev)
+void UtilityMethod::switchEvents(const int& _ws, uint32_t mode, struct epoll_event& event, const IO& ev)
 {
     event.events = mode;
     event.data.ptr = event.data.ptr;
@@ -68,7 +68,7 @@ void utilityMethod::switchEvents(const int& _ws, uint32_t mode, struct epoll_eve
         close(ev.getFd());
 }
 
-std::string utilityMethod::numberToString(const int& number)
+std::string UtilityMethod::numberToString(const int& number)
 {
     std::ostringstream ss;
 
@@ -77,14 +77,14 @@ std::string utilityMethod::numberToString(const int& number)
     return ss.str();
 }
 
-std::string utilityMethod::decimalToHex(const int& number)
+std::string UtilityMethod::decimalToHex(const int& number)
 {
     std::stringstream ss;
     ss << std::hex << number; 
     return ss.str();
 }
 
-const std::string& utilityMethod::getMimeType(std::string& path, const std::string& index_path, const std::string& index)
+const std::string& UtilityMethod::getMimeType(std::string& path, const std::string& index_path, const std::string& index)
 {
     if (path == index_path) path = index;
     
@@ -96,6 +96,25 @@ const std::string& utilityMethod::getMimeType(std::string& path, const std::stri
             break ;
     }
     return TcpServer::getMimeType(&path[i]);
+}
+
+char *UtilityMethod::mystrstr(const char *big, const char *needle)
+{
+    size_t	i;
+	size_t	j;
+
+	if (*(needle) == 0)
+		return ((char *)(big));
+	i = -1;
+	while (big[++i])
+	{
+		j = 0;
+		while ((big[i + j]) && (big[i + j] == needle[j]))
+		j++;
+		if (needle[j] == 0)
+			return ((char *)(&big[i]));
+	}
+	return (NULL);
 }
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/

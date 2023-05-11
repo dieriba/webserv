@@ -33,9 +33,10 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
     
     if (_response.checkBits(HttpResponse::FINISHED_RESPONSE))
     {
-        this -> resetOptions();
-        utilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
+        UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
         _response.resetOptions();
+        if (_response.getBuffer().size())
+            _response.getBuffer().clear();
     }
 
     return res;
@@ -48,41 +49,38 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
     int size = recv(this -> getFd(), buffer, REQUEST_SIZE, 0);
 
     if (size <= 0) return IO::IO_ERROR;
+
     _request.appendToBuffer(buffer, size);
         
     if (_request.getHeaderSize() >= MAX_HEADER_SIZE)
     {
-        utilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
+        UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
         setErrorStatus(TOO_LARGE_CONTENT);
         return IO::IO_SUCCESS;
     }
 
-    std::string s_buffer(buffer, size);
-    if (s_buffer.find(CRLF CRLF) != std::string::npos || (this -> checkBits(TcpServer::CONTENT_LENGTH) || this -> checkBits(TcpServer::TRANSFER_ENCODING)))
+    char *end_header = UtilityMethod::mystrstr(buffer, CRLF CRLF);
+    
+    if (end_header != NULL) this -> resetOptions();
+    
+    if (end_header != NULL || (this -> checkBits(TcpServer::CONTENT_LENGTH) || this -> checkBits(TcpServer::TRANSFER_ENCODING)))
     {
-        s_buffer = _request.getBuffer();
 
         int req = _request.parseRequest(*this);
 
-        if ((this -> checkBits(TcpServer::CONTENT_LENGTH) || this -> checkBits(TcpServer::TRANSFER_ENCODING)) && !this -> checkBits(TcpServer::FINISH_BODY))
+        if (!req && ((checkBits(TcpServer::CONTENT_LENGTH) || checkBits(TcpServer::TRANSFER_ENCODING)) && !checkBits(TcpServer::FINISH_BODY)))
             return IO::IO_SUCCESS;
-            
-        req = RequestChecker::checkAll(*(this -> getServer()), _request);
+        
+        if (req == 0) req = RequestChecker::checkAll(*(this -> getServer()), _request);
 
         _response.setMethodObj((req == 0 ? Method::_tab[_request.getMethod()]() : Method::_tab[3]()));
 
-        if (this -> checkBits(TcpServer::FINISH_BODY) != 0)
-        {
-            _request.appendToBuffer(NEW_LINE, 1);
-            //std::cout << _request.getBuffer();
-            this -> setOptions(TcpServer::FINISH_BODY, CLEAR);
-            exit(1);
-        }
-        else if (this -> checkBits(TcpServer::GET) != 0)
-            std::cout << s_buffer;
-            
+        this -> resetOptions();
+
         setErrorStatus(req);
-        utilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
+        if (_request.getBuffer().size())
+            _request.getBuffer().clear();
+        UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
     }
     
     return IO::IO_SUCCESS;
