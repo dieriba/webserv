@@ -35,8 +35,7 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
     {
         UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
         _response.resetOptions();
-        if (_response.getBuffer().size())
-            _response.getBuffer().clear();
+        _response.getBuffer().clear();
     }
 
     return res;
@@ -61,7 +60,11 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
 
     char *end_header = UtilityMethod::mystrstr(buffer, CRLF CRLF);
     
-    if (end_header != NULL) this -> resetOptions();
+    if (end_header != NULL)
+    {
+        this -> resetOptions();
+        _request.getHeaders().clear();
+    };
     
     if (end_header != NULL || (this -> checkBits(TcpServer::CONTENT_LENGTH) || this -> checkBits(TcpServer::TRANSFER_ENCODING)))
     {
@@ -78,8 +81,9 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         this -> resetOptions();
 
         setErrorStatus(req);
-        if (_request.getBuffer().size())
-            _request.getBuffer().clear();
+        
+        _request.getBuffer().clear();
+        
         UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
     }
     

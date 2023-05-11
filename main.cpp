@@ -22,7 +22,7 @@ void    print_location_config(const Location& location)
         << "Server: " << location.getServer() << std::endl;
 }
 
-void    print_server_config(const Server server)
+void    print_server_config(const Server& server)
 {
     std::vector<std::string> serv = server.getServerNames();
     std::vector<std::string>::iterator serv_it_ = serv.begin();

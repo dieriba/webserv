@@ -53,15 +53,18 @@ void HttpRequest::appendToBuffer(const char *toAppend, ssize_t size)
         _header_size = len + 1;
 }
 
+int HttpRequest::open_file(void)
+{
+    static int i = 0;
+    std::string _name = "video";
+    _name += UtilityMethod::numberToString(i++) + ".mp4";
+    outfile.open(_name.c_str());
+    if (outfile.fail()) return FORBIDEN;
+    return 0;
+}
+
 int HttpRequest::handlePostMethod(IO& object)
 {
-    if (_start == true)
-    {
-        outfile.open("video.mp4");
-        if (outfile.fail())
-            return FORBIDEN;
-        _start = false;
-    }
     try
     {
         outfile.write(s_buffer.data(), s_buffer.size());
@@ -72,7 +75,6 @@ int HttpRequest::handlePostMethod(IO& object)
             object.setOptions(TcpServer::FINISH_BODY, SET);
             clearRequestBodySize();
             outfile.close();
-            _start = true;
         }
         s_buffer.clear();
     }
@@ -90,6 +92,7 @@ int HttpRequest::parseRequest(IO& object)
 {
     if (object.checkBits(TcpServer::CONTENT_LENGTH))
     {
+        std::cout << "Entered" << std::endl;
         handlePostMethod(object);
         return 0;
     }
@@ -154,6 +157,8 @@ int HttpRequest::parseRequest(IO& object)
         
         if ((s_buffer.size()) >= _body)
             object.setOptions(TcpServer::FINISH_BODY, SET);
+        int err = open_file();
+        if (err) return err;
         return handlePostMethod(object);
     }
     return 0;
