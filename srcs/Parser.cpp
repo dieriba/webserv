@@ -79,11 +79,12 @@ void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Locat
     std::map<std::string, std::string>::iterator it;
     std::map<std::string, std::string>::iterator end = _map.end();
 
-    it = _map.find(ROOT);
 
     it = _map.find(INDEX);
     
     if (it != end) location.setIndex(it -> second);
+    
+    it = _map.find(ROOT);
 
     if (it != end)
     {
@@ -465,13 +466,9 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
                     throw ExceptionThrower("Opening Bracket Must Be At The End Of The Line");
                 
                 server.pushNewLocation(fillUpLocation(&server, file, line, pos != std::string::npos));
+
                 if (line.find("}") == std::string::npos)
                     throw ExceptionThrower("Missing End Bracket");
-                else
-                {
-                    std::getline(file, line);
-                    break ;
-                }
             }
             else
                 fillMap(line, server, _serv_conf);
@@ -493,7 +490,7 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
     return server;
 }
 
-/*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+/*----------------------------------------MEMBER FUNCTION-----line.find('{') != std::string::npos-----------------------------------*/
 std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_serv)
 {
     std::string line;
@@ -522,15 +519,16 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_
                 if ((pos != std::string::npos) && *line.rbegin() != '{')
                     throw ExceptionThrower("Opening Bracket Must Be At The End Of The Line");
                 
-                serv = fillServer(file, line, (line.find('{') != std::string::npos));
+                serv = fillServer(file, line, (pos != std::string::npos));
                 
                 serv.setIndexPath("/");
 
                 serv.setTcpServer(tcp_serv);
                 
                 server.push_back(serv);
+
                 if (line.find("}") == std::string::npos)
-                    throw ExceptionThrower("Missing End Bracket");
+                    throw ExceptionThrower("Missing End Bracket Here");
                 else
                     break ;
             }
