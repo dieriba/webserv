@@ -1,2 +1,4 @@
 *.[aod]
+obj/
+dep/
 webserv
