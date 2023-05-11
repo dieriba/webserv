@@ -1,4 +1,4 @@
-#include "../../includes/ExceptionThrower.hpp"
+#include "../../includes/utils/ExceptionThrower.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 ExceptionThrower::~ExceptionThrower() throw() {};

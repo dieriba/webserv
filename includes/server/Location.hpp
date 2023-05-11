@@ -1,7 +1,9 @@
 #ifndef __LOCATION_HPP_
 #define __LOCATION_HPP_
-#include "CommonLib.hpp"
-#include "TcpServer.hpp"
+
+# include "../utils/CommonLib.hpp"
+# include "TcpServer.hpp"
+
 class Server;
 class Location: public TcpServer
 {

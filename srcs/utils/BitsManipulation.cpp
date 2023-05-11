@@ -1,4 +1,4 @@
-#include "../../includes/BitsManipulation.hpp"
+#include "../../includes/utils/BitsManipulation.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 BitsManipulation::BitsManipulation():_options(0){};

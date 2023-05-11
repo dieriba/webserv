@@ -1,8 +1,8 @@
-# include "../../includes/Parser.hpp"
-# include "../../includes/TcpServer.hpp"
-# include "../../includes/Server.hpp"
-# include "../../includes/ExceptionThrower.hpp"
-# include "../../includes/Location.hpp"
+# include "../../includes/utils/Parser.hpp"
+# include "../../includes/utils/ExceptionThrower.hpp"
+# include "../../includes/server/TcpServer.hpp"
+# include "../../includes/server/Server.hpp"
+# include "../../includes/server/Location.hpp"
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Parser::Parser(){};
 Parser::Parser(const Parser& rhs){(void)rhs;};

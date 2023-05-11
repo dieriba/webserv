@@ -1,9 +1,9 @@
 #ifndef __SERVER_HPP_
 #define __SERVER_HPP_
 
-# include "CommonLib.hpp"
 # include "TcpServer.hpp"
-# include "./IO/IO.hpp"
+# include "../IO/IO.hpp"
+# include "../utils/CommonLib.hpp"
 
 typedef std::map<std::string, std::string>::iterator it_map;
 

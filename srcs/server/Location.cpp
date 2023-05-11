@@ -1,4 +1,4 @@
-# include "../../includes/Location.hpp"
+# include "../../includes/server/Location.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Location::Location():TcpServer(),_server(0){};

@@ -1,7 +1,7 @@
 # ifndef __METHOD_HPP__
 # define __METHOD_HPP__
 
-# include "../CommonLib.hpp"
+# include "../utils/CommonLib.hpp"
 
 class IO;
 class HttpRequest;

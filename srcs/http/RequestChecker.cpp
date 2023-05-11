@@ -1,8 +1,8 @@
 # include "../../includes/http/RequestChecker.hpp"
 # include "../../includes/http/HttpRequest.hpp"
-# include "../../includes/TcpServer.hpp"
-# include "../../includes/Server.hpp"
-# include "../../includes/Location.hpp"
+# include "../../includes/server/TcpServer.hpp"
+# include "../../includes/server/Server.hpp"
+# include "../../includes/server/Location.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 RequestChecker::RequestChecker(){};

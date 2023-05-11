@@ -1,6 +1,6 @@
 # include "../../includes/IO/ServerStream.hpp"
 # include "../../includes/IO/ClientSocketStream.hpp"
-# include "../../includes/TcpServer.hpp"
+# include "../../includes/server/TcpServer.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 ServerStream::ServerStream(){};

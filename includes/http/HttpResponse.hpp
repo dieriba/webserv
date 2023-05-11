@@ -2,7 +2,7 @@
 # define __HTTP_RESPONSE_HPP__
 
 # include "HttpMessage.hpp"
-# include "../BitsManipulation.hpp"
+# include "../utils/BitsManipulation.hpp"
 # include "../method/Method.hpp"
 # include "../method/Error.hpp"
 

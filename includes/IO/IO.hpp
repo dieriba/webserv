@@ -1,12 +1,12 @@
 # ifndef __IO_HPP__
 # define __IO_HPP__
 
-# include "../CommonLib.hpp"
-# include "../TcpServer.hpp"
-# include "../Server.hpp"
+# include "../utils/CommonLib.hpp"
+# include "../server/TcpServer.hpp"
+# include "../server/Server.hpp"
 # include "../http/HttpRequest.hpp"
 # include "../http/HttpResponse.hpp"
-# include "../BitsManipulation.hpp"
+# include "../utils/BitsManipulation.hpp"
 
 class IO: public BitsManipulation
 {

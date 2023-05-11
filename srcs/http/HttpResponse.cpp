@@ -1,7 +1,7 @@
 # include "../../includes/http/HttpResponse.hpp"
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/IO/IO.hpp"
-# include "../../includes/TcpServer.hpp"
+# include "../../includes/server/TcpServer.hpp"
 
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/

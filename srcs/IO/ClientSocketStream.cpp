@@ -1,5 +1,5 @@
 # include "../../includes/IO/ClientSocketStream.hpp"
-# include "../../includes/TcpServer.hpp"
+# include "../../includes/server/TcpServer.hpp"
 # include "../../includes/http/RequestChecker.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/

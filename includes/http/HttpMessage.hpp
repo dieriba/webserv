@@ -1,7 +1,7 @@
 # ifndef __HTTP_MESSAGE__
 # define __HTTP_MESSAGE__
 
-# include "../CommonLib.hpp"
+# include "../utils/CommonLib.hpp"
 
 class HttpMessage
 {

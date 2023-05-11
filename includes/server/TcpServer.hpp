@@ -1,9 +1,9 @@
 #ifndef __TcpServer_HPP_
 #define __TcpServer_HPP_
 
-# include "CommonLib.hpp"
-# include "Parser.hpp"
-# include "BitsManipulation.hpp"
+# include "../utils/CommonLib.hpp"
+# include "../utils/Parser.hpp"
+# include "../utils/BitsManipulation.hpp"
 
 
 class Server;

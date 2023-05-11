@@ -2,8 +2,8 @@
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/http/HttpResponse.hpp"
 # include "../../includes/IO/IO.hpp"
-# include "../../includes/UtilityMethod.hpp"
-# include "../../includes/TcpServer.hpp"
+# include "../../includes/utils/UtilityMethod.hpp"
+# include "../../includes/server/TcpServer.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Get::Get(){};
