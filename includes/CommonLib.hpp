@@ -87,6 +87,7 @@
 # define SH ".sh"
 # define MPEG ".mpeg"
 # define MP3 ".mp3"
+# define MP4 ".mp4"
 
 # define MIME_PLAIN "text/plain"
 # define MIME_HTM "text/html"
@@ -103,6 +104,7 @@
 # define MIME_SH "application/x-sh"
 # define MIME_MPEG "video/mpeg"
 # define MIME_MP3 "audio/mpeg"
+# define MIME_MP4 "video/mp4"
 /*
 
 

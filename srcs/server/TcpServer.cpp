@@ -1,10 +1,10 @@
-# include "../includes/TcpServer.hpp"
-# include "../includes/Server.hpp"
-# include "../includes/ExceptionThrower.hpp"
-# include "../includes/IO/IO.hpp"
-# include "../includes/IO/ServerStream.hpp"
-# include "../includes/IO/ClientSocketStream.hpp"
-# include "../includes/IO/CgiStream.hpp"
+# include "../../includes/TcpServer.hpp"
+# include "../../includes/Server.hpp"
+# include "../../includes/ExceptionThrower.hpp"
+# include "../../includes/IO/IO.hpp"
+# include "../../includes/IO/ServerStream.hpp"
+# include "../../includes/IO/ClientSocketStream.hpp"
+# include "../../includes/IO/CgiStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 TcpServer::TcpServer():BitsManipulation(),_body_size(0),
@@ -288,6 +288,7 @@ void TcpServer::initMimeTypes(void)
     _mimeTypes[PDF] = MIME_PDF;
     _mimeTypes[PHP] = MIME_PHP;
     _mimeTypes[SH] = MIME_SH;
+    _mimeTypes[MP4] = MIME_MP4;
 }
 
 void TcpServer::initHttpMethods(void)

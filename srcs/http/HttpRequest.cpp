@@ -57,7 +57,7 @@ int HttpRequest::handlePostMethod(IO& object)
 {
     if (_start == true)
     {
-        outfile.open("image.png");
+        outfile.open("video.mp4");
         if (outfile.fail())
             return FORBIDEN;
         _start = false;
@@ -68,6 +68,7 @@ int HttpRequest::handlePostMethod(IO& object)
         updateSize();
         if (getRequestBodySize() >= _body)
         {
+            std::cout << getRequestBodySize() << std::endl;
             object.setOptions(TcpServer::FINISH_BODY, SET);
             clearRequestBodySize();
             outfile.close();

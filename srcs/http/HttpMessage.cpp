@@ -33,7 +33,7 @@ void HttpMessage::appendToBuffer(const char *toAppend, ssize_t size)
 void HttpMessage::setBodySize(const std::string& body) 
 {
     std::stringstream ss(body);
-    int b;
+    size_t b;
 
     ss >> b;
     if (ss.fail())

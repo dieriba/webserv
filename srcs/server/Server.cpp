@@ -1,5 +1,5 @@
-# include "../includes/Server.hpp"
-# include "../includes/Location.hpp"
+# include "../../includes/Server.hpp"
+# include "../../includes/Location.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Server::Server():TcpServer(),_serv_socket(-1),_tcp_server(NULL){};
