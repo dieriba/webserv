@@ -92,7 +92,6 @@ int HttpRequest::parseRequest(IO& object)
 {
     if (object.checkBits(TcpServer::CONTENT_LENGTH))
     {
-        std::cout << "Entered" << std::endl;
         handlePostMethod(object);
         return 0;
     }

@@ -51,6 +51,16 @@
 # define HTTP_VERSION "HTTP/1.1"
 # define PATH "PATH"
 
+
+/*
+
+*/
+
+# define SERVER_SUCCESS_POST_RESPONSE "HTTP/1.1 201 CREATED\r\nContent-Type: application/json\r\nContent-Length: 17\r\n\r\n{\n\tsucess: true\n}"
+# define SERVER_ERROR_PAGE_NOT_FOUND "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\nContent-Length: 493\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Webserv Error Page</title>\n\t</head>\n\t<body style=\"display: flex; height: 100vh; align-items: center; font-family: 'Wix Madefor Text', sans-serif;  font-size: 2rem; flex-direction: column;\">\n\t\t<h1>404 Not Found</h1>\n\t\t<p>Unfortunately, the asked ressource do not exist</p>\n\t\t</body>\n</html>"
+# define SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\nContent-Length: 529\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Webserv Error Page</title>\n\t</head>\n\t<body style=\"display: flex; height: 100vh; align-items: center; font-family: 'Wix Madefor Text', sans-serif;  font-size: 2rem; flex-direction: column;\">\n\t\t<h1>500 Internal Server Error</h1>\n\t\t<p>Unfortunately, an error occured from the server, please try again later</p>\n\t</body>\n</html>"
+# define SERVER_ERROR_PAGE_BAD_REQUEST "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\nContent-Length: 437\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Webserv Error Page</title>\n\t</head>\n\t<body style=\"display: flex; height: 100vh; align-items: center; font-family: 'Wix Madefor Text', sans-serif;  font-size: 2rem; flex-direction: column;\">\n\t\t<h1>400 Bad Request</h1>\n\t</body>\n</html>"
+# define SERVER_ERROR_PAGE_FORBIDDEN "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html\r\nContent-Length: 435\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Webserv Error Page</title>\n\t</head>\n\t<body style=\"display: flex; height: 100vh; align-items: center; font-family: 'Wix Madefor Text', sans-serif;  font-size: 2rem; flex-direction: column;\">\n\t\t<h1>403 Forbidden</h1>\n\t</body>\n</html>"
 /*
 
 */
@@ -116,7 +126,7 @@
 # define INDEX "index"
 # define CLIENT_BODY "client_max_body_size"
 # define LOCATION "location"
-# define ERROR_FILE "error_file"
+# define ERROR_PAGE "error_pages"
 # define REDIRECT "redirect"
 # define CGI "cgi"
 /*

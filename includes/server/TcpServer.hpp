@@ -29,7 +29,8 @@ class TcpServer: public Parser, public BitsManipulation
             TRANSFER_ENCODING,
             FINISH_BODY,
             RESPONSE_HEADER_FINISHED,
-            LOCATION_BLOCK
+            LOCATION_BLOCK,
+            ERROR_PAGE_SET
         };
 
         /*GETTERS*/
@@ -40,9 +41,11 @@ class TcpServer: public Parser, public BitsManipulation
         const std::string& getRedirect(void) const;
         const std::string& getIndexPath(void) const;
         const std::string& getFullIndexPath(void) const;
+        const std::map<short int, std::string>& getErrorMaps() const;
         const int& getEpollWs(void) const ;
 
         /*SETTERS*/
+        int addToErrorMap(const short int& error, const std::string& file);
         void pushNewServer(const Server& server);
         void setBodySize(const size_t& body);
         void setIndex(const std::string& index);
@@ -76,6 +79,7 @@ class TcpServer: public Parser, public BitsManipulation
         std::string _redirect;
         std::string _index_path;
         std::string _full_index_path;
+        std::map<short int, std::string> _error_pages;
 
     private:
         int _epoll_ws;

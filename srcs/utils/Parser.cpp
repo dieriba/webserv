@@ -414,6 +414,10 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
         }
         _serv_conf[vec[0]] = "HTTP METHODS";
     }
+    else if (vec[0] == ERROR_PAGE)
+    {
+        
+    }
     else
         setCommonDirectives(vec, _serv_conf);
 }

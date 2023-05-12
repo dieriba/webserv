@@ -35,6 +35,7 @@ TcpServer::~TcpServer()
 
 /*----------------------------------------GETTER----------------------------------------*/
 const int& TcpServer::getEpollWs(void) const {return _epoll_ws;}
+const std::map<short int, std::string>& TcpServer::getErrorMaps() const {return _error_pages;}
 std::vector<Server> TcpServer::getServers(void) const {return _servers;};
 const size_t& TcpServer::getBodySize(void) const {return _body_size;};
 const std::string& TcpServer::getRootDir(void) const {return _root_dir;};
@@ -45,6 +46,16 @@ const std::string& TcpServer::getRedirect(void) const {return _redirect;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
+
+int TcpServer::addToErrorMap(const short int& error, const std::string& file)
+{
+    if (_error_pages.find(error) != _error_pages.end())
+        return -1;
+        
+    _error_pages[error] = file;
+
+    return 0;
+}
 
 void TcpServer::pushNewServer(const Server& server)
 {
@@ -191,7 +202,7 @@ void TcpServer::initknownLocationsDirectives(void)
     _knownDirectives[ALLOWED_METHOD] = true;
     _knownDirectives[INDEX] = true;
     _knownDirectives[REDIRECT] = true;
-    _knownDirectives[ERROR_FILE] = true;
+    _knownDirectives[ERROR_PAGE] = true;
     _knownDirectives[CLIENT_BODY] = true;
     _knownDirectives[LOCATION] = true;
 }   
@@ -205,7 +216,7 @@ void TcpServer::initKnownDirectives(void)
     _knownDirectives[INDEX] = true;
     _knownDirectives[CLIENT_BODY] = true;
     _knownDirectives[LOCATION] = true;
-    _knownDirectives[ERROR_FILE] = true;
+    _knownDirectives[ERROR_PAGE] = true;
     _knownDirectives[REDIRECT] = true;
     _knownDirectives[CGI] = true;
 }

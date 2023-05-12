@@ -22,6 +22,7 @@ class UtilityMethod
         static const std::string& getMimeType(std::string& path, const std::string& index_path, const std::string& index);
         static std::string decimalToHex(const int& number);
         static char *mystrstr(const char *big, const char *needle);
+        static size_t myStrlen(const char *buffer);
     
     private:
         UtilityMethod& operator=(const UtilityMethod& rhs);        

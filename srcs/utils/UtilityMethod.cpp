@@ -117,4 +117,11 @@ char *UtilityMethod::mystrstr(const char *big, const char *needle)
 	return (NULL);
 }
 
+size_t  UtilityMethod::myStrlen(const char *buffer)
+{
+    size_t  i = -1;
+    while (buffer[++i]);
+    return i;
+}
+
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/

@@ -33,6 +33,7 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
     
     if (_response.checkBits(HttpResponse::FINISHED_RESPONSE))
     {
+        std::cout << "Entered ERROR" << std::endl;
         UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
         _response.resetOptions();
         _response.getBuffer().clear();
@@ -68,7 +69,6 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
     
     if (end_header != NULL || (this -> checkBits(TcpServer::CONTENT_LENGTH) || this -> checkBits(TcpServer::TRANSFER_ENCODING)))
     {
-
         int req = _request.parseRequest(*this);
 
         if (!req && ((checkBits(TcpServer::CONTENT_LENGTH) || checkBits(TcpServer::TRANSFER_ENCODING)) && !checkBits(TcpServer::FINISH_BODY)))

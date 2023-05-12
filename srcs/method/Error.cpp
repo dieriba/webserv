@@ -26,12 +26,7 @@ Error::~Error(){};
 int Error::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
 {
     (void)req;
-    makeStatusLine(event.getErrStatus());
-    appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(0));
-    appendToResponse(CONTENT_TYP, "text/plain");
-    _response += CRLF;
-    std::cout << _response;
-    if (sendBuffer(event.getFd(), _response.c_str(), _response.size()))
+    if (sendBuffer(event.getFd(), ERROR_PAGE, UtilityMethod::myStrlen(ERROR_PAGE)))
         return IO::IO_ERROR;
     res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     return IO::IO_SUCCESS;
