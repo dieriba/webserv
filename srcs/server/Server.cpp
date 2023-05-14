@@ -16,7 +16,7 @@ Server::Server(const Server& rhs):TcpServer(rhs)
 }
 Server& Server::operator=(const Server& rhs)
 {
-    if (this == &rhs) return *this;
+    if (this == &rhs) return *(this);
     _serv_socket = rhs._serv_socket;
     _options = rhs._options;
     _tcp_server = rhs._tcp_server;
@@ -31,7 +31,7 @@ Server& Server::operator=(const Server& rhs)
     _cgi = rhs._cgi;
     _redirect = rhs._redirect;
     _index_path = rhs._index_path;
-    return *this;
+    return *(this);
 }
 Server::~Server()
 {
@@ -71,7 +71,6 @@ TcpServer *Server::getInstance(void) const {return _instance;}
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
-
 void    Server::setIp(const std::string& ip)
 {
     _ip = ip;
@@ -111,6 +110,7 @@ void Server::setTcpServer(TcpServer *tcp_server)
 {
     _tcp_server = tcp_server;
 }
+
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

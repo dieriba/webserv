@@ -26,7 +26,7 @@ Error::~Error(){};
 int Error::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
 {
     (void)req;
-    if (sendBuffer(event.getFd(), ERROR_PAGE, UtilityMethod::myStrlen(ERROR_PAGE)))
+    if (sendBuffer(event.getFd(), SERVER_ERROR_PAGE_NOT_FOUND, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_NOT_FOUND)))
         return IO::IO_ERROR;
     res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     return IO::IO_SUCCESS;

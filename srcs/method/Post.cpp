@@ -26,7 +26,7 @@ Post::~Post(){};
 int Post::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
 {
     (void)req;
-    if (sendBuffer(event.getFd(), POST_RESPONSE, strlen(POST_RESPONSE)))
+    if (sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, strlen(SERVER_SUCCESS_POST_RESPONSE)))
     {
         res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
         return IO::IO_ERROR;
