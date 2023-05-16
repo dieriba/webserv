@@ -18,6 +18,7 @@ Server& Server::operator=(const Server& rhs)
 {
     if (this == &rhs) return *(this);
     _serv_socket = rhs._serv_socket;
+    _error_pages = rhs._error_pages;
     _options = rhs._options;
     _tcp_server = rhs._tcp_server;
     _ip = rhs._ip;

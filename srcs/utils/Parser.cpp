@@ -195,6 +195,25 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
     if (it != end) server.setRedirect(it -> second);
 }
 
+void    Parser::setAllowedMethods(TcpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _serv_conf)
+{
+    if (vec.size() > 4)
+        throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
+    
+    size_t  len = vec.size() - 1;
+        
+    for (size_t i = 1; i < vec.size(); i++)
+    {
+        SemicolonCheck(vec[i], i, len);
+        if (vec[i].size() == 0 && i == len) break ;
+        int method = TcpServer::getHttpMethod(vec[i]);
+        if (method < 0)
+            throw ExceptionThrower("Unknown HTTP Method");
+        instance.setOptions(method, SET);
+    }
+    _serv_conf[vec[0]] = "HTTP METHODS";
+}
+
 void    Parser::checkOpeningLine(std::ifstream& file, std::string& line)
 {
     while (std::getline(file, line))
@@ -305,7 +324,6 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
 void    Parser::fillMap(const std::string& line, Location& location, std::map<std::string, std::string>& _serv_conf)
 {
     std::vector<std::string> vec;
-    size_t len;
     
     vec = UtilityMethod::stringSpliter(line, WHITESPACES);
     
@@ -319,31 +337,52 @@ void    Parser::fillMap(const std::string& line, Location& location, std::map<st
     if (vec.size() == 1)
         throw ExceptionThrower(MISSING_TOO_MANY_KEY_VALUE);
 
-    if (vec.size() > 3 && vec[0] != ALLOWED_METHOD)
+    if (vec.size() > 3 && (vec[0] != ALLOWED_METHOD && vec[0] != ERROR_PAGE))
         throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
-
-    len = vec.size() - 1;
 
     if (vec[0] == ALLOWED_METHOD)
     {
-        int method;
-
-        if (vec.size() > 4)
-            throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
-        
-        for (size_t i = 1; i < vec.size(); i++)
-        {
-            SemicolonCheck(vec[i], i, len);
-            if (vec[i].size() == 0 && i == len) break ;
-            method = TcpServer::getHttpMethod(vec[i]);
-            if (method < 0)
-                throw ExceptionThrower("Unknown HTTP Method");
-            location.setOptions(method, SET);
-        }
-        _serv_conf[vec[0]] = "HTTP METHODS";
+        TcpServer& instance = location;
+        setAllowedMethods(instance, vec, _serv_conf);
+    }
+    else if (vec[0] == ERROR_PAGE)
+    {
+        TcpServer& instance = location;
+        handleErrorPages(instance, vec);
     }
     else
         setCommonDirectives(vec, _serv_conf);
+}
+
+void    Parser::handleErrorPages(TcpServer& instance, std::vector<std::string>& vec)
+{
+    size_t len = vec.size() - 1;
+
+    if ((vec.size() % 2 != 0) || vec.size() < 4)
+        throw ExceptionThrower("Missing root_error_page directory");
+
+    std::string directory("." + vec[len--]);
+
+    for (size_t i = 1; i < len; i+=2)
+    {
+        std::stringstream number(vec[i]);
+            
+        short int err;
+            
+        number >> err;
+
+        if (number.fail())
+            throw ExceptionThrower("Error value must is too high");
+
+        if (vec[i].find_first_not_of(BASE_10) != std::string::npos)
+            throw ExceptionThrower("Error status code must only contains number between 0-9");
+            
+        if (instance.addToErrorMap(err, vec[i + 1], directory) == -1)
+            throw ExceptionThrower("Cannot rewrite the same status code");
+    }
+
+    instance.setOptions(TcpServer::ERROR_PAGE_SET, SET);
+    
 }
 
 void    Parser::fillMap(const std::string& line, Server& server, std::map<std::string, std::string>& _serv_conf)
@@ -364,7 +403,7 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
     if (vec.size() == 1)
         throw ExceptionThrower(MISSING_TOO_MANY_KEY_VALUE);
 
-    if (vec.size() > 3 && (vec[0] != SERVER_NAMES && vec[0] != ALLOWED_METHOD))
+    if (vec.size() > 3 && (vec[0] != SERVER_NAMES && vec[0] != ALLOWED_METHOD && vec[0] != ERROR_PAGE))
         throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
         
     if (vec.size() != 3 && vec[0] == CGI)
@@ -398,25 +437,13 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
     }
     else if (vec[0] == ALLOWED_METHOD)
     {
-        int method;
-
-        if (vec.size() > 4)
-            throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
-        
-        for (size_t i = 1; i < vec.size(); i++)
-        {
-            SemicolonCheck(vec[i], i, len);
-            if (vec[i].size() == 0 && i == len) break ;
-            method = TcpServer::getHttpMethod(vec[i]);
-            if (method < 0)
-                throw ExceptionThrower("Unknown HTTP Method");
-            server.setOptions(method, SET);
-        }
-        _serv_conf[vec[0]] = "HTTP METHODS";
+        TcpServer& instance = server;
+        setAllowedMethods(instance, vec, _serv_conf);
     }
-    else if (vec[0] == ERROR_PAGE)
+    else if (vec[0] == ROOT_ERROR_PAGE || vec[0] == ERROR_PAGE)
     {
-        
+        TcpServer& instance = server;
+        handleErrorPages(instance, vec);
     }
     else
         setCommonDirectives(vec, _serv_conf);

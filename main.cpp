@@ -6,6 +6,18 @@
 # include "./includes/http/RequestChecker.hpp"
 # include "./includes/method/Method.hpp"
 
+void    print_map_error_page(const TcpServer& instance)
+{
+    std::map<short int, std::string>::const_iterator it = instance.getErrorMaps().begin();
+    std::map<short int, std::string>::const_iterator end = instance.getErrorMaps().end();
+
+    for (; it != end; it++)
+    {
+        std::cout << "Error: " << it -> first << ", error_page_location: " << it -> second << std::endl;
+    }
+    
+}
+
 void    print_location_config(const Location& location)
 {
     std::cout << std::endl << std::endl ;
@@ -20,6 +32,8 @@ void    print_location_config(const Location& location)
         << "Root Directory: " << (location.getRootDir().size() > 0 ? location.getRootDir() : "No root directory") << std::endl
         << "Redirect: "  << (location.getRedirect().size() > 0 ? location.getRedirect() : "No redirect") << std::endl
         << "Server: " << location.getServer() << std::endl;
+        const TcpServer& instance = location;
+    print_map_error_page(instance);
 }
 
 void    print_server_config(const Server& server)
@@ -43,6 +57,8 @@ void    print_server_config(const Server& server)
         << "Client Max Body Size: " << server.getBodySize() << std::endl
         << "Root Directory: " << ((server.getRootDir().size()) > 0 ? server.getRootDir() : "No root directory") << std::endl
         << "Index HTML: " << ((server.getIndex().size()) > 0 ? server.getIndex() : "No index html") << std::endl;
+        const TcpServer& instance = server;
+        print_map_error_page(instance);
         if (serv_it_ != serv_it_end)
         {
             std::cout << "Server_name: ";
@@ -84,15 +100,15 @@ int main (int argc, char **argv)
         TcpServer tcp_servers;
         tcp_servers.settingUpServer(argc > 1 ? argv[1] : NULL);
         tcp_servers.runningUpServer();
-        tcp_servers.makeServerServe();
-        /*std::vector<Server> tmp(tcp_servers.getServers());
+        //tcp_servers.makeServerServe();
+        std::vector<Server> tmp(tcp_servers.getServers());
         std::vector<Server>::iterator it = tmp.begin();
         std::vector<Server>::iterator end = tmp.end();
         for ( ; it != end ; it++)
         {
             std::cout << "-----------SERVER-------------\n\n";
             print_server_config(*it);
-        }*/
+        }
     }
     catch(const std::exception& e)
     {

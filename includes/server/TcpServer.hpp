@@ -5,7 +5,6 @@
 # include "../utils/Parser.hpp"
 # include "../utils/BitsManipulation.hpp"
 
-
 class Server;
 class IO;
 typedef std::map<short int, std::string>::iterator vec_it;
@@ -42,10 +41,11 @@ class TcpServer: public Parser, public BitsManipulation
         const std::string& getIndexPath(void) const;
         const std::string& getFullIndexPath(void) const;
         const std::map<short int, std::string>& getErrorMaps() const;
+        std::map<short int, std::string>& getErrorMaps();
         const int& getEpollWs(void) const ;
 
         /*SETTERS*/
-        int addToErrorMap(const short int& error, const std::string& file);
+        int addToErrorMap(const short int& error, std::string& file, const std::string& directory);
         void pushNewServer(const Server& server);
         void setBodySize(const size_t& body);
         void setIndex(const std::string& index);

@@ -15,6 +15,7 @@ Location& Location::operator=(const Location& rhs)
     if (this == &rhs) return *this;
     _sub_path = rhs._sub_path;
     _options = rhs._options;
+    _error_pages = rhs._error_pages;
     _body_size = rhs._body_size;
     _root_dir = rhs._root_dir;
     _index = rhs._index;

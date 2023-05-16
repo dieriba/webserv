@@ -12,11 +12,13 @@ TcpServer::TcpServer():BitsManipulation(),_body_size(0),
 
 TcpServer::TcpServer(const TcpServer& rhs)
     :Parser(rhs),BitsManipulation(rhs),_body_size(rhs._body_size),_index(rhs._index),
-    _root_dir(rhs._root_dir),_redirect(rhs._redirect),_index_path(rhs._index_path),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
+    _root_dir(rhs._root_dir),_redirect(rhs._redirect),_index_path(rhs._index_path),_error_pages(rhs._error_pages)
+    ,_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
 
 TcpServer& TcpServer::operator=(const TcpServer& rhs)
 {
     if (this == &rhs) return *this;
+    _error_pages = rhs._error_pages;
     _body_size = rhs._body_size;
     _options = rhs._options;
     _index = rhs._index;
@@ -36,6 +38,7 @@ TcpServer::~TcpServer()
 /*----------------------------------------GETTER----------------------------------------*/
 const int& TcpServer::getEpollWs(void) const {return _epoll_ws;}
 const std::map<short int, std::string>& TcpServer::getErrorMaps() const {return _error_pages;}
+std::map<short int, std::string>& TcpServer::getErrorMaps() {return _error_pages;}
 std::vector<Server> TcpServer::getServers(void) const {return _servers;};
 const size_t& TcpServer::getBodySize(void) const {return _body_size;};
 const std::string& TcpServer::getRootDir(void) const {return _root_dir;};
@@ -47,13 +50,14 @@ const std::string& TcpServer::getRedirect(void) const {return _redirect;};
 
 /*----------------------------------------SETTER----------------------------------------*/
 
-int TcpServer::addToErrorMap(const short int& error, const std::string& file)
+int TcpServer::addToErrorMap(const short int& error, std::string& file, const std::string& directory)
 {
     if (_error_pages.find(error) != _error_pages.end())
         return -1;
-        
-    _error_pages[error] = file;
+    
+    file = directory + (file[0] != '/' ? "/" + file : file);
 
+    _error_pages[error] = file;
     return 0;
 }
 
@@ -198,17 +202,19 @@ bool TcpServer::isKnownLocationDirectives(const std::string& directive)
 
 void TcpServer::initknownLocationsDirectives(void)
 {
-    _knownDirectives[ROOT] = true;
-    _knownDirectives[ALLOWED_METHOD] = true;
-    _knownDirectives[INDEX] = true;
-    _knownDirectives[REDIRECT] = true;
-    _knownDirectives[ERROR_PAGE] = true;
-    _knownDirectives[CLIENT_BODY] = true;
-    _knownDirectives[LOCATION] = true;
+    _knownLocationsDirectives[ROOT] = true;
+    _knownLocationsDirectives[ALLOWED_METHOD] = true;
+    _knownLocationsDirectives[INDEX] = true;
+    _knownLocationsDirectives[REDIRECT] = true;
+    _knownLocationsDirectives[ERROR_PAGE] = true;
+    _knownLocationsDirectives[CLIENT_BODY] = true;
+    _knownLocationsDirectives[LOCATION] = true;
+    _knownLocationsDirectives[ROOT_ERROR_PAGE] = true;
 }   
 
 void TcpServer::initKnownDirectives(void)
 {
+    _knownDirectives[ROOT_ERROR_PAGE] = true;
     _knownDirectives[LISTEN] = true;
     _knownDirectives[SERVER_NAMES] = true;
     _knownDirectives[ROOT] = true;
@@ -219,6 +225,7 @@ void TcpServer::initKnownDirectives(void)
     _knownDirectives[ERROR_PAGE] = true;
     _knownDirectives[REDIRECT] = true;
     _knownDirectives[CGI] = true;
+    _knownLocationsDirectives[ROOT_ERROR_PAGE] = true;
 }
 
 void TcpServer::initHttpResponses(void)
