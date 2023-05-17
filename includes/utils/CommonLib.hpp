@@ -51,6 +51,8 @@
 # define METHOD "METHOD"
 # define HTTP_VERSION "HTTP/1.1"
 # define PATH "PATH"
+# define MIME_FILENAME "mimes_types.txt"
+
 
 
 /*

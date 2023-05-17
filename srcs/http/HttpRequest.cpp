@@ -1,4 +1,5 @@
 # include "../../includes/http/HttpRequest.hpp"
+# include "../../includes/http/RequestChecker.hpp"
 # include "../../includes/utils/UtilityMethod.hpp"
 # include "../../includes/server/TcpServer.hpp"
 # include "../../includes/IO/IO.hpp"
@@ -53,14 +54,18 @@ void HttpRequest::appendToBuffer(const char *toAppend, ssize_t size)
         _header_size = len + 1;
 }
 
-int HttpRequest::open_file(void)
+int HttpRequest::open_file(IO& event)
 {
-    static int i = 0;
-    std::string _name = "video";
-    _name += UtilityMethod::numberToString(i++) + ".mp4";
-    outfile.open(_name.c_str());
-    if (outfile.fail()) return FORBIDEN;
-    return 0;
+   TcpServer& instance = *(event.getServer() -> getInstance());
+    std::cout << "Instance: " << instance.getRootDir() << std::endl;
+    std::cout << "Path: " << getHeaders().find(PATH) -> second << std::endl;
+    std::cout << "MIME type: " <<  TcpServer::getMimeType(getHeaders().find(CONTENT_TYP)->second) << std::endl;
+
+    //outfile.open(_name.c_str(), std::ios::out);
+
+    //if (outfile.fail()) return FORBIDEN;
+    exit(1);
+    return IO::IO_SUCCESS;
 }
 
 int HttpRequest::handlePostMethod(IO& object)
@@ -132,11 +137,14 @@ int HttpRequest::parseRequest(IO& object)
     _it_content = _headers.find(CONTENT_LEN);
     _it_transfert = _headers.find(TRANSFERT_ENCODING);
 
+    Server& server = *(object.getServer());
+    server.setInstance((TcpServer *)RequestChecker::serverOrLocation(server, (*this)));
+
     size_t lenq;
+    std::cout << s_buffer << std::endl;
     if ((lenq = s_buffer.find(CRLF CRLF)) != std::string::npos)
     {
         lenq += 4;
-        std::cout << s_buffer.substr(0, lenq);
         s_buffer.erase(0, lenq);
     }
     
@@ -156,7 +164,7 @@ int HttpRequest::parseRequest(IO& object)
         
         if ((s_buffer.size()) >= _body)
             object.setOptions(TcpServer::FINISH_BODY, SET);
-        int err = open_file();
+        int err = open_file(object);
         if (err) return err;
         return handlePostMethod(object);
     }

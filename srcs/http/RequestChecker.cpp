@@ -40,9 +40,8 @@ int RequestChecker::checkAll(Server& server, const HttpRequest& req)
     
     if (res) return res;
 
-    const TcpServer *instance = serverOrLocation(server, req);
+    const TcpServer *instance = server.getInstance();
     
-    server.setInstance((TcpServer *)instance);
     //if (loc) server.setOptions(LOCATION_BLOCK, SET);
 
     //std::cout << "I should look to serve data from: " << (loc == 1 ? "Location Block" : "Server Block") << std::endl;

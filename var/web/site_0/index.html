@@ -1,20 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>WebServ Dieri</title>
+  <title>File Upload</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <h1>DIERI WebServ</h1>
-    <h1>TEST MOUSSA EST UNE PUTE</h1>
-    <h1>667 EKIP</h1>
-    <img src="Untitled.jpeg" alt="">
-    <form action="/" method="post">
-        <input type="file" name="file" id="">
-        <button type="submit">envoyze</button>
-    </form>
+  <h1>File Upload to C++ Server</h1>
+  
+  <div class="description">
+    <p>This page allows you to upload images, videos, and music files to a C++ server located at <code>localhost:8080</code>.</p>
+    <p>Select the files you want to upload and click the "Upload" button.</p>
+  </div>
+
+  <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*">
+    <input type="file" name="video" accept="video/*">
+    <input type="file" name="music" accept="audio/*">
+    <input type="submit" value="Upload">
+  </form>
 </body>
 </html>

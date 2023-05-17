@@ -22,7 +22,7 @@ class HttpRequest: public HttpMessage
         void clearRequestBodySize(void);
         
         /*MEMBER FUNCTION*/
-        int open_file(void);
+        int open_file(IO& event);
         int handlePostMethod(IO& object);
         void appendToBuffer(const char *toAppend, ssize_t size);
         int parseRequest(IO& object);

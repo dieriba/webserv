@@ -15,6 +15,7 @@ class RequestChecker
         ~RequestChecker();
 
         /*STATIC FUNCTION*/
+        static const TcpServer* serverOrLocation(const Server& server, const HttpRequest& req);
         static int checkValidPath(const TcpServer *instance, const HttpRequest& req);
         static int checkAllowedMethod(const TcpServer *instance, const HttpRequest& req);
         static int checkBodySize(const TcpServer *instance, const HttpRequest& req);
@@ -25,6 +26,5 @@ class RequestChecker
     private:
         RequestChecker& operator=(const RequestChecker& rhs);
         RequestChecker(const RequestChecker& rhs);
-        static const TcpServer* serverOrLocation(const Server& server, const HttpRequest& req);
 };
 # endif

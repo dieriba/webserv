@@ -307,6 +307,25 @@ void TcpServer::initMimeTypes(void)
     _mimeTypes[PHP] = MIME_PHP;
     _mimeTypes[SH] = MIME_SH;
     _mimeTypes[MP4] = MIME_MP4;
+
+    std::ifstream file(MIME_FILENAME);
+
+    if (!file)
+        ExceptionThrower("Could not open the file");
+
+    std::string line;
+    while (std::getline(file, line))
+    {
+        std::vector<std::string> vec = UtilityMethod::stringSpliter(line, WHITESPACES);
+
+        if (vec.size() == 2)
+        {
+            if ((vec[0][0] == '.' && UtilityMethod::count(vec[0], '.') == 1) && (vec[1][0] != '/' && UtilityMethod::count(vec[1], '/') == 1))
+                _mimeTypes[vec[0]] = vec[1];
+        }
+
+        if (file.eof()) break;
+    }
 }
 
 void TcpServer::initHttpMethods(void)
