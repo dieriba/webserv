@@ -15,7 +15,7 @@ class Post: public Method
         virtual ~Post();
 
         /*MEMBER FUNCTION*/
-        int sendResponse(IO&, const HttpRequest&, HttpResponse&);
+        int sendResponse(IO&, HttpRequest&, HttpResponse&);
 };
 
 # endif

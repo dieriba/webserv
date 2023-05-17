@@ -25,8 +25,9 @@ class IO: public BitsManipulation
         const int& getFd(void) const;
         const HttpRequest& getRequest(void) const;
         const HttpResponse& getReponse(void) const;
-        HttpResponse& getReponse(void);
         const int& getErrStatus(void) const;
+        HttpRequest& getRequest(void);
+        HttpResponse& getReponse(void);
         Server* getServer(void) const;
 
         /*SETTERS*/

@@ -15,7 +15,7 @@ class Delete: public Method
         ~Delete();
 
         /*MEMBER FUNCTION*/
-        int sendResponse(IO&, const HttpRequest&, HttpResponse&);
+        int sendResponse(IO&, HttpRequest&, HttpResponse&);
 };
 
 

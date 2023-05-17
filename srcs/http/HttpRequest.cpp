@@ -95,15 +95,8 @@ int HttpRequest::handlePostMethod(IO& object)
 
 int HttpRequest::parseRequest(IO& object)
 {
-    if (object.checkBits(TcpServer::CONTENT_LENGTH))
-    {
-        handlePostMethod(object);
+    if (object.checkBits(TcpServer::CONTENT_LENGTH) || object.checkBits(TcpServer::TRANSFER_ENCODING))
         return 0;
-    }
-    else if (object.checkBits(TcpServer::TRANSFER_ENCODING))
-    {
-        return 0;
-    }
     
     std::vector<std::string> headers = UtilityMethod::stringSpliter(s_buffer, CRLF);
     std::vector<std::string> header;
@@ -140,6 +133,13 @@ int HttpRequest::parseRequest(IO& object)
     Server& server = *(object.getServer());
     server.setInstance((TcpServer *)RequestChecker::serverOrLocation(server, (*this)));
 
+    int req = RequestChecker::checkAll(server, (*this));
+    
+    if (req != 0) 
+    {
+        std::cout << req << std::endl;
+        return req;
+    }
     size_t lenq;
     std::cout << s_buffer << std::endl;
     if ((lenq = s_buffer.find(CRLF CRLF)) != std::string::npos)
@@ -148,26 +148,35 @@ int HttpRequest::parseRequest(IO& object)
         s_buffer.erase(0, lenq);
     }
     
-    if (_it_transfert != _headers.end())
+    if (_it_transfert != _headers.end() || _it_content != _headers.end())
     {
-        object.setOptions(TcpServer::TRANSFER_ENCODING, SET);
+        std::cout << "Entered" << std::endl;
+        if (_it_transfert != _headers.end())
+        {
+            object.setOptions(TcpServer::TRANSFER_ENCODING, SET);
 
-        if (s_buffer.find(END_CHUNK) != std::string::npos)
+            if (s_buffer.find(END_CHUNK) != std::string::npos)
             object.setOptions(TcpServer::FINISH_BODY, SET);
+        }
+
+        if (_it_content != _headers.end())
+        {
+            object.setOptions(TcpServer::CONTENT_LENGTH, SET);
+        
+            setBodySize(_it_content -> second);
+        
+            if ((s_buffer.size()) >= _body)
+                object.setOptions(TcpServer::FINISH_BODY, SET);
+        }
+
+        HttpRequest& req = object.getRequest();
+        HttpResponse& res = object.getReponse();
+
+        res.setMethodObj(Method::_tab[req.getMethod()]());
+
+        return res.serveResponse(object, req);
     }
     
-    if (_it_content != _headers.end())
-    {
-        object.setOptions(TcpServer::CONTENT_LENGTH, SET);
-        
-        setBodySize(_it_content -> second);
-        
-        if ((s_buffer.size()) >= _body)
-            object.setOptions(TcpServer::FINISH_BODY, SET);
-        int err = open_file(object);
-        if (err) return err;
-        return handlePostMethod(object);
-    }
     return 0;
 }
 

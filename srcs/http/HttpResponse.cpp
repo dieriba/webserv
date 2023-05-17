@@ -26,6 +26,7 @@ HttpResponse::~HttpResponse()
 
 /*----------------------------------------GETTER----------------------------------------*/
 Method *HttpResponse::getHttpMethod(void) const {return _method;};
+Method *HttpResponse::getHttpMethod(void) {return _method;};
 Error& HttpResponse::getErrorMethod(void) {return _error;};
 const std::string& HttpResponse::getPath(void) const {return _path_req;};
 const DIR *HttpResponse::getDirectory(void) const {return _directory;}

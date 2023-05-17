@@ -44,7 +44,7 @@ int Get::handleChunkedRequest(HttpResponse& res, std::string& s_buffer)
     return (0);
 }
 
-int Get::handleFileRessource(IO& event, const HttpRequest& req, HttpResponse& res)
+int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
 {
     try
     {
@@ -147,7 +147,7 @@ int Get::handleDirectoryRessource(IO& event, DIR *directory)
     return (0);
 }
 
-int Get::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
+int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 {
     if (!res.checkBits(HttpResponse::STARTED))
     {

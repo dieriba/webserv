@@ -23,7 +23,7 @@ Delete::~Delete(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-int Delete::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
+int Delete::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 {
     (void)event;
     (void)req;

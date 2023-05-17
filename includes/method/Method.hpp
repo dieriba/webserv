@@ -26,7 +26,7 @@ class Method
         void appendToResponse(const std::string& key, const std::string& value);
 
         /*VIRTUAL FUNCTION*/
-        virtual int sendResponse(IO&, const HttpRequest&, HttpResponse&) = 0;
+        virtual int sendResponse(IO&, HttpRequest&, HttpResponse&) = 0;
 
         /*STATIC MEMBER FUNCTION*/
         static Method* createGet();

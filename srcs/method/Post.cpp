@@ -23,15 +23,18 @@ Post::~Post(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-int Post::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
+int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 {
     (void)req;
-    if (sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, strlen(SERVER_SUCCESS_POST_RESPONSE)))
+    (void)event;
+    (void) res;
+    std::cout << "ENTERED POST" << std::endl; 
+    /*if (sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, strlen(SERVER_SUCCESS_POST_RESPONSE)))
     {
         res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
         return IO::IO_ERROR;
     }
-    res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+    res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);*/
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

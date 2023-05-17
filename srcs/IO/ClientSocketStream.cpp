@@ -63,22 +63,21 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
     
     if (end_header != NULL)
     {
-        this -> resetOptions();
+        resetOptions();
         _request.getHeaders().clear();
     };
     
-    if (end_header != NULL || (this -> checkBits(TcpServer::CONTENT_LENGTH) || this -> checkBits(TcpServer::TRANSFER_ENCODING)))
+    if (end_header != NULL || (checkBits(TcpServer::CONTENT_LENGTH) || checkBits(TcpServer::TRANSFER_ENCODING)))
     {
         int req = _request.parseRequest(*this);
 
         if (!req && ((checkBits(TcpServer::CONTENT_LENGTH) || checkBits(TcpServer::TRANSFER_ENCODING)) && !checkBits(TcpServer::FINISH_BODY)))
-            return IO::IO_SUCCESS;
-        
-        if (req == 0) req = RequestChecker::checkAll(*(this -> getServer()), _request);
+            return _response.serveResponse((*this), _request);
 
-        _response.setMethodObj((req == 0 ? Method::_tab[_request.getMethod()]() : Method::_tab[3]()));
-
-        this -> resetOptions();
+        if (_response.getHttpMethod() == NULL)
+            _response.setMethodObj((req == 0 ? Method::_tab[_request.getMethod()]() : Method::_tab[3]()));
+ 
+        resetOptions();
 
         setErrorStatus(req);
         

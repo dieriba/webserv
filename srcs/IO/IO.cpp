@@ -24,6 +24,7 @@ const int& IO::getFd(void) const { return _fd ;};
 const int& IO::getErrStatus(void) const {return _err;}
 Server* IO::getServer(void) const { return _server;}
 const HttpRequest& IO::getRequest(void) const {return _request;}
+HttpRequest& IO::getRequest(void)  {return _request;}
 const HttpResponse& IO::getReponse(void) const {return _response;};
 HttpResponse& IO::getReponse(void) {return _response;};
 /*----------------------------------------GETTER----------------------------------------*/

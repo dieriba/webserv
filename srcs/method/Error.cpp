@@ -23,7 +23,7 @@ Error::~Error(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-int Error::sendResponse(IO& event, const HttpRequest& req, HttpResponse& res)
+int Error::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 {
     (void)req;
     if (sendBuffer(event.getFd(), SERVER_ERROR_PAGE_NOT_FOUND, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_NOT_FOUND)))

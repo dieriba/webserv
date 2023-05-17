@@ -30,6 +30,7 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         /*GETTER*/
         Error& getErrorMethod(void);
         Method *getHttpMethod(void) const;
+        Method *getHttpMethod(void);
         const DIR *getDirectory(void) const;
         std::ifstream& getFile(void);
         const std::string& getPath(void) const;
