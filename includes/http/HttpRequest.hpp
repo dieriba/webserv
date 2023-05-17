@@ -22,9 +22,10 @@ class HttpRequest: public HttpMessage
         void clearRequestBodySize(void);
         
         /*MEMBER FUNCTION*/
+        void clear(void);
+        void appendToBuffer(const char *toAppend, ssize_t size);
         int open_file(IO& event);
         int handlePostMethod(IO& object);
-        void appendToBuffer(const char *toAppend, ssize_t size);
         int parseRequest(IO& object);
         int checkValidHeader(int _ws, struct epoll_event event) const;
 

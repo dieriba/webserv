@@ -24,6 +24,10 @@ class HttpMessage
         void setBodySize(const size_t& size);
         virtual void appendToBuffer(const char *toAppend, ssize_t size);
         void setMetod(const int& _method);
+
+        /*MEMBER FUNCTION*/
+        virtual void clear(void) = 0;
+
     protected:
         size_t  _body;
         short int _method;

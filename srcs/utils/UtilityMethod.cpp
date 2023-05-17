@@ -60,12 +60,19 @@ size_t  UtilityMethod::count(const std::string& line, char to_find)
 }
 
 
-void UtilityMethod::switchEvents(const int& _ws, uint32_t mode, struct epoll_event& event, const IO& ev)
+int UtilityMethod::switchEvents(const int& _ws, uint32_t mode, struct epoll_event& event, IO& ev)
 {
     event.events = mode;
     event.data.ptr = event.data.ptr;
+    
     if (epoll_ctl(_ws, EPOLL_CTL_MOD, ev.getFd(), &event) == -1)
+    {
         close(ev.getFd());
+        return IO::IO_ERROR;
+    }
+
+    ev.setEvents(mode);
+    return IO::IO_SUCCESS;
 }
 
 std::string UtilityMethod::numberToString(const int& number)

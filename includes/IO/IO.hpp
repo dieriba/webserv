@@ -22,6 +22,7 @@ class IO: public BitsManipulation
         
     
         /*GETTERS*/
+        const uint32_t& getEvents() const;
         const int& getFd(void) const;
         const HttpRequest& getRequest(void) const;
         const HttpResponse& getReponse(void) const;
@@ -31,6 +32,7 @@ class IO: public BitsManipulation
         Server* getServer(void) const;
 
         /*SETTERS*/
+        void setEvents(const uint32_t& events);
         void setFD(const int& fd);
         void setErrorStatus(const int& err);
 
@@ -54,6 +56,7 @@ class IO: public BitsManipulation
             int _fd;
             int _err;
             Server *_server;
+            uint32_t     _event;
             HttpRequest _request;
             HttpResponse _response;
             enum type _type;

@@ -3,9 +3,11 @@
 
 # include "../utils/CommonLib.hpp"
 
-class HttpRequest;
 class TcpServer;
 class Server;
+class IO;
+class HttpRequest;
+class HttpResponse;
 
 class RequestChecker
 {
@@ -19,8 +21,8 @@ class RequestChecker
         static int checkValidPath(const TcpServer *instance, const HttpRequest& req);
         static int checkAllowedMethod(const TcpServer *instance, const HttpRequest& req);
         static int checkBodySize(const TcpServer *instance, const HttpRequest& req);
-        static int checkAll(Server& server, const HttpRequest& req);
-        static int checkHeader(const HttpRequest& req);
+        static int checkAll(IO& object, HttpRequest& req, HttpResponse& res);
+        static int checkHeader(HttpRequest& req, HttpResponse& res);
         static Checker tab[10];
     
     private:

@@ -25,16 +25,25 @@ Post::~Post(){};
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 {
-    (void)req;
-    (void)event;
-    (void) res;
-    std::cout << "ENTERED POST" << std::endl; 
-    /*if (sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, strlen(SERVER_SUCCESS_POST_RESPONSE)))
+    if (event.getEvents() & EPOLLIN)
     {
-        res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
-        return IO::IO_ERROR;
+        (void)req;
+        if (res.checkBits(HttpResponse::MULTIPART_DATA))
+        {
+            std::cout << req.getHeaders().find(BOUNDARY) -> second << std::endl;
+            std::cout << req.getHeaders().find(END_BOUNDARY) -> second << std::endl;
+        }
+        exit(1);
     }
-    res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);*/
+    else
+    {
+        if (sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, strlen(SERVER_SUCCESS_POST_RESPONSE)))
+        {
+            res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+            return IO::IO_ERROR;
+        }
+        res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+    }
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

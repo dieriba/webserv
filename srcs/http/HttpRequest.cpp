@@ -98,7 +98,7 @@ int HttpRequest::parseRequest(IO& object)
     if (object.checkBits(TcpServer::CONTENT_LENGTH) || object.checkBits(TcpServer::TRANSFER_ENCODING))
         return 0;
     
-    std::vector<std::string> headers = UtilityMethod::stringSpliter(s_buffer, CRLF);
+    std::vector<std::string> headers = UtilityMethod::stringSpliter(s_buffer.substr(0, s_buffer.find(CRLF CRLF)), CRLF);
     std::vector<std::string> header;
     std::map<std::string, std::string>::const_iterator _it_content;
     std::map<std::string, std::string>::const_iterator _it_transfert;
@@ -133,15 +133,17 @@ int HttpRequest::parseRequest(IO& object)
     Server& server = *(object.getServer());
     server.setInstance((TcpServer *)RequestChecker::serverOrLocation(server, (*this)));
 
-    int req = RequestChecker::checkAll(server, (*this));
+    int req = RequestChecker::checkAll(object, (*this), object.getReponse());
     
     if (req != 0) 
     {
-        std::cout << req << std::endl;
+        std::cout << "Request Error value is: " << req << std::endl;
         return req;
     }
+
     size_t lenq;
     std::cout << s_buffer << std::endl;
+    
     if ((lenq = s_buffer.find(CRLF CRLF)) != std::string::npos)
     {
         lenq += 4;
@@ -150,7 +152,7 @@ int HttpRequest::parseRequest(IO& object)
     
     if (_it_transfert != _headers.end() || _it_content != _headers.end())
     {
-        std::cout << "Entered" << std::endl;
+        std::cout << "Entered POST CONTENT LENGTH TRANSFERT ENCODING" << std::endl;
         if (_it_transfert != _headers.end())
         {
             object.setOptions(TcpServer::TRANSFER_ENCODING, SET);
@@ -187,4 +189,10 @@ int HttpRequest::checkValidHeader(int _ws, struct epoll_event event) const
     
     return 0;
 }
+
+void HttpRequest::clear(void)
+{
+    _headers.clear();
+}
+
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

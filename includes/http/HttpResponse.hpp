@@ -24,7 +24,10 @@ class HttpResponse: public HttpMessage, public BitsManipulation
             STARTED,
             FILE,
             DIRECTORY,
-            FINISHED_RESPONSE
+            FINISHED_RESPONSE,
+            MULTIPART_DATA,
+            APPLICATION_FORM_URLENCODED,
+            NO_ENCODING
         };
         
         /*GETTER*/
@@ -40,8 +43,9 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         void setMethodObj(Method *method);
     
         /*MEMBER FUNCTION*/
+        void clear(void);
         void setDirectory(DIR* directory);
-        int serveResponse(IO&, const HttpRequest&);
+        int serveResponse(IO&, HttpRequest&);
 
     private:
         std::string _path_req;

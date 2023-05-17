@@ -52,8 +52,10 @@
 # define HTTP_VERSION "HTTP/1.1"
 # define PATH "PATH"
 # define MIME_FILENAME "mimes_types.txt"
-
-
+# define MULTIPART_FORM_DATA "multipart/form-data"
+# define BOUNDARY "boundary"
+# define END_BOUNDARY "end_boundary"
+# define FORM_URLENCODED "application/x-www-form-urlencoded"
 
 /*
 

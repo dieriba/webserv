@@ -53,7 +53,14 @@ void HttpResponse::setDirectory(DIR *directory)
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-int HttpResponse::serveResponse(IO& event, const HttpRequest& req)
+void HttpResponse::clear(void)
+{
+    delete _method;
+    _method = NULL;
+    resetOptions();
+}
+
+int HttpResponse::serveResponse(IO& event, HttpRequest& req)
 {
     return _method -> sendResponse(event, req, *this);
 }

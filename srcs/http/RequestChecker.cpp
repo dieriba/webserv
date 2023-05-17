@@ -1,8 +1,10 @@
 # include "../../includes/http/RequestChecker.hpp"
-# include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/server/TcpServer.hpp"
 # include "../../includes/server/Server.hpp"
 # include "../../includes/server/Location.hpp"
+# include "../../includes/IO/IO.hpp"
+# include "../../includes/http/HttpRequest.hpp"
+# include "../../includes/http/HttpResponse.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 RequestChecker::RequestChecker(){};
@@ -34,11 +36,13 @@ const TcpServer *RequestChecker::serverOrLocation(const Server& server, const Ht
     return &server;
 }
 
-int RequestChecker::checkAll(Server& server, const HttpRequest& req)
+int RequestChecker::checkAll(IO& object, HttpRequest& req, HttpResponse& res)
 {
-    int res = checkHeader(req);
+    Server& server = *(object.getServer());
     
-    if (res) return res;
+    int _res = checkHeader(req, res);
+    
+    if (_res) return _res;
 
     const TcpServer *instance = server.getInstance();
     
@@ -48,17 +52,47 @@ int RequestChecker::checkAll(Server& server, const HttpRequest& req)
 
     for (size_t i = 0; tab[i] != 0; i++)
     {
-        res = tab[i](instance, req);
+        _res = tab[i](instance, req);
     
-        if (res) return res;
+        if (_res) return _res;
     }
-    return res;
+    return _res;
 }
 
-int RequestChecker::checkHeader(const HttpRequest& req)
+int RequestChecker::checkHeader(HttpRequest& req, HttpResponse& res)
 {
-    (void)req;
-    return 0;
+    std::map<std::string, std::string>& _map = req.getHeaders();
+    
+    if (req.getMethod() == TcpServer::POST)
+    {
+        std::map<std::string, std::string>::iterator it = _map.find(CONTENT_TYP);
+
+        if (it == _map.end()) return BAD_REQUEST;
+
+        size_t len = UtilityMethod::myStrlen(MULTIPART_FORM_DATA"; boundary=");
+        
+        if (it -> second.compare(0, len, MULTIPART_FORM_DATA"; boundary=") == 0)
+        {
+            int count = 0;
+            
+            for (size_t i = len; it -> second[i]; i++)
+            {
+                if (it -> second[i] == '-')
+                    count ++;
+                else
+                    break ;
+            }
+
+            if (count <= 2) return BAD_REQUEST; 
+            
+            _map[BOUNDARY] = it -> second.erase(0, len);
+            _map[END_BOUNDARY] = it -> second + "--";
+
+            res.setOptions(HttpResponse::MULTIPART_DATA, SET);       
+        }
+    }
+
+    return IO::IO_SUCCESS;
 }
 
 int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest& req)
