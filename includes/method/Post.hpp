@@ -16,6 +16,9 @@ class Post: public Method
 
         /*MEMBER FUNCTION*/
         int sendResponse(IO&, HttpRequest&, HttpResponse&);
+    
+    private:
+        int handleMultipartData(HttpRequest& req);
 };
 
 # endif
