@@ -560,13 +560,10 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_
 
                 if (line.find("}") == std::string::npos)
                     throw ExceptionThrower("Missing End Bracket Here");
-                else
-                    break ;
             }
             else
                 throw ExceptionThrower("Wrong Format of config file: " + line);
         }
-
         if (file.eof()) break ;
     }
     return server;
