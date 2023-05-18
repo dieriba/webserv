@@ -104,7 +104,6 @@ int HttpRequest::parseRequest(IO& object)
     std::map<std::string, std::string>::const_iterator _it_transfert;
     size_t len = headers.size() - 1;
 
-    
     header = UtilityMethod::stringSpliter(headers[0], " ");
     
     _headers[METHOD] =  header.size() > 0 ? header[0] : NO_VALUE;
@@ -112,6 +111,8 @@ int HttpRequest::parseRequest(IO& object)
     _headers[VERSION] = header.size() > 2 ? header[2] : NO_VALUE;
 
     setMetod(TcpServer::getHttpMethod(header[0]));
+
+    std::cout << s_buffer << std::endl;
 
     for (size_t i = 1; i < len - 1; i++)
     {

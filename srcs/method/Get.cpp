@@ -62,16 +62,11 @@ int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
         }
 
         if (file.fail() && file.eof())
-        {
-            res.resetOptions();
-            file.close();
             res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
-        }
     }
     catch(const std::exception& e)
     {
-        res.clear();
-        return 1;
+        res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     }
     return IO::IO_SUCCESS;
 }
@@ -106,7 +101,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 
         std::string ressource(res.getPath());
         
-        appendToResponse(CONTENT_TYP, UtilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex()));
+        appendToResponse(CONTENT_TYP, UtilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex(), true));
         appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()));
         _response += CRLF;
 

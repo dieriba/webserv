@@ -34,8 +34,7 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
     if (_response.checkBits(HttpResponse::FINISHED_RESPONSE))
     {
         UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
-        _response.resetOptions();
-        _response.getBuffer().clear();
+        clear();
     }
 
     return res;
@@ -48,9 +47,11 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
     int size = recv(this -> getFd(), buffer, REQUEST_SIZE, 0);
 
     if (size <= 0) return IO::IO_ERROR;
-
-    _request.appendToBuffer(buffer, size);
         
+    char *end_header = UtilityMethod::mystrstr(buffer, CRLF CRLF);
+    
+    if (end_header != NULL) clear();
+
     if (_request.getHeaderSize() >= MAX_HEADER_SIZE)
     {
         UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
@@ -58,9 +59,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         return IO::IO_SUCCESS;
     }
 
-    char *end_header = UtilityMethod::mystrstr(buffer, CRLF CRLF);
-    
-    if (end_header != NULL) clear();
+    _request.appendToBuffer(buffer, size);
     
     if (end_header != NULL || (checkBits(TcpServer::CONTENT_LENGTH) || checkBits(TcpServer::TRANSFER_ENCODING)))
     {

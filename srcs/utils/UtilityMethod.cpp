@@ -91,9 +91,9 @@ std::string UtilityMethod::decimalToHex(const int& number)
     return ss.str();
 }
 
-const std::string& UtilityMethod::getMimeType(std::string& path, const std::string& index_path, const std::string& index)
+const std::string& UtilityMethod::getMimeType(std::string& path, const std::string& index_path, const std::string& index, const bool& to_check)
 {
-    if (path == index_path) path = index;
+    if (to_check && (path == index_path)) path = index;
     
     int  i = path.size() - 1;
 
@@ -102,6 +102,7 @@ const std::string& UtilityMethod::getMimeType(std::string& path, const std::stri
         if (path[i] == '/' || path[i] == '.')
             break ;
     }
+    
     return TcpServer::getMimeType(&path[i]);
 }
 

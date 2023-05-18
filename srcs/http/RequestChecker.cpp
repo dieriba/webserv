@@ -90,6 +90,12 @@ int RequestChecker::checkHeader(HttpRequest& req, HttpResponse& res)
 
             res.setOptions(HttpResponse::MULTIPART_DATA, SET);       
         }
+        else
+        {
+            std::cout << UtilityMethod::getMimeType(it -> second, "", "", false) << std::endl;
+            
+            res.setOptions(HttpResponse::NO_ENCODING, SET);       
+        }
     }
 
     return IO::IO_SUCCESS;
