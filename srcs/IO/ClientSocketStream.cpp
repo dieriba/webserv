@@ -60,12 +60,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
 
     char *end_header = UtilityMethod::mystrstr(buffer, CRLF CRLF);
     
-    if (end_header != NULL)
-    {
-        resetOptions();
-        _response.clear();
-        _request.clear();
-    };
+    if (end_header != NULL) clear();
     
     if (end_header != NULL || (checkBits(TcpServer::CONTENT_LENGTH) || checkBits(TcpServer::TRANSFER_ENCODING)))
     {

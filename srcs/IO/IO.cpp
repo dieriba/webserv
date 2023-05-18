@@ -47,4 +47,10 @@ bool IO::validSocketClient(int _fd, struct epoll_event event)
     return true ;
 }
 
+void IO::clear(void)
+{
+    _request.clear();
+    _response.clear();
+    resetOptions();
+}
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

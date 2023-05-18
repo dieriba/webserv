@@ -17,9 +17,6 @@ class IO: public BitsManipulation
         IO& operator=(const IO& rhs);
         virtual ~IO();
 
-        virtual int handleIoOperation(const int& _ws, struct epoll_event& event) = 0;
-
-        
     
         /*GETTERS*/
         const uint32_t& getEvents() const;
@@ -38,6 +35,10 @@ class IO: public BitsManipulation
 
         /*MEMBER FUNCTION*/
         bool validSocketClient(int _fd, struct epoll_event event);
+
+        /*PURE VIRTUAL FUNCTION*/
+        virtual int handleIoOperation(const int& _ws, struct epoll_event& event) = 0;
+        void clear(void);
 
         enum
         {

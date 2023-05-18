@@ -193,6 +193,7 @@ int HttpRequest::checkValidHeader(int _ws, struct epoll_event event) const
 void HttpRequest::clear(void)
 {
     _headers.clear();
+    s_buffer.clear();
 }
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
