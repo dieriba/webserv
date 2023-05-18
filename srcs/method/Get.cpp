@@ -48,6 +48,7 @@ int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
 {
     try
     {
+        (void)req;
         char buffer[REQUEST_SIZE + 1] = {0};
 
         std::ifstream& file = res.getFile();
@@ -123,7 +124,6 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     {
         res.setOptions(HttpResponse::DIRECTORY, SET);
         
-        delete directory;
     }
     res.setOptions(HttpResponse::STARTED, SET);
     
