@@ -46,6 +46,7 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         void clear(void);
         void setDirectory(DIR* directory);
         int serveResponse(IO&, HttpRequest&);
+        int switchMethod(IO& event, const short int& method, const short int& status);
 
     private:
         std::string _path_req;

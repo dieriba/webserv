@@ -23,6 +23,7 @@ class TcpServer: public Parser, public BitsManipulation
             GET,
             POST,
             DELETE,
+            ERROR,
             HEADER,
             CONTENT_LENGTH,
             TRANSFER_ENCODING,

@@ -69,13 +69,10 @@ int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
     }
     catch(const std::exception& e)
     {
-        event.setErrorStatus(500);
-        res.getErrorMethod().sendResponse(event, req, res);
-        res.getFile().close();
-        res.resetOptions();
+        res.clear();
         return 1;
     }
-    return 0;
+    return IO::IO_SUCCESS;
 }
 
 int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
@@ -96,23 +93,13 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 
         file.open(res.getPath().c_str(), std::ifstream::in | std::ifstream::binary);
             
-        if (!file) 
-        {
-            delete res.getHttpMethod();
-            res.setMethodObj(new Error);
-            return (1);
-        }
+        if (!file) return res.switchMethod(event, TcpServer::ERROR, FORBIDEN);
     
         file.seekg(0, std::ios::end);
         res.setBodySize(file.tellg());
         file.seekg(0, std::ios::beg);
 
-        if (file.fail())
-        {
-            delete res.getHttpMethod();
-            res.setMethodObj(new Error);
-            return (1);
-        }
+        if (file.fail()) return res.switchMethod(event, TcpServer::ERROR, 500);
 
         makeStatusLine(OK);
 
@@ -135,9 +122,12 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     else if (directory)
     {
         res.setOptions(HttpResponse::DIRECTORY, SET);
+        
+        delete directory;
     }
     res.setOptions(HttpResponse::STARTED, SET);
-    return 0;
+    
+    return IO::IO_SUCCESS;
 }
 
 int Get::handleDirectoryRessource(IO& event, DIR *directory)

@@ -57,11 +57,23 @@ void HttpResponse::clear(void)
 {
     delete _method;
     _method = NULL;
+
+    _file.clear();
+    if (_file.is_open()) _file.close();
+    
     resetOptions();
 }
 
 int HttpResponse::serveResponse(IO& event, HttpRequest& req)
 {
     return _method -> sendResponse(event, req, *this);
+}
+
+int HttpResponse::switchMethod(IO& event, const short int& method, const short int& status)
+{
+    delete _method;
+    event.setErrorStatus(status);
+    _method = Method::_tab[method]();
+    return (1);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
