@@ -34,7 +34,6 @@ class HttpRequest: public HttpMessage
 
     private:
         size_t _header_size;
-        size_t _request_body_size;
         std::ofstream outfile;
         bool _start;
 };

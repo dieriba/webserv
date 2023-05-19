@@ -1,7 +1,7 @@
 # include "../../includes/http/HttpMessage.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-HttpMessage::HttpMessage():s_buffer(""){};
+HttpMessage::HttpMessage():_body(0), s_buffer(""){};
 HttpMessage::HttpMessage(const HttpMessage& rhs):_body(rhs._body),_method(rhs._method),s_buffer(rhs.s_buffer),_headers(rhs._headers){};
 HttpMessage& HttpMessage::operator=(const HttpMessage& rhs)
 {
@@ -24,7 +24,6 @@ const size_t& HttpMessage::getBodySize(void) const {return _body;};
 int HttpMessage::getMethod(void) const {return _method;}
 /*----------------------------------------GETTER----------------------------------------*/
 
-
 /*----------------------------------------SETTER----------------------------------------*/
 void HttpMessage::appendToBuffer(const char *toAppend, ssize_t size) 
 {
@@ -37,10 +36,7 @@ void HttpMessage::setBodySize(const std::string& body)
     size_t b;
 
     ss >> b;
-    if (ss.fail())
-        _body = std::string::npos;
-    else
-        _body = b;
+    ss.fail() ? _body = std::string::npos : b;
 }
 
 void HttpMessage::setBodySize(const size_t& size)
@@ -52,4 +48,5 @@ void HttpMessage::setMetod(const int& method) {_method = method;}
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

@@ -66,11 +66,16 @@ int RequestChecker::checkHeader(HttpRequest& req, HttpResponse& res)
 {
     std::map<std::string, std::string>& _map = req.getHeaders();
     
-    if (req.getMethod() == TcpServer::POST)
+    if (req.getMethod() == TcpServer::GET)
+    {
+
+    }
+    else if (req.getMethod() == TcpServer::POST)
     {
         std::map<std::string, std::string>::iterator it = _map.find(CONTENT_TYP);
 
-        if (it == _map.end()) return BAD_REQUEST;
+        if (((_map.find(CONTENT_LEN) == _map.end()) && (_map.find(TRANSFERT_ENCODING) == _map.end())) || it == _map.end())
+            return BAD_REQUEST;
 
         size_t len = UtilityMethod::myStrlen(MULTIPART_FORM_DATA"; boundary=");
         
@@ -81,7 +86,7 @@ int RequestChecker::checkHeader(HttpRequest& req, HttpResponse& res)
             for (size_t i = len; it -> second[i]; i++)
             {
                 if (it -> second[i] == '-')
-                    count ++;
+                    count++;
                 else
                     break ;
             }
@@ -110,10 +115,12 @@ int RequestChecker::checkHeader(HttpRequest& req, HttpResponse& res)
 int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest& req)
 {
     std::string root;
+ 
     if (instance -> getRootDir().size() == 0) return NOT_FOUND;
 
     root = instance -> getRootDir();
     root += req.getHeaders().find("PATH") -> second;
+    
     const char *root_c = root.c_str();
     
     if (req.getMethod() == TcpServer::POST)
@@ -121,11 +128,13 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
     
     if (req.getMethod() != TcpServer::POST)
     {
+        
         if (access(root_c, F_OK) != 0)
             return NOT_FOUND;
         
         if (req.getMethod() == TcpServer::GET && (access(root_c, R_OK) != 0))
             return FORBIDEN;
+
     }
     
     if (req.getMethod() == TcpServer::POST && (access(root_c, F_OK) == 0 && access(root_c, W_OK) != 0))
@@ -143,10 +152,13 @@ int RequestChecker::checkAllowedMethod(const TcpServer *instance, const HttpRequ
 
 int RequestChecker::checkBodySize(const TcpServer *instance, const HttpRequest& req)
 {
-    if ((instance -> getBodySize() != std::string::npos) && (req.getBodySize() > instance -> getBodySize()))
+
+    std::cout << instance->getRootDir() << std::endl;
+
+    if ((instance -> getBodySize() != std::string::npos) && (req.getBodySize() > instance -> getBodySize()))                                                                            
         return TOO_LARGE_CONTENT;
-    
-    return 0;
+
+    return IO::IO_SUCCESS;
 }
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 

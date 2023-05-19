@@ -58,7 +58,7 @@ int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
         if (sendBuffer(event.getFd(), buffer, file.gcount()))
         {
             std::cout << "Socket Ended" << std::endl;
-            return (-1);
+            return (IO::IO_ERROR);
         }
 
         if (file.fail() && file.eof())
