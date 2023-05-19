@@ -25,10 +25,6 @@ class TcpServer: public Parser, public BitsManipulation
             DELETE,
             ERROR,
             HEADER,
-            CONTENT_LENGTH,
-            TRANSFER_ENCODING,
-            FINISH_BODY,
-            RESPONSE_HEADER_FINISHED,
             LOCATION_BLOCK,
             ERROR_PAGE_SET
         };

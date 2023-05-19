@@ -4,26 +4,60 @@
 # include "../../includes/IO/IO.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-Post::Post(){};
-Post::Post(const Post& rhs):Method(rhs){};
+Post::Post():_request_body_size(0){};
+Post::Post(const Post& rhs):Method(rhs),_request_body_size(rhs._request_body_size){};
 Post& Post::operator=(const Post& rhs)
 {
     if (this == &rhs) return *this;
-    
+    _request_body_size = rhs._request_body_size;
     return *this;
 };
 Post::~Post(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
+const size_t& Post::getRequestBodySize(void) const {return _request_body_size;}
 /*----------------------------------------GETTER----------------------------------------*/
 
 
 /*----------------------------------------SETTER----------------------------------------*/
+void Post::updateSize(const size_t& size)
+{
+    _request_body_size += size;
+};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+void Post::clearRequestBodySize(void)
+{
+    _request_body_size = 0;
+}
 
+int Post::writeToFile(IO& object, HttpRequest& req)
+{
+    std::ofstream& outfile = req.getOutfile();
+    try
+    {
+        outfile.write(req.getBuffer().data(), req.getBuffer().size());
+        updateSize(req.getBuffer().size());
+        if (getRequestBodySize() >= req.getBodySize())
+        {
+            object.setOptions(HttpRequest::FINISH_BODY, SET);
+            std::cout << "Full body size: " << getRequestBodySize() << std::endl;
+            clearRequestBodySize();
+            outfile.close();
+        }
+        req.getBuffer().clear();
+    }
+    catch(const std::exception& e)
+    {
+        outfile.close();
+        clearRequestBodySize();
+        return INTERNAL_SERVER_ERROR;
+    }
+
+    return IO::IO_SUCCESS;
+}
 
 int Post::handleMultipartData(HttpRequest& req)
 {
@@ -67,10 +101,13 @@ int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
             std::cout << req.getBuffer().find(req.getHeaders().find(END_BOUNDARY) -> second) << std::endl;
             handleMultipartData(req);
         }
+        else if (res.checkBits(HttpResponse::NO_ENCODING))
+            return writeToFile(event, req);
         exit(1);
     }
     else
     {
+        std::cout << "Entered OUT" << std::endl;
         if (sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, strlen(SERVER_SUCCESS_POST_RESPONSE)))
         {
             res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);

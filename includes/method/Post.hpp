@@ -14,11 +14,20 @@ class Post: public Method
         Post& operator=(const Post& rhs);
         virtual ~Post();
 
+        /*GETTERS*/
+        const size_t& getRequestBodySize(void) const;
+
+        /*SETTERS*/
+        void updateSize(const size_t& size);
+
         /*MEMBER FUNCTION*/
+        void clearRequestBodySize(void);
         int sendResponse(IO&, HttpRequest&, HttpResponse&);
-    
+        int writeToFile(IO& object, HttpRequest& req);
+
     private:
         int handleMultipartData(HttpRequest& req);
+        size_t _request_body_size;
 };
 
 # endif

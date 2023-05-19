@@ -102,8 +102,12 @@ const std::string& UtilityMethod::getMimeType(std::string& path, const std::stri
         if (path[i] == '/' || path[i] == '.')
             break ;
     }
-    
     return TcpServer::getMimeType(&path[i]);
+}
+
+const std::string& UtilityMethod::getFileExtension(const std::string& content_type)
+{
+    return TcpServer::getMimeType(content_type);
 }
 
 char *UtilityMethod::mystrstr(const char *big, const char *needle)

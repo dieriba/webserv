@@ -13,19 +13,22 @@ class HttpRequest: public HttpMessage
         HttpRequest& operator=(const HttpRequest& rhs);
         ~HttpRequest();
 
+        enum
+        {
+            CONTENT_LENGTH,
+            TRANSFER_ENCODING,
+            FINISH_BODY,
+            RESPONSE_HEADER_FINISHED,
+        };
+
         /*GETTERS*/
         const size_t& getHeaderSize(void) const;
-        const size_t& getRequestBodySize(void) const;
+        std::ofstream& getOutfile(void);
 
-        /*SETTERS*/
-        void updateSize();
-        void clearRequestBodySize(void);
-        
         /*MEMBER FUNCTION*/
         void clear(void);
         void appendToBuffer(const char *toAppend, ssize_t size);
         int open_file(IO& event);
-        int handlePostMethod(IO& object);
         int parseRequest(IO& object);
         int checkValidHeader(int _ws, struct epoll_event event) const;
 

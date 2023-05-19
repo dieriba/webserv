@@ -5,17 +5,15 @@
 # include "../../includes/IO/IO.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-HttpRequest::HttpRequest():HttpMessage(),_header_size(0),_request_body_size(0),_start(true){};
+HttpRequest::HttpRequest():HttpMessage(),_header_size(0),_start(true){};
 HttpRequest::HttpRequest(const HttpRequest& rhs):HttpMessage(rhs)
 {
-    _request_body_size = rhs._request_body_size;
     _header_size = rhs._header_size;
     _start = rhs._start;
 };
 HttpRequest& HttpRequest::operator=(const HttpRequest& rhs)
 {
     if (this == &rhs) return *this;
-    _request_body_size = rhs._request_body_size;
     _start = rhs._start;
     _header_size = rhs._header_size;
     s_buffer = rhs.s_buffer;
@@ -28,19 +26,13 @@ HttpRequest::~HttpRequest(){};
 
 /*----------------------------------------GETTER----------------------------------------*/
 const size_t& HttpRequest::getHeaderSize(void) const {return _header_size;}
-const size_t& HttpRequest::getRequestBodySize(void) const {return _request_body_size;}
+std::ofstream& HttpRequest::getOutfile(void) {return outfile;}
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
-void HttpRequest::updateSize(void)
-{
-    _request_body_size += s_buffer.size();
-};
 
-void HttpRequest::clearRequestBodySize(void)
-{
-    _request_body_size = 0;
-}
+
+
 /*----------------------------------------SETTER----------------------------------------*/
 
 
@@ -56,65 +48,49 @@ void HttpRequest::appendToBuffer(const char *toAppend, ssize_t size)
 
 int HttpRequest::open_file(IO& event)
 {
-   TcpServer& instance = *(event.getServer() -> getInstance());
-    std::cout << "Instance: " << instance.getRootDir() << std::endl;
-    std::cout << "Path: " << getHeaders().find(PATH) -> second << std::endl;
-    std::cout << "MIME type: " <<  TcpServer::getMimeType(getHeaders().find(CONTENT_TYP)->second) << std::endl;
+    static int _nb;
+    TcpServer& instance = *(event.getServer() -> getInstance());
+    std::string& path = getHeaders().find(PATH) -> second; 
+    std::string fileExtenstion = UtilityMethod::getFileExtension(getHeaders().find(CONTENT_TYP) -> second);
+    std::string filepath;
+    
+    if (path == SLASH)
+        filepath = instance.getRootDir() + DEFAULT_FILE_NAME + UtilityMethod::numberToString(_nb) + fileExtenstion;
+    else
+        filepath = instance.getRootDir() + &path[path.rfind('/')];
 
-    //outfile.open(_name.c_str(), std::ios::out);
+    if (outfile.is_open()) outfile.close();
+    
+    outfile.clear();
+    
+    outfile.open(filepath.c_str(), std::ios::out);
+    
+    if (outfile.fail()) return FORBIDEN;
+    
+    _nb++;
 
-    //if (outfile.fail()) return FORBIDEN;
-    exit(1);
     return IO::IO_SUCCESS;
-}
-
-int HttpRequest::handlePostMethod(IO& object)
-{
-    try
-    {
-        outfile.write(s_buffer.data(), s_buffer.size());
-        updateSize();
-        if (getRequestBodySize() >= _body)
-        {
-            std::cout << getRequestBodySize() << std::endl;
-            object.setOptions(TcpServer::FINISH_BODY, SET);
-            clearRequestBodySize();
-            outfile.close();
-        }
-        s_buffer.clear();
-    }
-    catch(const std::exception& e)
-    {
-        outfile.close();
-        _start = true;
-        clearRequestBodySize();
-        return INTERNAL_SERVER_ERROR;
-    }
-    return 0;
 }
 
 int HttpRequest::parseRequest(IO& object)
 {
-    if (object.checkBits(TcpServer::CONTENT_LENGTH) || object.checkBits(TcpServer::TRANSFER_ENCODING))
+    if (object.checkBits(HttpRequest::CONTENT_LENGTH) || object.checkBits(HttpRequest::TRANSFER_ENCODING))
         return 0;
     
     std::vector<std::string> headers = UtilityMethod::stringSpliter(s_buffer.substr(0, s_buffer.find(CRLF CRLF)), CRLF);
     std::vector<std::string> header;
     std::map<std::string, std::string>::const_iterator _it_content;
     std::map<std::string, std::string>::const_iterator _it_transfert;
-    size_t len = headers.size() - 1;
+    size_t len = headers.size();
 
     header = UtilityMethod::stringSpliter(headers[0], " ");
-    
     _headers[METHOD] =  header.size() > 0 ? header[0] : NO_VALUE;
     _headers[PATH] =  header.size() > 1 ? header[1] : NO_VALUE;
     _headers[VERSION] = header.size() > 2 ? header[2] : NO_VALUE;
 
     setMetod(TcpServer::getHttpMethod(header[0]));
 
-    std::cout << s_buffer << std::endl;
-
-    for (size_t i = 1; i < len - 1; i++)
+    for (size_t i = 1; i < len; i++)
     {
         header = UtilityMethod::stringSpliter(headers[i], ":");
 
@@ -127,49 +103,44 @@ int HttpRequest::parseRequest(IO& object)
             _headers[header[0]] = header.size() >= 2 ? header[1].erase(0, 1) : NO_VALUE;
         }
     }
-
+    
     _it_content = _headers.find(CONTENT_LEN);
     _it_transfert = _headers.find(TRANSFERT_ENCODING);
 
     Server& server = *(object.getServer());
     server.setInstance((TcpServer *)RequestChecker::serverOrLocation(server, (*this)));
 
-    int req = RequestChecker::checkAll(object, (*this), object.getReponse());
+    int _req = RequestChecker::checkAll(object, (*this), object.getReponse());
     
-    if (req != 0) 
-    {
-        std::cout << "Request Error value is: " << req << std::endl;
-        return req;
-    }
-
+    if (_req != 0)  return _req;
+    
     size_t lenq;
-    std::cout << s_buffer << std::endl;
     
     if ((lenq = s_buffer.find(CRLF CRLF)) != std::string::npos)
     {
         lenq += 4;
+        std::cout << s_buffer.substr(0, lenq);
         s_buffer.erase(0, lenq);
     }
     
     if (_it_transfert != _headers.end() || _it_content != _headers.end())
     {
-        std::cout << "Entered POST CONTENT LENGTH TRANSFERT ENCODING" << std::endl;
         if (_it_transfert != _headers.end())
         {
-            object.setOptions(TcpServer::TRANSFER_ENCODING, SET);
+            object.setOptions(HttpRequest::TRANSFER_ENCODING, SET);
 
             if (s_buffer.find(END_CHUNK) != std::string::npos)
-            object.setOptions(TcpServer::FINISH_BODY, SET);
+                object.setOptions(HttpRequest::FINISH_BODY, SET);
         }
 
         if (_it_content != _headers.end())
         {
-            object.setOptions(TcpServer::CONTENT_LENGTH, SET);
-        
+            object.setOptions(HttpRequest::CONTENT_LENGTH, SET);
+    
             setBodySize(_it_content -> second);
         
             if ((s_buffer.size()) >= _body)
-                object.setOptions(TcpServer::FINISH_BODY, SET);
+                object.setOptions(HttpRequest::FINISH_BODY, SET);
         }
 
         HttpRequest& req = object.getRequest();
@@ -177,10 +148,11 @@ int HttpRequest::parseRequest(IO& object)
 
         res.setMethodObj(Method::_tab[req.getMethod()]());
 
-        return res.serveResponse(object, req);
+        if (res.checkBits(HttpResponse::NO_ENCODING)) open_file(object);
+
     }
     
-    return 0;
+    return IO::IO_SUCCESS;
 }
 
 int HttpRequest::checkValidHeader(int _ws, struct epoll_event event) const

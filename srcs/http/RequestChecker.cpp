@@ -56,6 +56,9 @@ int RequestChecker::checkAll(IO& object, HttpRequest& req, HttpResponse& res)
     
         if (_res) return _res;
     }
+
+    
+
     return _res;
 }
 
@@ -92,8 +95,11 @@ int RequestChecker::checkHeader(HttpRequest& req, HttpResponse& res)
         }
         else
         {
-            std::cout << UtilityMethod::getMimeType(it -> second, "", "", false) << std::endl;
-            
+            std::string& path(_map.find(PATH) -> second);
+            std::string _pathMimeType = UtilityMethod::getMimeType(path, "", "", false);
+
+            if (path != SLASH && _pathMimeType != it -> second) return BAD_REQUEST;
+
             res.setOptions(HttpResponse::NO_ENCODING, SET);       
         }
     }

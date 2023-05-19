@@ -321,7 +321,10 @@ void TcpServer::initMimeTypes(void)
         if (vec.size() == 2)
         {
             if ((vec[0][0] == '.' && UtilityMethod::count(vec[0], '.') == 1) && (vec[1][0] != '/' && UtilityMethod::count(vec[1], '/') == 1))
+            {
                 _mimeTypes[vec[0]] = vec[1];
+                _mimeTypes[vec[1]] = vec[0];
+            }
         }
 
         if (file.eof()) break;
