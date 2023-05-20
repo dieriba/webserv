@@ -277,6 +277,7 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
         vec[1].erase(vec[1].length() - 1);
 
     _location.setIndexPath(vec[1]);
+
     if (!bracket)
     {
         /*CHECKS IF FIRST LINE MEET PARSING REQUIREMENTS*/
@@ -358,10 +359,17 @@ void    Parser::handleErrorPages(TcpServer& instance, std::vector<std::string>& 
 {
     size_t len = vec.size() - 1;
 
+    for (size_t i = 0; i <= len; i++)
+    {
+        SemicolonCheck(vec[i], i, len);
+    }
+    
     if ((vec.size() % 2 != 0) || vec.size() < 4)
         throw ExceptionThrower("Missing root_error_page directory");
 
     std::string directory("." + vec[len--]);
+
+    
 
     for (size_t i = 1; i < len; i+=2)
     {
@@ -486,9 +494,15 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
                 line += "}";
                 break ;
             }
-            if (line.find(LOCATION, 0, 8) != std::string::npos)
+
+            size_t pos;
+            
+            if ((pos = line.find(LOCATION)) != std::string::npos)
             {
-                size_t pos = line.find('{');
+                if (pos != 0)
+                    throw ExceptionThrower("Unkown Context");
+                    
+                pos = line.find('{');
                 
                 if (UtilityMethod::count(line, '{') > 1)
                     throw ExceptionThrower("Too Many Opening Bracket");
@@ -540,8 +554,15 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_
             if (line.find('}') != std::string::npos)
                     throw ExceptionThrower("BAD_SYNTAX");
             
-            if (line.find(SERVER_CONTEXT, 0, 6) != std::string::npos)
+            if (line.compare(0, UtilityMethod::myStrlen(SERVER_CONTEXT), SERVER_CONTEXT) == 0)
             {
+                pos = line.find_first_of(WHITESPACES);
+                
+                if (pos == std::string::npos) pos = 0;
+
+                if ((pos == 0 && line.size() != UtilityMethod::myStrlen(SERVER_CONTEXT)) || (pos && (UtilityMethod::myStrlen(SERVER_CONTEXT) != pos)))
+                    throw ExceptionThrower("Unknow Context: " + line + " please refer to dieriba for the known context");
+
                 if (UtilityMethod::count(line, '{') > 1)
                     throw ExceptionThrower("Too Many Opening Bracket");
 
@@ -562,7 +583,7 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_
                     throw ExceptionThrower("Missing End Bracket Here");
             }
             else
-                throw ExceptionThrower("Wrong Format of config file: " + line);
+                throw ExceptionThrower("Unknow Context: " + line + " please refer to dieriba for the known context");
         }
         if (file.eof()) break ;
     }
