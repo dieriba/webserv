@@ -45,7 +45,7 @@ int RequestChecker::checkAll(IO& object, HttpRequest& req, HttpResponse& res)
     if (_res) return _res;
 
     const TcpServer *instance = server.getInstance();
-    
+
     //if (loc) server.setOptions(LOCATION_BLOCK, SET);
 
     //std::cout << "I should look to serve data from: " << (loc == 1 ? "Location Block" : "Server Block") << std::endl;
@@ -53,11 +53,9 @@ int RequestChecker::checkAll(IO& object, HttpRequest& req, HttpResponse& res)
     for (size_t i = 0; tab[i] != 0; i++)
     {
         _res = tab[i](instance, req);
-    
+        std::cout << "Res value: " << _res << "I value: " << i << std::endl;
         if (_res) return _res;
     }
-
-    
 
     return _res;
 }
@@ -119,16 +117,16 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
     if (instance -> getRootDir().size() == 0) return NOT_FOUND;
 
     root = instance -> getRootDir();
-    root += req.getHeaders().find("PATH") -> second;
+    root += req.getHeaders().find(PATH) -> second;
     
     const char *root_c = root.c_str();
     
-    if (req.getMethod() == TcpServer::POST)
-        std::cout << "Root: " << root_c << std::endl;
+    //std::cout << "Root_c" << root_c << std::endl;
+
     
     if (req.getMethod() != TcpServer::POST)
     {
-        
+        std::cout << "GET: " << root_c << std::endl;   
         if (access(root_c, F_OK) != 0)
             return NOT_FOUND;
         
@@ -137,8 +135,26 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
 
     }
     
-    if (req.getMethod() == TcpServer::POST && (access(root_c, F_OK) == 0 && access(root_c, W_OK) != 0))
-        return FORBIDEN;
+    if (req.getMethod() == TcpServer::POST)
+    {
+        std::cout << "Root: " << root_c << std::endl;
+
+        size_t i = root.rfind('/');
+        
+        if (i == std::string::npos) return BAD_REQUEST;
+
+        char stop = root_c[i + 1];
+        char *alias_root = (char *)root_c;
+        alias_root[i + 1] = 0;
+    
+        if (UtilityMethod::is_a_directory(alias_root) == NULL) return NOT_FOUND;
+
+        alias_root[i + 1] = stop;
+
+        if (access(alias_root, W_OK) && errno == EACCES) return FORBIDEN;
+
+        std::cout << "Here" << std::endl;
+    }
 
     return 0;
 }
@@ -152,9 +168,7 @@ int RequestChecker::checkAllowedMethod(const TcpServer *instance, const HttpRequ
 
 int RequestChecker::checkBodySize(const TcpServer *instance, const HttpRequest& req)
 {
-
-    std::cout << instance->getRootDir() << std::endl;
-
+    std::cout << "Instance body size: " << instance -> getBodySize() << "Req body size: " << req.getBodySize() << std::endl;
     if ((instance -> getBodySize() != std::string::npos) && (req.getBodySize() > instance -> getBodySize()))                                                                            
         return TOO_LARGE_CONTENT;
 

@@ -79,14 +79,14 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     DIR *directory;
 
     if (path != "/") directory = opendir(res.getPath().c_str());
-        
+    
     if ((path == instance.getIndexPath() || (directory == NULL && (errno == ENOENT || errno == ENOTDIR))))
     {
         std::ifstream& file = res.getFile();
 
         if (req.getHeaders().find(PATH) -> second == instance.getIndexPath())
-            res.setPath(instance.getRootDir() + "/" + instance.getIndex());
-
+            res.setPath(instance.getRootDir() + instance.getIndexPath() + "/" + instance.getIndex());
+                
         file.open(res.getPath().c_str(), std::ifstream::in | std::ifstream::binary);
             
         if (!file) return res.switchMethod(event, TcpServer::ERROR, FORBIDEN);

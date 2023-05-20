@@ -23,6 +23,7 @@ class UtilityMethod
         static const std::string& getFileExtension(const std::string& content_type);
         static std::string decimalToHex(const int& number);
         static char *mystrstr(const char *big, const char *needle);
+        static const char *is_a_directory(const char *path);
         static size_t myStrlen(const char *buffer);
     
     private:

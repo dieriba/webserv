@@ -54,10 +54,12 @@ int HttpRequest::open_file(IO& event)
     std::string fileExtenstion = UtilityMethod::getFileExtension(getHeaders().find(CONTENT_TYP) -> second);
     std::string filepath;
     
-    if (path == SLASH)
-        filepath = instance.getRootDir() + DEFAULT_FILE_NAME + UtilityMethod::numberToString(_nb) + fileExtenstion;
+    /*ADD THIS INTO A TRY CATCH BLOCK*/
+
+    if (path == instance.getIndexPath())
+        filepath = instance.getRootDir() + instance .getIndexPath() + DEFAULT_FILE_NAME + UtilityMethod::numberToString(_nb) + fileExtenstion;
     else
-        filepath = instance.getRootDir() + &path[path.rfind('/')];
+        filepath = instance.getRootDir() + path;
 
     if (outfile.is_open()) outfile.close();
     
@@ -83,6 +85,8 @@ int HttpRequest::parseRequest(IO& object)
     std::map<std::string, std::string>::const_iterator _it_transfert;
     size_t len = headers.size();
 
+    if (headers.size() == 0) return BAD_REQUEST;
+
     header = UtilityMethod::stringSpliter(headers[0], " ");
     _headers[METHOD] =  header.size() > 0 ? header[0] : NO_VALUE;
     _headers[PATH] =  header.size() > 1 ? header[1] : NO_VALUE;
@@ -107,6 +111,24 @@ int HttpRequest::parseRequest(IO& object)
     _it_content = _headers.find(CONTENT_LEN);
     _it_transfert = _headers.find(TRANSFERT_ENCODING);
 
+    if (_it_transfert != _headers.end())
+    {
+        object.setOptions(HttpRequest::TRANSFER_ENCODING, SET);
+
+        if (s_buffer.find(END_CHUNK) != std::string::npos)
+            object.setOptions(HttpRequest::FINISH_BODY, SET);
+    }
+
+    if (_it_content != _headers.end())
+    {
+        object.setOptions(HttpRequest::CONTENT_LENGTH, SET);
+    
+        setBodySize(_it_content -> second);
+
+        if ((s_buffer.size()) >= _body)
+            object.setOptions(HttpRequest::FINISH_BODY, SET);
+    }
+
     Server& server = *(object.getServer());
     server.setInstance((TcpServer *)RequestChecker::serverOrLocation(server, (*this)));
 
@@ -125,23 +147,6 @@ int HttpRequest::parseRequest(IO& object)
     
     if (_it_transfert != _headers.end() || _it_content != _headers.end())
     {
-        if (_it_transfert != _headers.end())
-        {
-            object.setOptions(HttpRequest::TRANSFER_ENCODING, SET);
-
-            if (s_buffer.find(END_CHUNK) != std::string::npos)
-                object.setOptions(HttpRequest::FINISH_BODY, SET);
-        }
-
-        if (_it_content != _headers.end())
-        {
-            object.setOptions(HttpRequest::CONTENT_LENGTH, SET);
-    
-            setBodySize(_it_content -> second);
-        
-            if ((s_buffer.size()) >= _body)
-                object.setOptions(HttpRequest::FINISH_BODY, SET);
-        }
 
         HttpRequest& req = object.getRequest();
         HttpResponse& res = object.getReponse();
@@ -150,6 +155,7 @@ int HttpRequest::parseRequest(IO& object)
 
         if (res.checkBits(HttpResponse::NO_ENCODING)) open_file(object);
 
+        res.serveResponse(object, req);
     }
     
     return IO::IO_SUCCESS;

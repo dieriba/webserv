@@ -43,7 +43,6 @@ int Post::writeToFile(IO& object, HttpRequest& req)
         if (getRequestBodySize() >= req.getBodySize())
         {
             object.setOptions(HttpRequest::FINISH_BODY, SET);
-            std::cout << "Full body size: " << getRequestBodySize() << std::endl;
             clearRequestBodySize();
             outfile.close();
         }
@@ -103,7 +102,6 @@ int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
         }
         else if (res.checkBits(HttpResponse::NO_ENCODING))
             return writeToFile(event, req);
-        exit(1);
     }
     else
     {

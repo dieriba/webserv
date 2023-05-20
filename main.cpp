@@ -100,15 +100,15 @@ int main (int argc, char **argv)
         TcpServer tcp_servers;
         tcp_servers.settingUpServer(argc > 1 ? argv[1] : NULL);
         tcp_servers.runningUpServer();
-        //tcp_servers.makeServerServe();
-        std::vector<Server> tmp(tcp_servers.getServers());
+        tcp_servers.makeServerServe();
+        /*std::vector<Server> tmp(tcp_servers.getServers());
         std::vector<Server>::iterator it = tmp.begin();
         std::vector<Server>::iterator end = tmp.end();
         for ( ; it != end ; it++)
         {
             std::cout << "-----------SERVER-------------\n\n";
             print_server_config(*it);
-        }
+        }*/
     }
     catch(const std::exception& e)
     {

@@ -36,7 +36,7 @@ void HttpMessage::setBodySize(const std::string& body)
     size_t b;
 
     ss >> b;
-    ss.fail() ? _body = std::string::npos : b;
+    _body = ss.fail() ? std::string::npos : b;
 }
 
 void HttpMessage::setBodySize(const size_t& size)

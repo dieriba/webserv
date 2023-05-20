@@ -136,4 +136,14 @@ size_t  UtilityMethod::myStrlen(const char *buffer)
     return i;
 }
 
+const char    *UtilityMethod::is_a_directory(const char *path)
+{
+    DIR* dir = opendir(path);
+    
+    if (dir)
+        closedir(dir);
+    else
+        return NULL;
+    return path;
+}
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
