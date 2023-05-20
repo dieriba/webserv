@@ -554,13 +554,13 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_
             if (line.find('}') != std::string::npos)
                     throw ExceptionThrower("BAD_SYNTAX");
             
-            if (line.compare(0, UtilityMethod::myStrlen(SERVER_CONTEXT), SERVER_CONTEXT) == 0)
+            if (line.find(SERVER_CONTEXT) == 0)
             {
-                pos = line.find_first_of(WHITESPACES);
+                pos = line.find_first_not_of(SERVER_CONTEXT);
                 
-                if (pos == std::string::npos) pos = 0;
-
-                if ((pos == 0 && line.size() != UtilityMethod::myStrlen(SERVER_CONTEXT)) || (pos && (UtilityMethod::myStrlen(SERVER_CONTEXT) != pos)))
+                std::cout << pos << std::endl;
+                if ((pos == std::string::npos && line.size() != UtilityMethod::myStrlen(SERVER_CONTEXT))
+                    || (pos != std::string::npos && (UtilityMethod::myStrlen(SERVER_CONTEXT) != pos)))
                     throw ExceptionThrower("Unknow Context: " + line + " please refer to dieriba for the known context");
 
                 if (UtilityMethod::count(line, '{') > 1)
