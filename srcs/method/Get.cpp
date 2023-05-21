@@ -78,10 +78,12 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     res.setPath(instance.getRootDir() + req.getHeaders().find(PATH) -> second);
     DIR *directory;
 
-    if (path != "/") directory = opendir(res.getPath().c_str());
+    directory = opendir(res.getPath().c_str());
     
-    if ((path == instance.getIndexPath() || (directory == NULL && (errno == ENOENT || errno == ENOTDIR))))
+    if ((directory && instance.getIndex().size()) || (directory == NULL && (errno == ENOENT || errno == ENOTDIR)))
     {
+        closedir(directory);
+        
         std::ifstream& file = res.getFile();
 
         if (req.getHeaders().find(PATH) -> second == instance.getIndexPath())
@@ -117,8 +119,8 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     }
     else if (directory)
     {
+        closedir(directory);
         res.setOptions(HttpResponse::DIRECTORY, SET);
-        
     }
     res.setOptions(HttpResponse::STARTED, SET);
     
@@ -143,7 +145,7 @@ int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 
     if (res.checkBits(HttpResponse::FILE))
     {
-        handleFileRessource(event, req, res);
+        return handleFileRessource(event, req, res);
     }
 
     return IO::IO_SUCCESS;

@@ -95,6 +95,7 @@ int main (int argc, char **argv)
 {
     try
     {
+        signal(SIGINT, TcpServer::switch_off_signal);
         signal(SIGPIPE, SIG_IGN);
         init_static_data();
         TcpServer tcp_servers;

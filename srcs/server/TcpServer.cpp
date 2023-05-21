@@ -147,7 +147,7 @@ void TcpServer::makeServerServe(void)
 
     IO  *events;
 
-    while (1)
+    while (TcpServer::g_signal == 1)
     {
         to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, -1);
         for (int i = 0; i < to_proceed; i++)
@@ -356,7 +356,13 @@ int TcpServer::makeNonBlockingFd(const int& fd)
     return 0;
 }
 
+void TcpServer::switch_off_signal(int)
+{
+    TcpServer::g_signal = 0;
+}
+
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
+short int TcpServer::g_signal = 1;
 std::map<short int, std::string> TcpServer::_httpResponses;
 std::map<std::string, bool> TcpServer::_knownDirectives;
 std::map<std::string, bool> TcpServer::_knownLocationsDirectives;

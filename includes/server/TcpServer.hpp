@@ -69,6 +69,12 @@ class TcpServer: public Parser, public BitsManipulation
         static int getHttpMethod(const std::string& method);
         static int makeNonBlockingFd(const int& fd);
         static int getMethodIndex(const std::string& method);
+
+        static void switch_off_signal(int signal);
+
+        /*static var*/
+        static short int g_signal;
+    
     protected:
         size_t _body_size;
         std::string _index;
