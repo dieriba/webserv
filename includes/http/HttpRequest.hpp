@@ -19,20 +19,26 @@ class HttpRequest: public HttpMessage
             TRANSFER_ENCODING,
             FINISH_BODY,
             RESPONSE_HEADER_FINISHED,
+            CHUNKED_FINISHED
         };
 
         /*GETTERS*/
         const size_t& getHeaderSize(void) const;
+        const std::string& getChunkBody(void) const;
+        std::string& getChunkBody(void);
         std::ofstream& getOutfile(void);
 
         /*MEMBER FUNCTION*/
-        void clear(void);
-        void appendToBuffer(const char *toAppend, ssize_t size);
+        int fillChunkBody(IO& object);
         int open_file(IO& event);
         int parseRequest(IO& object);
-        int checkValidHeader(int _ws, struct epoll_event event) const;
+        int checkValidHeader(const int& _ws, struct epoll_event event) const;
+        void appendToChunkBody(const std::string& chunk, const ssize_t& size);
+        void clear(void);
+        void appendToBuffer(const char *toAppend, const ssize_t& size);
 
     private:
+        std::string _chunk_body;
         size_t _header_size;
         std::ofstream outfile;
         bool _start;

@@ -9,6 +9,20 @@ UtilityMethod::~UtilityMethod(){};
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
 
+size_t UtilityMethod::hexToDecimal(const std::string& hex)
+{
+    std::stringstream ss;
+
+    ss << std::hex << hex;
+    
+    size_t  number;
+
+    ss >> number;
+
+    if (ss.fail()) return std::string::npos;
+    return number;
+}
+
 std::vector<std::string> UtilityMethod::stringSpliter(const std::string& line, const std::string& delim) 
 {
     size_t pos_start = 0, pos_end;

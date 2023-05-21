@@ -38,15 +38,23 @@ int Post::writeToFile(IO& object, HttpRequest& req)
     std::ofstream& outfile = req.getOutfile();
     try
     {
-        outfile.write(req.getBuffer().data(), req.getBuffer().size());
-        updateSize(req.getBuffer().size());
-        if (getRequestBodySize() >= req.getBodySize())
+        const TcpServer& instance = *(object.getServer() -> getInstance());
+        bool content_len = object.checkBits(HttpRequest::CONTENT_LENGTH);
+        bool end_chunk = object.checkBits(HttpRequest::CHUNKED_FINISHED);
+        std::string& alias = content_len ? req.getBuffer() : req.getChunkBody();
+        
+        if (!content_len && (alias.size() + getRequestBodySize()) > instance.getBodySize())
+            return TOO_LARGE_CONTENT;
+        outfile.write(alias.data(), alias.size());
+
+        updateSize(alias.size());
+        if ((content_len && getRequestBodySize() >= req.getBodySize()) || (!content_len && end_chunk))
         {
             object.setOptions(HttpRequest::FINISH_BODY, SET);
             clearRequestBodySize();
             outfile.close();
         }
-        req.getBuffer().clear();
+        alias.clear();
     }
     catch(const std::exception& e)
     {

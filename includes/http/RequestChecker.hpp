@@ -22,7 +22,7 @@ class RequestChecker
         static int checkAllowedMethod(const TcpServer *instance, const HttpRequest& req);
         static int checkBodySize(const TcpServer *instance, const HttpRequest& req);
         static int checkAll(IO& object, HttpRequest& req, HttpResponse& res);
-        static int checkHeader(HttpRequest& req, HttpResponse& res);
+        static int checkHeader(const TcpServer& instance, HttpRequest& req, HttpResponse& res);
         static Checker tab[10];
     
     private:

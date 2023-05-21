@@ -25,6 +25,8 @@ HttpRequest::~HttpRequest(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
+const std::string& HttpRequest::getChunkBody(void) const {return _chunk_body;}
+std::string& HttpRequest::getChunkBody(void) {return _chunk_body;}
 const size_t& HttpRequest::getHeaderSize(void) const {return _header_size;}
 std::ofstream& HttpRequest::getOutfile(void) {return outfile;}
 /*----------------------------------------GETTER----------------------------------------*/
@@ -34,11 +36,79 @@ std::ofstream& HttpRequest::getOutfile(void) {return outfile;}
 
 
 /*----------------------------------------SETTER----------------------------------------*/
-
-
+void HttpRequest::appendToChunkBody(const std::string& chunk, const ssize_t& size)
+{
+    _chunk_body.append(chunk, size);
+}
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-void HttpRequest::appendToBuffer(const char *toAppend, ssize_t size)
+int HttpRequest::fillChunkBody(IO& object)
+{
+    size_t pos = 0;
+    size_t len_crlf = UtilityMethod::myStrlen(CRLF);
+    const TcpServer& instance = *(object.getServer() -> getInstance());
+
+   // static int i;
+    while ((pos = s_buffer.find(CRLF, pos)) != std::string::npos)
+    {
+        if (object.checkBits(HttpRequest::CHUNKED_FINISHED)) return BAD_REQUEST;
+        
+        /*std::cout << s_buffer << std::endl;
+        std::cout << "pos: " << pos << " size: " << s_buffer.size() << std::endl << std::endl;*/
+        pos += len_crlf;
+        char c = s_buffer[pos];
+        s_buffer[pos] = 0;
+
+        if (s_buffer.find_first_not_of(BASE_16 CRLF) != pos)
+        {
+            //std::cout << s_buffer << std::endl;
+            //std::cout << "s_buf pos: " << s_buffer.find_first_not_of(BASE_16 CRLF) << " pos: " << pos << std::endl;
+            return BAD_REQUEST ;
+        }
+        s_buffer[pos] = c;
+        c = s_buffer[pos - len_crlf];
+
+        s_buffer[pos - len_crlf] = 0;
+        
+        size_t chunk_len = UtilityMethod::hexToDecimal(s_buffer);
+        s_buffer[pos - len_crlf] = c;
+        if (chunk_len == std::string::npos) return BAD_REQUEST;
+
+        size_t next_crlf = s_buffer.find(CRLF, pos);
+            
+        if (next_crlf == std::string::npos) break ;
+            
+        if (next_crlf - pos != chunk_len) return BAD_REQUEST;
+
+        if (chunk_len == 0)
+        {
+            object.setOptions(HttpRequest::CHUNKED_FINISHED, SET);
+            break ;
+        }
+
+        _chunk_body.append(&s_buffer[pos], chunk_len);
+        if (_chunk_body.size() > instance.getBodySize()) return TOO_LARGE_CONTENT;
+
+        pos = next_crlf + len_crlf;
+
+        s_buffer.erase(0, pos);
+
+        //std::cout << "ENTERED" << std::endl;
+            
+        //std::cout <<  "End chunk" << s_buffer.find(END_CHUNK) << std::endl;
+    }
+    /*std::cout << s_buffer << std::endl << std::endl;
+
+    for (size_t i = 0; i < s_buffer.size(); i++)
+    {
+        std::cout << static_cast<int>(s_buffer[i]) << ": " << s_buffer[i] << " ";
+    }
+    std::cout << "\n" << s_buffer.size() << " " << i << std::endl;
+    i++;*/
+    return IO::IO_SUCCESS;
+}
+
+void HttpRequest::appendToBuffer(const char *toAppend, const ssize_t& size)
 {
     size_t  len;
     s_buffer.append(toAppend, size);
@@ -108,35 +178,10 @@ int HttpRequest::parseRequest(IO& object)
         }
     }
     
-    _it_content = _headers.find(CONTENT_LEN);
-    _it_transfert = _headers.find(TRANSFERT_ENCODING);
-
-    if (_it_transfert != _headers.end())
-    {
-        object.setOptions(HttpRequest::TRANSFER_ENCODING, SET);
-
-        if (s_buffer.find(END_CHUNK) != std::string::npos)
-            object.setOptions(HttpRequest::FINISH_BODY, SET);
-    }
-
-    if (_it_content != _headers.end())
-    {
-        object.setOptions(HttpRequest::CONTENT_LENGTH, SET);
+    size_t lenq;
     
-        setBodySize(_it_content -> second);
-
-        if ((s_buffer.size()) >= _body)
-            object.setOptions(HttpRequest::FINISH_BODY, SET);
-    }
-
     Server& server = *(object.getServer());
     server.setInstance((TcpServer *)RequestChecker::serverOrLocation(server, (*this)));
-
-    int _req = RequestChecker::checkAll(object, (*this), object.getReponse());
-    
-    if (_req != 0)  return _req;
-    
-    size_t lenq;
     
     if ((lenq = s_buffer.find(CRLF CRLF)) != std::string::npos)
     {
@@ -144,6 +189,27 @@ int HttpRequest::parseRequest(IO& object)
         std::cout << s_buffer.substr(0, lenq);
         s_buffer.erase(0, lenq);
     }
+
+    _it_content = _headers.find(CONTENT_LEN);
+    _it_transfert = _headers.find(TRANSFERT_ENCODING);
+
+    if (_it_transfert != _headers.end())
+    {
+        object.setOptions(HttpRequest::TRANSFER_ENCODING, SET);
+        int res = fillChunkBody(object);
+        if (res) return res;
+    }
+
+    if (_it_content != _headers.end())
+    {
+        object.setOptions(HttpRequest::CONTENT_LENGTH, SET);
+        setBodySize(_it_content -> second);
+    }
+
+    int _req = RequestChecker::checkAll(object, (*this), object.getReponse());
+
+
+    if (_req != 0)  return _req;
     
     if (_it_transfert != _headers.end() || _it_content != _headers.end())
     {
@@ -157,11 +223,10 @@ int HttpRequest::parseRequest(IO& object)
 
         res.serveResponse(object, req);
     }
-    
     return IO::IO_SUCCESS;
 }
 
-int HttpRequest::checkValidHeader(int _ws, struct epoll_event event) const
+int HttpRequest::checkValidHeader(const int& _ws, struct epoll_event event) const
 {
     (void)_ws;
     (void)event;

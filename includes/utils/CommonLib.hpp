@@ -78,7 +78,8 @@
 # define WHITESPACES " \n\t\r\f\v"
 # define NEW_LINE "\n"
 # define BASE_10 "0123456789"
-# define REQUEST_SIZE 70000
+# define BASE_16 "0123456789ABCDEFabcdef"
+# define REQUEST_SIZE 80000
 # define MAXEVENTS 64
 # define CRLF "\r\n"
 # define END_CHUNK "0\r\n\r\n"

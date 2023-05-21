@@ -40,11 +40,12 @@ int RequestChecker::checkAll(IO& object, HttpRequest& req, HttpResponse& res)
 {
     Server& server = *(object.getServer());
     
-    int _res = checkHeader(req, res);
+    const TcpServer *instance = server.getInstance();
+    
+    int _res = checkHeader(*(instance), req, res);
     
     if (_res) return _res;
 
-    const TcpServer *instance = server.getInstance();
 
     //if (loc) server.setOptions(LOCATION_BLOCK, SET);
 
@@ -53,14 +54,13 @@ int RequestChecker::checkAll(IO& object, HttpRequest& req, HttpResponse& res)
     for (size_t i = 0; tab[i] != 0; i++)
     {
         _res = tab[i](instance, req);
-        std::cout << "Res value: " << _res << "I value: " << i << std::endl;
         if (_res) return _res;
     }
 
     return _res;
 }
 
-int RequestChecker::checkHeader(HttpRequest& req, HttpResponse& res)
+int RequestChecker::checkHeader(const TcpServer& instance, HttpRequest& req, HttpResponse& res)
 {
     std::map<std::string, std::string>& _map = req.getHeaders();
     
@@ -99,9 +99,11 @@ int RequestChecker::checkHeader(HttpRequest& req, HttpResponse& res)
         else
         {
             std::string& path(_map.find(PATH) -> second);
-            std::string _pathMimeType = UtilityMethod::getMimeType(path, "", "", false);
+            std::string _pathMimeType = UtilityMethod::getMimeType(path, "", "", true);
 
-            if (path != SLASH && _pathMimeType != it -> second) return BAD_REQUEST;
+            if (path.size() > 2 && *(path.rbegin()) == '/') path.erase(path.size() - 1);
+
+            if (path != instance.getIndexPath() && _pathMimeType != it -> second) return BAD_REQUEST;
 
             res.setOptions(HttpResponse::NO_ENCODING, SET);       
         }
@@ -126,7 +128,6 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
     
     if (req.getMethod() != TcpServer::POST)
     {
-        std::cout << "GET: " << root_c << std::endl;   
         if (access(root_c, F_OK) != 0)
             return NOT_FOUND;
         
@@ -137,7 +138,6 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
     
     if (req.getMethod() == TcpServer::POST)
     {
-        std::cout << "Root: " << root_c << std::endl;
 
         size_t i = root.rfind('/');
         
@@ -153,7 +153,6 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
 
         if (access(alias_root, W_OK) && errno == EACCES) return FORBIDEN;
 
-        std::cout << "Here" << std::endl;
     }
 
     return 0;
@@ -168,7 +167,6 @@ int RequestChecker::checkAllowedMethod(const TcpServer *instance, const HttpRequ
 
 int RequestChecker::checkBodySize(const TcpServer *instance, const HttpRequest& req)
 {
-    std::cout << "Instance body size: " << instance -> getBodySize() << "Req body size: " << req.getBodySize() << std::endl;
     if ((instance -> getBodySize() != std::string::npos) && (req.getBodySize() > instance -> getBodySize()))                                                                            
         return TOO_LARGE_CONTENT;
 

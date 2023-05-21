@@ -31,9 +31,10 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
 {
     int res = _response.serveResponse((*this), getRequest());
     
-    if (_response.checkBits(HttpResponse::FINISHED_RESPONSE))
+    if (_response.checkBits(HttpResponse::FINISHED_RESPONSE) || res > 0)
     {
         UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
+        setErrorStatus(res);
         clear();
     }
 
@@ -49,7 +50,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
     if (size <= 0) return IO::IO_ERROR;
         
     _request.appendToBuffer(buffer, size);
-    
+
     if (_request.getHeaderSize() >= MAX_HEADER_SIZE)
     {
         UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
@@ -57,7 +58,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         return IO::IO_SUCCESS;
     }
 
-    char *end_header = UtilityMethod::mystrstr(buffer, CRLF CRLF);
+    char *end_header = UtilityMethod::mystrstr(_request.getBuffer().c_str(), CRLF CRLF);
     
     if (end_header != NULL || (checkBits(HttpRequest::CONTENT_LENGTH) || checkBits(HttpRequest::TRANSFER_ENCODING)))
     {
@@ -65,6 +66,8 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         
         if (!req && ((checkBits(HttpRequest::CONTENT_LENGTH) || checkBits(HttpRequest::TRANSFER_ENCODING)) && !checkBits(HttpRequest::FINISH_BODY)))
         {
+            if (checkBits(HttpRequest::TRANSFER_ENCODING))
+                _request.fillChunkBody(*this);
             _response.serveResponse((*this), _request);
             if (!checkBits(HttpRequest::FINISH_BODY))
                 return IO::IO_SUCCESS;
