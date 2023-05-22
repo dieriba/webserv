@@ -20,7 +20,7 @@ class HttpRequest: public HttpMessage
             FINISH_BODY,
             RESPONSE_HEADER_FINISHED,
             CHUNK_SET,
-            CHUNKED_FINISHED
+            CHUNKED_FINISHED,
         };
 
         /*GETTERS*/

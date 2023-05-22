@@ -73,13 +73,15 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
                 return IO::IO_SUCCESS;
         }
 
+        if (req == 1) req = 0;
+
         if (_response.getHttpMethod() == NULL)
             _response.setMethodObj((req == 0 ? Method::_tab[_request.getMethod()]() : Method::_tab[3]()));
 
         resetOptions();
 
         setErrorStatus(req);
-        
+
         _request.getBuffer().clear();
         
         UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));

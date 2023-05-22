@@ -45,14 +45,14 @@ int Post::writeToFile(IO& object, HttpRequest& req)
         if ((!content_len && !object.checkBits(HttpRequest::CHUNK_SET))) return IO::IO_SUCCESS;
         
         size_t size = alias.size();
-        std::cout << "BEFORE Size: " << size << std::endl;
+       // std::cout << "BEFORE Size: " << size << std::endl;
         if (!content_len)
         {
         
             size_t len = req.getChunkSize() - req.getCurrentChunkSize();
-            std::cout << "len: " << len << std::endl;
+            /*std::cout << "len: " << len << std::endl;
             std::cout << "Chunk size: " << req.getChunkSize() << std::endl;
-            std::cout << "Current chunk size: " << req.getCurrentChunkSize() << std::endl;
+            std::cout << "Current chunk size: " << req.getCurrentChunkSize() << std::endl;*/
             if (len < alias.size())
                 size = len;
             
@@ -64,7 +64,7 @@ int Post::writeToFile(IO& object, HttpRequest& req)
 
             if (req.getChunkSize() == req.getCurrentChunkSize())
             {
-                std::cout << "ENTERED HEREEEEEEEEEEEEEEEE" << std::endl;
+                //std::cout << "ENTERED HEREEEEEEEEEEEEEEEE" << std::endl;
                 object.setOptions(HttpRequest::CHUNK_SET, CLEAR);
                 req.clearCurrentChunkSize();
             }
@@ -78,11 +78,11 @@ int Post::writeToFile(IO& object, HttpRequest& req)
         else
         {
             alias.erase(0, size + (object.checkBits(HttpRequest::CHUNK_SET) == 0) * UtilityMethod::myStrlen(CRLF));
-            std::cout << "ALIAS VALUE" << std::endl;
-            for (size_t i = 0; i < alias.size(); i++)
+            //std::cout << "ALIAS VALUE" << std::endl;
+            /*for (size_t i = 0; i < alias.size(); i++)
             {
                 std::cout << static_cast<int>(alias[i]) << ": " << alias[i]  << std::endl;
-            }
+            }*/
             
             if (alias.find(END_CHUNK) == 0)
             {

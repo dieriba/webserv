@@ -164,6 +164,12 @@ int HttpRequest::parseRequest(IO& object)
     
     Server& server = *(object.getServer());
     server.setInstance((TcpServer *)RequestChecker::serverOrLocation(server, (*this)));
+
+    if (server.getInstance() -> getRedirect().size() > 0)
+    {
+        object.getReponse().setOptions(HttpResponse::REDIRECT_SET, SET);
+        return 1;
+    }
     
     if ((lenq = s_buffer.find(CRLF CRLF)) != std::string::npos)
     {
@@ -189,7 +195,6 @@ int HttpRequest::parseRequest(IO& object)
     }
 
     int _req = RequestChecker::checkAll(object, (*this), object.getReponse());
-
 
     if (_req != 0)  return _req;
     

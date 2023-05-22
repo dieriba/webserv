@@ -136,18 +136,42 @@ int Get::handleDirectoryRessource(IO& event, DIR *directory)
 
 int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 {
-    if (!res.checkBits(HttpResponse::STARTED))
+    if (!res.checkBits(HttpResponse::REDIRECT_SET))
     {
-        int err = firstStep(event, req, res);
+        if (!res.checkBits(HttpResponse::STARTED))
+        {
+            int err = firstStep(event, req, res);
+            if (err) return err;
+        }
 
-        if (err) return err;
+        if (res.checkBits(HttpResponse::FILE))
+        {
+            return handleFileRessource(event, req, res);
+        }
     }
-
-    if (res.checkBits(HttpResponse::FILE))
+    else
     {
-        return handleFileRessource(event, req, res);
+        if (req.getMethod() == TcpServer::GET)
+        {
+            if (sendBuffer(event.getFd(), FOUND_REDIRECT, UtilityMethod::myStrlen(FOUND_REDIRECT)))
+                return IO::IO_ERROR;
+        }
+        else if (req.getMethod() == TcpServer::POST)
+        {
+            if (sendBuffer(event.getFd(), FOUND_REDIRECT_POST, UtilityMethod::myStrlen(FOUND_REDIRECT_POST)))
+                return IO::IO_ERROR;
+        }
+        else
+        {
+            if (sendBuffer(event.getFd(), FOUND_REDIRECT_IND_METHOD, UtilityMethod::myStrlen(FOUND_REDIRECT)))
+                return IO::IO_ERROR;
+        }
+        const std::string& link = event.getServer() -> getInstance() -> getRedirect();
+        if (sendBuffer(event.getFd(), link.c_str(), link.size()) || sendBuffer(event.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
+            return IO::IO_ERROR;
+            
+        res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     }
-
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
