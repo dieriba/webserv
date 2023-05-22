@@ -168,7 +168,7 @@ int HttpRequest::parseRequest(IO& object)
     if (server.getInstance() -> getRedirect().size() > 0)
     {
         object.getReponse().setOptions(HttpResponse::REDIRECT_SET, SET);
-        return 1;
+        return getMethod();
     }
     
     if ((lenq = s_buffer.find(CRLF CRLF)) != std::string::npos)

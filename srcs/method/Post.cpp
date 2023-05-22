@@ -144,25 +144,38 @@ int Post::handleMultipartData(HttpRequest& req)
 
 int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 {
-    if (event.getEvents() & EPOLLIN)
+    if (!res.checkBits(HttpResponse::REDIRECT_SET))
     {
-        (void)req;
-        if (res.checkBits(HttpResponse::MULTIPART_DATA))
+        if (event.getEvents() & EPOLLIN)
         {
-            std::cout << req.getBuffer().find(req.getHeaders().find(END_BOUNDARY) -> second) << std::endl;
-            handleMultipartData(req);
+            (void)req;
+            if (res.checkBits(HttpResponse::MULTIPART_DATA))
+            {
+                std::cout << req.getBuffer().find(req.getHeaders().find(END_BOUNDARY) -> second) << std::endl;
+                handleMultipartData(req);
+            }
+            else if (res.checkBits(HttpResponse::NO_ENCODING))
+                return writeToFile(event, req);
         }
-        else if (res.checkBits(HttpResponse::NO_ENCODING))
-            return writeToFile(event, req);
+        else
+        {
+            if (sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, strlen(SERVER_SUCCESS_POST_RESPONSE)))
+            {
+                res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+                return IO::IO_ERROR;
+            }
+            res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+        }
     }
     else
     {
-        std::cout << "Entered OUT" << std::endl;
-        if (sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, strlen(SERVER_SUCCESS_POST_RESPONSE)))
-        {
-            res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+        if (sendBuffer(event.getFd(), FOUND_REDIRECT_POST, UtilityMethod::myStrlen(FOUND_REDIRECT_POST)))
             return IO::IO_ERROR;
-        }
+        const std::string& link = event.getServer() -> getInstance() -> getRedirect();
+        
+        if (sendBuffer(event.getFd(), link.c_str(), link.size()) || sendBuffer(event.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
+            return IO::IO_ERROR;
+            
         res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     }
     return IO::IO_SUCCESS;

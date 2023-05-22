@@ -25,7 +25,7 @@ int HttpMessage::getMethod(void) const {return _method;}
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
-void HttpMessage::appendToBuffer(const char *toAppend, ssize_t size) 
+void HttpMessage::appendToBuffer(const char *toAppend, const ssize_t& size) 
 {
     s_buffer.append(toAppend, size);
 }
