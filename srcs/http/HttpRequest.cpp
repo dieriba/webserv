@@ -51,12 +51,19 @@ void HttpRequest::appendToChunkBody(const std::string& chunk, const ssize_t& siz
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
+void HttpRequest::clearCurrentChunkSize(void)
+{
+    _current_chunk_size = 0;
+}
+
 int HttpRequest::fillChunkBody(IO& object)
 {
+    if (object.checkBits(HttpRequest::CHUNKED_FINISHED) == 0)
+        std::cout << (object.checkBits(HttpRequest::CHUNK_SET) ? "SET" : "NOT SET") << std::endl;
     if (object.checkBits(HttpRequest::CHUNK_SET) == 0)
     {
         size_t pos = s_buffer.find(CRLF), len_crlf = UtilityMethod::myStrlen(CRLF);
-
+        
         if (pos == std::string::npos) return BAD_REQUEST;
 
         pos += len_crlf;
@@ -75,7 +82,6 @@ int HttpRequest::fillChunkBody(IO& object)
         if (chunk_len == std::string::npos) return BAD_REQUEST;
 
         setChunkSize(chunk_len);
-
         s_buffer[pos - len_crlf] = c;
         object.setOptions(HttpRequest::CHUNK_SET, SET);
         s_buffer.erase(0, pos);

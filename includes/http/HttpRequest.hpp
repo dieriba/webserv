@@ -36,6 +36,7 @@ class HttpRequest: public HttpMessage
         int open_file(IO& event);
         int parseRequest(IO& object);
         int checkValidHeader(const int& _ws, struct epoll_event event) const;
+        void clearCurrentChunkSize(void);
         void setChunkSize(const size_t& chunk_size);
         void updateCurrentChunkSize(const size_t& current_chunk_size);
         void appendToChunkBody(const std::string& chunk, const ssize_t& size);

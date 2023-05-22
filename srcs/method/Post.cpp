@@ -40,49 +40,50 @@ int Post::writeToFile(IO& object, HttpRequest& req)
     {
         const TcpServer& instance = *(object.getServer() -> getInstance());
         bool content_len = object.checkBits(HttpRequest::CONTENT_LENGTH);
-        bool end_chunk = object.checkBits(HttpRequest::CHUNKED_FINISHED);
         std::string& alias = req.getBuffer();
         
-        if (alias.size() == 0) return IO::IO_SUCCESS;
+        if ((!content_len && !object.checkBits(HttpRequest::CHUNK_SET))) return IO::IO_SUCCESS;
         
-        size_t pos;
-
-        pos = alias.size();
-
+        size_t size = alias.size();
+        std::cout << "BEFORE Size: " << size << std::endl;
         if (!content_len)
         {
-            if ((alias.size() + getRequestBodySize()) > instance.getBodySize())
-                return TOO_LARGE_CONTENT;
         
-            pos = 0;
-            while ((pos = alias.find('\r', pos)) != std::string::npos)
+            size_t len = req.getChunkSize() - req.getCurrentChunkSize();
+            std::cout << "len: " << len << std::endl;
+            std::cout << "Chunk size: " << req.getChunkSize() << std::endl;
+            std::cout << "Current chunk size: " << req.getCurrentChunkSize() << std::endl;
+            if (len < alias.size())
+                size = len;
+            
+            if ((size + getRequestBodySize()) > instance.getBodySize())
+                return TOO_LARGE_CONTENT;
+
+            std::cout << "AFTER Size: " << size << std::endl;
+            req.updateCurrentChunkSize(size);
+
+            if (req.getChunkSize() == req.getCurrentChunkSize())
             {
-                if (alias.size() > pos && alias[pos + 1] == '\n')
-                {
-                    if (pos != req.getChunkSize())
-                        return BAD_REQUEST;
-
-                    object.setOptions(HttpRequest::CHUNK_SET, CLEAR);
-                    break ;
-                }
-                else
-                    break ;
-                pos++;
+                std::cout << "ENTERED HEREEEEEEEEEEEEEEEE" << std::endl;
+                object.setOptions(HttpRequest::CHUNK_SET, CLEAR);
+                req.clearCurrentChunkSize();
             }
-            if (pos == std::string::npos)
-                pos = alias.size();
-
-            req.updateCurrentChunkSize(pos);
         }
         
-        outfile.write(alias.data(), pos);
-        updateSize(pos);
+        outfile.write(alias.data(), size);
+        updateSize(size);
 
         if (content_len)
             alias.clear();
         else
         {
-            alias.erase(0, pos + (object.checkBits(HttpRequest::CHUNK_SET) == 0) * UtilityMethod::myStrlen(CRLF));
+            alias.erase(0, size + (object.checkBits(HttpRequest::CHUNK_SET) == 0) * UtilityMethod::myStrlen(CRLF));
+            std::cout << "ALIAS VALUE" << std::endl;
+            for (size_t i = 0; i < alias.size(); i++)
+            {
+                std::cout << static_cast<int>(alias[i]) << ": " << alias[i]  << std::endl;
+            }
+            
             if (alias.find(END_CHUNK) == 0)
             {
                 if (alias.size() != UtilityMethod::myStrlen(END_CHUNK)) return BAD_REQUEST;
@@ -90,7 +91,7 @@ int Post::writeToFile(IO& object, HttpRequest& req)
                 object.setOptions(HttpRequest::CHUNKED_FINISHED, SET);
             }
         }
-        if ((content_len && getRequestBodySize() >= req.getBodySize()) || (!content_len && end_chunk))
+        if ((content_len && getRequestBodySize() >= req.getBodySize()) || (!content_len && object.checkBits(HttpRequest::CHUNKED_FINISHED)))
         {
             std::cout << _request_body_size << std::endl;
             object.setOptions(HttpRequest::FINISH_BODY, SET);
