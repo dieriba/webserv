@@ -57,8 +57,8 @@ void HttpResponse::clear(void)
 {
     delete _method;
     _method = NULL;
-
     _file.clear();
+    
     if (_file.is_open()) _file.close();
     
     resetOptions();

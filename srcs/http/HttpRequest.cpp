@@ -5,7 +5,7 @@
 # include "../../includes/IO/IO.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-HttpRequest::HttpRequest():HttpMessage(),_header_size(0),_start(true){};
+HttpRequest::HttpRequest():HttpMessage(),_header_size(0),_chunk_size(0),_current_chunk_size(0),_start(true){};
 HttpRequest::HttpRequest(const HttpRequest& rhs):HttpMessage(rhs)
 {
     _header_size = rhs._header_size;
@@ -26,14 +26,23 @@ HttpRequest::~HttpRequest(){};
 
 /*----------------------------------------GETTER----------------------------------------*/
 const std::string& HttpRequest::getChunkBody(void) const {return _chunk_body;}
+const size_t& HttpRequest::getChunkSize(void) const {return _chunk_size;}
+const size_t& HttpRequest::getCurrentChunkSize(void) const {return _current_chunk_size;}
 std::string& HttpRequest::getChunkBody(void) {return _chunk_body;}
 const size_t& HttpRequest::getHeaderSize(void) const {return _header_size;}
 std::ofstream& HttpRequest::getOutfile(void) {return outfile;}
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
+void HttpRequest::setChunkSize(const size_t& chunk_size)
+{
+    _chunk_size = chunk_size;
+}
 
-
+void HttpRequest::updateCurrentChunkSize(const size_t& chunk_size)
+{
+    _current_chunk_size += chunk_size;
+}
 
 /*----------------------------------------SETTER----------------------------------------*/
 void HttpRequest::appendToChunkBody(const std::string& chunk, const ssize_t& size)
@@ -44,67 +53,34 @@ void HttpRequest::appendToChunkBody(const std::string& chunk, const ssize_t& siz
 
 int HttpRequest::fillChunkBody(IO& object)
 {
-    size_t pos = 0;
-    size_t len_crlf = UtilityMethod::myStrlen(CRLF);
-    const TcpServer& instance = *(object.getServer() -> getInstance());
-
-   // static int i;
-    while ((pos = s_buffer.find(CRLF, pos)) != std::string::npos)
+    if (object.checkBits(HttpRequest::CHUNK_SET) == 0)
     {
-        if (object.checkBits(HttpRequest::CHUNKED_FINISHED)) return BAD_REQUEST;
-        
-        /*std::cout << s_buffer << std::endl;
-        std::cout << "pos: " << pos << " size: " << s_buffer.size() << std::endl << std::endl;*/
+        size_t pos = s_buffer.find(CRLF), len_crlf = UtilityMethod::myStrlen(CRLF);
+
+        if (pos == std::string::npos) return BAD_REQUEST;
+
         pos += len_crlf;
+
         char c = s_buffer[pos];
         s_buffer[pos] = 0;
 
-        if (s_buffer.find_first_not_of(BASE_16 CRLF) != pos)
-        {
-            //std::cout << s_buffer << std::endl;
-            //std::cout << "s_buf pos: " << s_buffer.find_first_not_of(BASE_16 CRLF) << " pos: " << pos << std::endl;
-            return BAD_REQUEST ;
-        }
+        if (s_buffer.find_first_not_of(BASE_16 CRLF) != pos) return BAD_REQUEST;
+        
         s_buffer[pos] = c;
         c = s_buffer[pos - len_crlf];
-
         s_buffer[pos - len_crlf] = 0;
-        
+
         size_t chunk_len = UtilityMethod::hexToDecimal(s_buffer);
-        s_buffer[pos - len_crlf] = c;
+        
         if (chunk_len == std::string::npos) return BAD_REQUEST;
 
-        size_t next_crlf = s_buffer.find(CRLF, pos);
-            
-        if (next_crlf == std::string::npos) break ;
-            
-        if (next_crlf - pos != chunk_len) return BAD_REQUEST;
+        setChunkSize(chunk_len);
 
-        if (chunk_len == 0)
-        {
-            object.setOptions(HttpRequest::CHUNKED_FINISHED, SET);
-            break ;
-        }
-
-        _chunk_body.append(&s_buffer[pos], chunk_len);
-        if (_chunk_body.size() > instance.getBodySize()) return TOO_LARGE_CONTENT;
-
-        pos = next_crlf + len_crlf;
-
+        s_buffer[pos - len_crlf] = c;
+        object.setOptions(HttpRequest::CHUNK_SET, SET);
         s_buffer.erase(0, pos);
-
-        //std::cout << "ENTERED" << std::endl;
-            
-        //std::cout <<  "End chunk" << s_buffer.find(END_CHUNK) << std::endl;
     }
-    /*std::cout << s_buffer << std::endl << std::endl;
 
-    for (size_t i = 0; i < s_buffer.size(); i++)
-    {
-        std::cout << static_cast<int>(s_buffer[i]) << ": " << s_buffer[i] << " ";
-    }
-    std::cout << "\n" << s_buffer.size() << " " << i << std::endl;
-    i++;*/
     return IO::IO_SUCCESS;
 }
 
@@ -213,7 +189,6 @@ int HttpRequest::parseRequest(IO& object)
     
     if (_it_transfert != _headers.end() || _it_content != _headers.end())
     {
-
         HttpRequest& req = object.getRequest();
         HttpResponse& res = object.getReponse();
 
