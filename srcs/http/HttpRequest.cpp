@@ -59,6 +59,7 @@ void HttpRequest::clearCurrentChunkSize(void)
 
 int HttpRequest::fillChunkBody(IO& object, Post& post)
 {
+    static size_t len;
     while (1)
     {
         if (object.checkBits(HttpRequest::CHUNK_SET) == 0)
@@ -108,7 +109,6 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
         updateCurrentChunkSize(size);
 
         int err = post.writeToFile(object, (*this), size);
-     
         if (err) return err;
 
         s_buffer.erase(0, size);

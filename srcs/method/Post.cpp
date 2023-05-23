@@ -44,7 +44,6 @@ int Post::writeToFile(IO& object, HttpRequest& req, const size_t& bytes)
         {
             outfile.write(alias.data(), bytes);
             updateSize(bytes);
-            alias.erase(0, bytes);
         }
         else
         {
