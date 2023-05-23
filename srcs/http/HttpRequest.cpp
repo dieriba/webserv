@@ -59,7 +59,6 @@ void HttpRequest::clearCurrentChunkSize(void)
 
 int HttpRequest::fillChunkBody(IO& object, Post& post)
 {
-    static size_t len;
     while (1)
     {
         (void)post;
@@ -106,7 +105,6 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
 
         if (size > s_buffer.size())
             size = s_buffer.size();
-        len += size;
         updateCurrentChunkSize(size);
 
         /*int err = post.writeToFile(object, (*this), size);
@@ -121,10 +119,7 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
             object.setOptions(HttpRequest::CARRIAGE_FEED, SET);
         };
 
-        std::cout << "Len << value: " << len  << std::endl;
-
         if (s_buffer.size() == 0) return IO::IO_SUCCESS;
-
     }
 
 

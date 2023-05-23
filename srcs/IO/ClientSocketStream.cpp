@@ -47,7 +47,6 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
 
     int size = recv(this -> getFd(), buffer, REQUEST_SIZE, 0);
 
-    std::cout << "Recv return value is: " << size << std::endl;
     if (size <= 0) return IO::IO_ERROR;
         
     _request.appendToBuffer(buffer, size);
