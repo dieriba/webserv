@@ -59,17 +59,27 @@ void HttpRequest::clearCurrentChunkSize(void)
 
 int HttpRequest::fillChunkBody(IO& object, Post& post)
 {
+    static size_t len;
     while (1)
     {
+        (void)post;
         if (object.checkBits(HttpRequest::CHUNK_SET) == 0)
         {
             size_t start = 0;
 
             if (object.checkBits(HttpRequest::CARRIAGE_FEED))
             {
-                if (s_buffer.size() >= 1 && s_buffer[0] == '\n')
-                    start = 1;
+                size_t pos = s_buffer.find_first_not_of(CRLF);
+
+                if (pos == std::string::npos || pos != LEN_CRLF) return BAD_REQUEST;
+                
+                start = pos;
+
+                object.setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
             }
+
+            if (getCurrentChunkSize() > 0) clearCurrentChunkSize();
+
             size_t pos = s_buffer.find(CRLF, start);
             
             if (pos == std::string::npos)  return IO::IO_SUCCESS;
@@ -82,44 +92,39 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
             if (s_buffer.find_first_not_of(BASE_16 CRLF) != pos) return BAD_REQUEST;
             
             s_buffer[pos] = c;
-            c = s_buffer[pos - LEN_CRLF];
-            s_buffer[pos - LEN_CRLF] = 0;
-            setChunkSize(UtilityMethod::hexToDecimal(s_buffer));
+
+            setChunkSize(UtilityMethod::hexToDecimal(s_buffer.substr(start, pos - LEN_CRLF)));
+            
             if (getChunkSize() == std::string::npos) return BAD_REQUEST;
 
-            s_buffer[pos - LEN_CRLF] = c;
             s_buffer.erase(0, pos);
+
             object.setOptions(HttpRequest::CHUNK_SET, SET);
-            object.setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
         }
 
-        size_t size = s_buffer.size(), pos = 0;
-        
-        while ((pos = s_buffer.find('\r', pos)) != std::string::npos)
-        {
-            if ((s_buffer.size() > pos && s_buffer[pos + 1] == '\n') || ((s_buffer.size() - 1 == pos)
-                && ((getCurrentChunkSize() + pos) == getChunkSize())))
-            {
-                size = pos;
-                object.setOptions(HttpRequest::CARRIAGE_FEED, SET);
-                object.setOptions(HttpRequest::CHUNK_SET, CLEAR);
-                clearCurrentChunkSize();
-                break ;
-            }
-            pos++;
-        }
+        size_t size = getChunkSize() - getCurrentChunkSize();
 
-        size = pos == std::string::npos ? s_buffer.size() : size;
-
+        if (size > s_buffer.size())
+            size = s_buffer.size();
+        len += size;
         updateCurrentChunkSize(size);
 
-        if (getCurrentChunkSize() > getChunkSize()) return BAD_REQUEST;
-
-        int err = post.writeToFile(object, (*this), size);
-
-        if (err) return err;
+        /*int err = post.writeToFile(object, (*this), size);
+     
+        if (err) return err;*/
 
         s_buffer.erase(0, size);
+
+        if (getCurrentChunkSize() == getChunkSize())
+        {
+            object.setOptions(HttpRequest::CHUNK_SET, CLEAR);
+            object.setOptions(HttpRequest::CARRIAGE_FEED, SET);
+        };
+
+        std::cout << "Len << value: " << len  << std::endl;
+
+        if (s_buffer.size() == 0) return IO::IO_SUCCESS;
+
     }
 
 
