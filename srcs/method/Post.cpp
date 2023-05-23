@@ -74,7 +74,6 @@ int Post::writeToFile(IO& object, HttpRequest& req)
         
         outfile.write(alias.data(), alias.size());
         updateSize(alias.size());
-
         if (getRequestBodySize() >= req.getBodySize())
         {
             std::cout << _request_body_size << std::endl;
