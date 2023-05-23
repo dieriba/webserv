@@ -4,6 +4,7 @@
 # include "HttpMessage.hpp"
 
 class IO;
+class Post;
 
 class HttpRequest: public HttpMessage
 {
@@ -21,6 +22,7 @@ class HttpRequest: public HttpMessage
             RESPONSE_HEADER_FINISHED,
             CHUNK_SET,
             CHUNKED_FINISHED,
+            CARRIAGE_FEED
         };
 
         /*GETTERS*/
@@ -32,7 +34,7 @@ class HttpRequest: public HttpMessage
         std::ofstream& getOutfile(void);
 
         /*MEMBER FUNCTION*/
-        int fillChunkBody(IO& object);
+        int fillChunkBody(IO& object, Post& post);
         int open_file(IO& event);
         int parseRequest(IO& object);
         int checkValidHeader(const int& _ws, struct epoll_event event) const;

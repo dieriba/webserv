@@ -1,6 +1,7 @@
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/http/RequestChecker.hpp"
 # include "../../includes/utils/UtilityMethod.hpp"
+# include "../../includes/method/Post.hpp"
 # include "../../includes/server/TcpServer.hpp"
 # include "../../includes/IO/IO.hpp"
 
@@ -56,36 +57,71 @@ void HttpRequest::clearCurrentChunkSize(void)
     _current_chunk_size = 0;
 }
 
-int HttpRequest::fillChunkBody(IO& object)
+int HttpRequest::fillChunkBody(IO& object, Post& post)
 {
-    if (object.checkBits(HttpRequest::CHUNKED_FINISHED) == 0)
-        std::cout << (object.checkBits(HttpRequest::CHUNK_SET) ? "SET" : "NOT SET") << std::endl;
-    if (object.checkBits(HttpRequest::CHUNK_SET) == 0)
+    while (1)
     {
-        size_t pos = s_buffer.find(CRLF), len_crlf = UtilityMethod::myStrlen(CRLF);
+        if (object.checkBits(HttpRequest::CHUNK_SET) == 0)
+        {
+            size_t start = 0;
+
+            if (object.checkBits(HttpRequest::CARRIAGE_FEED))
+            {
+                if (s_buffer.size() >= 1 && s_buffer[0] == '\n')
+                    start = 1;
+            }
+            size_t pos = s_buffer.find(CRLF, start);
+            
+            if (pos == std::string::npos)  return IO::IO_SUCCESS;
+            
+            pos += LEN_CRLF;
+
+            char c = s_buffer[pos];
+            s_buffer[pos] = 0;
+
+            if (s_buffer.find_first_not_of(BASE_16 CRLF) != pos) return BAD_REQUEST;
+            
+            s_buffer[pos] = c;
+            c = s_buffer[pos - LEN_CRLF];
+            s_buffer[pos - LEN_CRLF] = 0;
+            setChunkSize(UtilityMethod::hexToDecimal(s_buffer));
+            if (getChunkSize() == std::string::npos) return BAD_REQUEST;
+
+            s_buffer[pos - LEN_CRLF] = c;
+            s_buffer.erase(0, pos);
+            object.setOptions(HttpRequest::CHUNK_SET, SET);
+            object.setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
+        }
+
+        size_t size = s_buffer.size(), pos = 0;
         
-        if (pos == std::string::npos) return BAD_REQUEST;
+        while ((pos = s_buffer.find('\r', pos)) != std::string::npos)
+        {
+            if ((s_buffer.size() > pos && s_buffer[pos + 1] == '\n') || ((s_buffer.size() - 1 == pos)
+                && ((getCurrentChunkSize() + pos) == getChunkSize())))
+            {
+                size = pos;
+                object.setOptions(HttpRequest::CARRIAGE_FEED, SET);
+                object.setOptions(HttpRequest::CHUNK_SET, CLEAR);
+                clearCurrentChunkSize();
+                break ;
+            }
+            pos++;
+        }
 
-        pos += len_crlf;
+        size = pos == std::string::npos ? s_buffer.size() : size;
 
-        char c = s_buffer[pos];
-        s_buffer[pos] = 0;
+        updateCurrentChunkSize(size);
 
-        if (s_buffer.find_first_not_of(BASE_16 CRLF) != pos) return BAD_REQUEST;
-        
-        s_buffer[pos] = c;
-        c = s_buffer[pos - len_crlf];
-        s_buffer[pos - len_crlf] = 0;
+        if (getCurrentChunkSize() > getChunkSize()) return BAD_REQUEST;
 
-        size_t chunk_len = UtilityMethod::hexToDecimal(s_buffer);
-        
-        if (chunk_len == std::string::npos) return BAD_REQUEST;
+        int err = post.writeToFile(object, (*this), size);
 
-        setChunkSize(chunk_len);
-        s_buffer[pos - len_crlf] = c;
-        object.setOptions(HttpRequest::CHUNK_SET, SET);
-        s_buffer.erase(0, pos);
+        if (err) return err;
+
+        s_buffer.erase(0, size);
     }
+
 
     return IO::IO_SUCCESS;
 }
@@ -182,11 +218,7 @@ int HttpRequest::parseRequest(IO& object)
     _it_transfert = _headers.find(TRANSFERT_ENCODING);
 
     if (_it_transfert != _headers.end())
-    {
         object.setOptions(HttpRequest::TRANSFER_ENCODING, SET);
-        int res = fillChunkBody(object);
-        if (res) return res;
-    }
 
     if (_it_content != _headers.end())
     {
@@ -207,7 +239,6 @@ int HttpRequest::parseRequest(IO& object)
 
         if (res.checkBits(HttpResponse::NO_ENCODING)) open_file(object);
 
-        res.serveResponse(object, req);
     }
     return IO::IO_SUCCESS;
 }

@@ -156,6 +156,7 @@ void TcpServer::makeServerServe(void)
             res = events -> handleIoOperation(_epoll_ws, _events[i]) == IO::IO_ERROR;
             if (res == IO::IO_ERROR)
             {
+                std::cout << "ERROR" << std::endl;
                 Server *server = events -> getServer();
                 server -> deleteFromEventsMap(events);
             }

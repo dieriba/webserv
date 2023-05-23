@@ -47,6 +47,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
 
     int size = recv(this -> getFd(), buffer, REQUEST_SIZE, 0);
 
+    std::cout << "Recv return value is: " << size << std::endl;
     if (size <= 0) return IO::IO_ERROR;
         
     _request.appendToBuffer(buffer, size);
@@ -63,14 +64,10 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
     if (end_header != NULL || (checkBits(HttpRequest::CONTENT_LENGTH) || checkBits(HttpRequest::TRANSFER_ENCODING)))
     {
         int req = _request.parseRequest(*this);
-        
         if (!req && ((checkBits(HttpRequest::CONTENT_LENGTH) || checkBits(HttpRequest::TRANSFER_ENCODING)) && !checkBits(HttpRequest::FINISH_BODY)))
         {
-            if (checkBits(HttpRequest::TRANSFER_ENCODING))
-                _request.fillChunkBody(*this);
             _response.serveResponse((*this), _request);
-            if (!checkBits(HttpRequest::FINISH_BODY))
-                return IO::IO_SUCCESS;
+            if (!checkBits(HttpRequest::FINISH_BODY)) return IO::IO_SUCCESS;
         }
 
         if (_response.getHttpMethod() == NULL)
