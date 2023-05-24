@@ -132,7 +132,8 @@ int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
         {
             if (res.checkBits(HttpResponse::MULTIPART_DATA))
             {
-                std::cout << req.getBuffer().find(req.getHeaders().find(END_BOUNDARY) -> second) << std::endl;
+                //std::cout << req.getBuffer().find(req.getHeaders().find(END_BOUNDARY) -> second) << std::endl;
+                exit(1);
                 handleMultipartData(req);
             }
             else if (res.checkBits(HttpResponse::NO_ENCODING))

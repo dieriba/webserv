@@ -186,14 +186,15 @@ int HttpRequest::parseRequest(IO& object)
     {
         header = UtilityMethod::stringSpliter(headers[i], ":");
 
-        if (header.size())
-        {
-            if (i != 0)
-                for (size_t i = 2; i < header.size(); i++)
-                    header[1] += ":" + header[i];
+        if (header.size() <= 1) return BAD_REQUEST;
 
-            _headers[header[0]] = header.size() >= 2 ? header[1].erase(0, 1) : NO_VALUE;
-        }
+        if (i != 0)
+            for (size_t i = 2; i < header.size(); i++)
+                header[1] += ":" + header[i];
+        
+        std::cout << header[0] << ": " << header[1] << std::endl;
+
+        _headers[header[0]] = header[1].erase(0, 1);
     }
     
     size_t lenq;
@@ -207,10 +208,11 @@ int HttpRequest::parseRequest(IO& object)
         return getMethod();
     }
     
+   // std::cout << s_buffer << std::endl;
     if ((lenq = s_buffer.find(CRLF CRLF)) != std::string::npos)
     {
         lenq += 4;
-        std::cout << s_buffer.substr(0, lenq);
+     //   std::cout << s_buffer.substr(0, lenq);
         s_buffer.erase(0, lenq);
     }
 
