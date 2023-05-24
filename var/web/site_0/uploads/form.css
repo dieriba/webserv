@@ -1,0 +1,17 @@
+body {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding-top: 100px;
+  }
+  
+  form {
+    display: inline-block;
+    text-align: left;
+  }
+  
+  input[type="submit"]:hover {
+    background-color: #555;
+    color: #fff;
+    cursor: pointer;
+  }
