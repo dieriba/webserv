@@ -1,6 +1,7 @@
 # include "../../includes/method/Post.hpp"
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/http/HttpResponse.hpp"
+# include "../../includes/utils/UtilityMethod.hpp"
 # include "../../includes/IO/IO.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
@@ -94,33 +95,36 @@ int Post::writeToFile(IO& object, HttpRequest& req)
 
 int Post::handleMultipartData(HttpRequest& req)
 {
-    static int _nb;
-    const std::map<std::string, std::string>& _map = req.getHeaders();
-    std::string& s_buffer = req.getBuffer();
-
-    while (1)
+    if (req.checkBits(HttpResponse::STARTED) == 0)
     {
-        size_t pos = s_buffer.find(_map.find(BOUNDARY CRLF) -> second);
-        if (pos != std::string::npos)
-        {
-            std::cout << s_buffer;
-            //std::cout << pos << std::endl;
-            std::vector<std::string> form_header = UtilityMethod::stringSpliter(s_buffer.substr(pos, s_buffer.find(CRLF CRLF)), CRLF);
-            
-            /*for (size_t i = 0; i < form_header.size(); i++)
-            {
-                std::cout << form_header[i] << std::endl;
-            }*/
-            
-            s_buffer.erase(pos, s_buffer.find(CRLF CRLF) + 4);
-        }
+        const std::map<std::string, std::string>& _map = req.getHeaders();
+        const std::string& boundary = _map.find(BOUNDARY) -> second;
+        std::string& s_buffer = req.getBuffer();
 
-        /*pos = s_buffer.find(_map.find(END_BOUNDARY CRLF) -> second);
-        if (pos == 0) break ;*/
+        std::cout << s_buffer << std::endl;
+        size_t pos = s_buffer.find(boundary);
+
+        if (pos == std::string::npos) return IO::IO_SUCCESS;
+
+        s_buffer.erase(0, boundary.size());
+
+        pos = s_buffer.find(CRLF);
+
+        if (pos == std::string::npos) return IO::IO_SUCCESS;
+
+        std::vector<std::string> vec = UtilityMethod::stringSpliter(s_buffer.substr(0, pos), ";");
+        
+        req.setOptions(HttpResponse::STARTED, SET);
+
+        std::cout << s_buffer.substr(0, pos + LEN_CRLF) << std::endl;
+        s_buffer.erase(0, pos + LEN_CRLF);
+        exit(1);
     }
+    else
+    {
 
-    _nb++;
-
+    }
+    
     return IO::IO_SUCCESS;
 }
 
@@ -131,12 +135,8 @@ int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
         if (event.getEvents() & EPOLLIN)
         {
             if (res.checkBits(HttpResponse::MULTIPART_DATA))
-            {
-                //std::cout << req.getBuffer().find(req.getHeaders().find(END_BOUNDARY) -> second) << std::endl;
-                exit(1);
                 handleMultipartData(req);
-            }
-            else if (res.checkBits(HttpResponse::NO_ENCODING))
+            if (res.checkBits(HttpResponse::NO_ENCODING))
             {
                 if (event.checkBits(HttpRequest::CONTENT_LENGTH))
                     return writeToFile(event, req);

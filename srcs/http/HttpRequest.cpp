@@ -208,11 +208,12 @@ int HttpRequest::parseRequest(IO& object)
         return getMethod();
     }
     
-   // std::cout << s_buffer << std::endl;
+    //std::cout << s_buffer << std::endl;
+
     if ((lenq = s_buffer.find(CRLF CRLF)) != std::string::npos)
     {
         lenq += 4;
-     //   std::cout << s_buffer.substr(0, lenq);
+        std::cout << s_buffer.substr(0, lenq);
         s_buffer.erase(0, lenq);
     }
 
@@ -242,6 +243,7 @@ int HttpRequest::parseRequest(IO& object)
         if (res.checkBits(HttpResponse::NO_ENCODING)) open_file(object);
 
     }
+
     return IO::IO_SUCCESS;
 }
 

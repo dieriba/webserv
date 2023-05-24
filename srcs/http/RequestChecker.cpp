@@ -90,10 +90,8 @@ int RequestChecker::checkHeader(const TcpServer& instance, HttpRequest& req, Htt
             }
 
             if (count <= 2) return BAD_REQUEST; 
-            
             _map[BOUNDARY] = it -> second.erase(0, len);
             _map[END_BOUNDARY] = it -> second + "--";
-
             res.setOptions(HttpResponse::MULTIPART_DATA, SET);       
         }
         else
@@ -124,7 +122,6 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
     const char *root_c = root.c_str();
     
     //std::cout << "Root_c" << root_c << std::endl;
-
     
     if (req.getMethod() != TcpServer::POST)
     {

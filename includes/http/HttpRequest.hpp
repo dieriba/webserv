@@ -2,11 +2,12 @@
 # define __HTTP_REQUEST_HPP__
 
 # include "HttpMessage.hpp"
+# include "../utils/BitsManipulation.hpp"
 
 class IO;
 class Post;
 
-class HttpRequest: public HttpMessage
+class HttpRequest: public HttpMessage, public BitsManipulation
 {
     public:
         HttpRequest();
