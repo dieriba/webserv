@@ -42,11 +42,11 @@ int Post::writeToFileMutltipartData(IO& event, HttpRequest& req, const size_t& s
     try
     {
         (void)event;
+        std::cout << "Entered" << std::endl;
         static size_t len ;
         len += size;
         outfile.write(s_buffer.data(), size);
 
-        s_buffer.erase(0, size);
         std::cout << "Len value: " << len << std::endl;
 
     }
@@ -125,23 +125,35 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
     const std::string& boundary = _map.find(BOUNDARY) -> second;
     const std::string& end_boundary = req.getHeaders().find(END_BOUNDARY) -> second;
     std::string& s_buffer = req.getBuffer();
-
     while (1)
     {
-
         if (req.checkBits(HttpResponse::STARTED) == 0)
         {
-            size_t pos_one = s_buffer.find(CRLF);
+            size_t start = 0;
+
+            if (event.checkBits(HttpRequest::CARRIAGE_FEED))
+            {
+                size_t pos = s_buffer.find_first_not_of(CRLF);
+
+                if (pos == std::string::npos || pos != LEN_CRLF) return BAD_REQUEST;
+                
+                start = pos;
+                event.setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
+            }
+
+            size_t pos_one = s_buffer.find(CRLF, start);
 
             if (pos_one == std::string::npos) return (IO::IO_SUCCESS);
 
-            if (s_buffer.compare(0, boundary.size(), boundary.c_str()) != 0) return BAD_REQUEST;
+            if (s_buffer.find(boundary, start) != start) return BAD_REQUEST;
             
-            size_t pos_two = s_buffer.find(CRLF, boundary.size() + LEN_CRLF);
+            size_t pos_two = s_buffer.find(CRLF, start + boundary.size() + LEN_CRLF);
 
             if (pos_two == std::string::npos) return (IO::IO_SUCCESS);
 
-            std::string content_disp = s_buffer.substr(boundary.size() + LEN_CRLF, pos_two - (boundary.size() + LEN_CRLF));
+            std::string content_disp = s_buffer.substr(start + boundary.size() + LEN_CRLF, pos_two - (start + boundary.size() + LEN_CRLF));
+
+            std::cout << content_disp << std::endl;
 
             std::vector<std::string> vec = UtilityMethod::stringSpliter(content_disp, ";");
 
@@ -169,46 +181,73 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
                 
                 if (vector_filename[1].size()) req.open_file(event, vector_filename[1]);
 
-                pos_two = pos_three + LEN_CRLF;
+                pos_two = pos_three;
             }
 
             updateSize(pos_two + LEN_CRLF + LEN_CRLF);
+
             s_buffer.erase(0, pos_two + LEN_CRLF + LEN_CRLF);
+            
             req.setOptions(HttpResponse::STARTED, SET);
         }
-
+  
         if (req.checkBits(HttpResponse::STARTED))
         {
-            size_t size = s_buffer.find(boundary);
-            
-            if (size == std::string::npos) size = s_buffer.size();
-            
-            updateSize(size);
+            size_t boundary_br = s_buffer.find(CRLF + boundary);
+            size_t size = boundary_br;
+            size_t pos_crlf = 0;
 
-            if (req.getOutfile().is_open())
+            if (size == std::string::npos)
+            {
+                while ((pos_crlf = s_buffer.find('\r', pos_crlf)) != std::string::npos)
+                {
+                    if ((pos_crlf + (UtilityMethod::myStrlen(CRLF) + boundary.size()) - 1) > s_buffer.size())
+                        break;
+                    pos_crlf++;
+                }
+                if (pos_crlf == std::string::npos)
+                    size = s_buffer.size();
+                else
+                    size = pos_crlf;
+            }
+            else
+                event.setOptions(HttpRequest::CARRIAGE_FEED, SET);
+            
+            if (req.getOutfile().is_open() && size > 0)
             {
                 int res = writeToFileMutltipartData(event, req, size);
 
                 if (res) return res;
             }
-
-            if (s_buffer.size() == 0) return IO::IO_SUCCESS;
             
-            req.getOutfile().clear();
-            req.getOutfile().close();
-            
-            if (s_buffer.find(end_boundary) == 0)
+            if (size)
             {
-                updateSize(end_boundary.size() + LEN_CRLF);
+                updateSize(size);
+                s_buffer.erase(0, size);
+            }
+
+            if (s_buffer.size() == 0 || (pos_crlf != std::string::npos && boundary_br == std::string::npos))
+                break;
+            
+            if (req.getOutfile().is_open())
+            {
+                req.getOutfile().clear();
+                req.getOutfile().close();
+            }
+
+            if (s_buffer.find(CRLF + end_boundary) == 0)
+            {
+                updateSize(end_boundary.size() + LEN_CRLF + LEN_CRLF);
                 std::cout << "request body: " << _request_body_size << std::endl;
                 event.setOptions(HttpRequest::FINISH_BODY, SET);
-                return IO::IO_SUCCESS;
+                break;
             }
 
             req.setOptions(HttpResponse::STARTED, CLEAR);
 
         }
     }
+
     return IO::IO_SUCCESS;
 }
 
