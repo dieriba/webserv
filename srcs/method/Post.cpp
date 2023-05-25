@@ -34,6 +34,32 @@ void Post::clearRequestBodySize(void)
     _request_body_size = 0;
 }
 
+int Post::writeToFileMutltipartData(IO& event, HttpRequest& req, const size_t& size)
+{
+    std::ofstream& outfile = req.getOutfile();
+    std::string& s_buffer = req.getBuffer();
+    
+    try
+    {
+        (void)event;
+        static size_t len ;
+        len += size;
+        outfile.write(s_buffer.data(), size);
+
+        s_buffer.erase(0, size);
+        std::cout << "Len value: " << len << std::endl;
+
+    }
+    catch(const std::exception& e)
+    {
+        outfile.close();
+        clearRequestBodySize();
+        return INTERNAL_SERVER_ERROR;
+    }
+
+    return IO::IO_SUCCESS;
+}
+
 int Post::writeToFile(IO& object, HttpRequest& req, const size_t& bytes)
 {
     std::ofstream& outfile = req.getOutfile();
@@ -95,27 +121,25 @@ int Post::writeToFile(IO& object, HttpRequest& req)
 
 int Post::handleMultipartData(IO& event, HttpRequest& req)
 {
+    const std::map<std::string, std::string>& _map = req.getHeaders();
+    const std::string& boundary = _map.find(BOUNDARY) -> second;
+    const std::string& end_boundary = req.getHeaders().find(END_BOUNDARY) -> second;
+    std::string& s_buffer = req.getBuffer();
+
     while (1)
     {
 
         if (req.checkBits(HttpResponse::STARTED) == 0)
         {
-            const std::map<std::string, std::string>& _map = req.getHeaders();
-            const std::string& boundary = _map.find(BOUNDARY) -> second;
-            std::string& s_buffer = req.getBuffer();
-            static size_t pos_one;
+            size_t pos_one = s_buffer.find(CRLF);
 
-            if (pos_one == 0) pos_one = s_buffer.find(CRLF);
-
-            if (pos_one == std::string::npos) return (pos_one = 0, IO::IO_SUCCESS);
+            if (pos_one == std::string::npos) return (IO::IO_SUCCESS);
 
             if (s_buffer.compare(0, boundary.size(), boundary.c_str()) != 0) return BAD_REQUEST;
             
-            static size_t pos_two;
+            size_t pos_two = s_buffer.find(CRLF, boundary.size() + LEN_CRLF);
 
-            if (pos_two == 0) pos_two = s_buffer.find(CRLF, boundary.size() + LEN_CRLF);
-
-            if (pos_two == std::string::npos) return (pos_two = 0, IO::IO_SUCCESS);
+            if (pos_two == std::string::npos) return (IO::IO_SUCCESS);
 
             std::string content_disp = s_buffer.substr(boundary.size() + LEN_CRLF, pos_two - (boundary.size() + LEN_CRLF));
 
@@ -144,18 +168,44 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
                     != UtilityMethod::getFileExtension(vec_content_type[1] ,0)) return BAD_REQUEST;
                 
                 if (vector_filename[1].size()) req.open_file(event, vector_filename[1]);
+
+                pos_two = pos_three + LEN_CRLF;
             }
 
-            exit(1);
-            s_buffer.erase(0, pos_two + LEN_CRLF);
+            updateSize(pos_two + LEN_CRLF + LEN_CRLF);
+            s_buffer.erase(0, pos_two + LEN_CRLF + LEN_CRLF);
             req.setOptions(HttpResponse::STARTED, SET);
-            pos_one = 0;
-            pos_two = 0;
-            exit(1);
         }
 
         if (req.checkBits(HttpResponse::STARTED))
         {
+            size_t size = s_buffer.find(boundary);
+            
+            if (size == std::string::npos) size = s_buffer.size();
+            
+            updateSize(size);
+
+            if (req.getOutfile().is_open())
+            {
+                int res = writeToFileMutltipartData(event, req, size);
+
+                if (res) return res;
+            }
+
+            if (s_buffer.size() == 0) return IO::IO_SUCCESS;
+            
+            req.getOutfile().clear();
+            req.getOutfile().close();
+            
+            if (s_buffer.find(end_boundary) == 0)
+            {
+                updateSize(end_boundary.size() + LEN_CRLF);
+                std::cout << "request body: " << _request_body_size << std::endl;
+                event.setOptions(HttpRequest::FINISH_BODY, SET);
+                return IO::IO_SUCCESS;
+            }
+
+            req.setOptions(HttpResponse::STARTED, CLEAR);
 
         }
     }

@@ -91,7 +91,7 @@ int RequestChecker::checkHeader(const TcpServer& instance, HttpRequest& req, Htt
 
             if (count <= 2) return BAD_REQUEST; 
             _map[BOUNDARY] = DOUBLE_HIPHEN + it -> second.erase(0, len);
-            _map[END_BOUNDARY] = it -> second + DOUBLE_HIPHEN;
+            _map[END_BOUNDARY] = DOUBLE_HIPHEN + it -> second + DOUBLE_HIPHEN;
             res.setOptions(HttpResponse::MULTIPART_DATA, SET);       
         }
         else

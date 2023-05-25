@@ -25,6 +25,7 @@ class Post: public Method
         int sendResponse(IO&, HttpRequest&, HttpResponse&);
         int writeToFile(IO& object, HttpRequest& req);
         int writeToFile(IO& object, HttpRequest& req, const size_t& bytes);
+        int writeToFileMutltipartData(IO& object, HttpRequest& req, const size_t& bytes);
 
     private:
         int handleMultipartData(IO& event, HttpRequest& req);

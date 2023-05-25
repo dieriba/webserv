@@ -144,8 +144,6 @@ int HttpRequest::open_file(IO& event, std::string& filepath)
 
     filepath = instance.getRootDir() + path + "/" + filepath;
 
-    std::cout << "Filepath: " << filepath << std::endl;
-
     if (outfile.is_open()) outfile.close();
     
     outfile.clear();
@@ -217,8 +215,6 @@ int HttpRequest::parseRequest(IO& object)
             for (size_t i = 2; i < header.size(); i++)
                 header[1] += ":" + header[i];
         
-        std::cout << header[0] << ": " << header[1] << std::endl;
-
         _headers[header[0]] = header[1].erase(0, 1);
     }
     
