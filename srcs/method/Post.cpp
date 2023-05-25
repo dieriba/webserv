@@ -42,13 +42,7 @@ int Post::writeToFileMutltipartData(IO& event, HttpRequest& req, const size_t& s
     try
     {
         (void)event;
-        std::cout << "Entered" << std::endl;
-        static size_t len ;
-        len += size;
         outfile.write(s_buffer.data(), size);
-
-        std::cout << "Len value: " << len << std::endl;
-
     }
     catch(const std::exception& e)
     {
@@ -119,12 +113,29 @@ int Post::writeToFile(IO& object, HttpRequest& req)
     return IO::IO_SUCCESS;
 }
 
-int Post::handleMultipartData(IO& event, HttpRequest& req)
+int Post::handleMultipartDataTransferEncoding(IO& event, HttpRequest& req)
 {
     const std::map<std::string, std::string>& _map = req.getHeaders();
     const std::string& boundary = _map.find(BOUNDARY) -> second;
     const std::string& end_boundary = req.getHeaders().find(END_BOUNDARY) -> second;
     std::string& s_buffer = req.getBuffer();
+
+    (void)_map;
+    (void)boundary;
+    (void)end_boundary;
+    (void)s_buffer;
+    (void)event;
+    (void)req;
+    return IO::IO_SUCCESS;
+}
+
+int Post::handleMultipartDataContentLength(IO& event, HttpRequest& req)
+{
+    const std::map<std::string, std::string>& _map = req.getHeaders();
+    const std::string& boundary = _map.find(BOUNDARY) -> second;
+    const std::string& end_boundary = req.getHeaders().find(END_BOUNDARY) -> second;
+    std::string& s_buffer = req.getBuffer();
+
     while (1)
     {
         if (req.checkBits(HttpResponse::STARTED) == 0)
@@ -136,7 +147,7 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
                 size_t pos = s_buffer.find_first_not_of(CRLF);
 
                 if (pos == std::string::npos || pos != LEN_CRLF) return BAD_REQUEST;
-                
+
                 start = pos;
                 event.setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
             }
@@ -258,12 +269,16 @@ int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
         if (event.getEvents() & EPOLLIN)
         {
             if (res.checkBits(HttpResponse::MULTIPART_DATA))
-                handleMultipartData(event, req);
-            if (res.checkBits(HttpResponse::NO_ENCODING))
+            {
+                if (event.checkBits(HttpRequest::CONTENT_LENGTH))
+                    return handleMultipartDataContentLength(event, req);
+                return handleMultipartDataTransferEncoding(event, req);
+            }
+            else
             {
                 if (event.checkBits(HttpRequest::CONTENT_LENGTH))
                     return writeToFile(event, req);
-                req.fillChunkBody(event, *this);
+                return req.fillChunkBody(event, *this);
             }
         }
         else

@@ -28,7 +28,8 @@ class Post: public Method
         int writeToFileMutltipartData(IO& object, HttpRequest& req, const size_t& bytes);
 
     private:
-        int handleMultipartData(IO& event, HttpRequest& req);
+        int handleMultipartDataContentLength(IO& event, HttpRequest& req);
+        int handleMultipartDataTransferEncoding(IO& event, HttpRequest& req);
         size_t _request_body_size;
 };
 
