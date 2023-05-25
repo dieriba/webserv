@@ -27,7 +27,7 @@ class Post: public Method
         int writeToFile(IO& object, HttpRequest& req, const size_t& bytes);
 
     private:
-        int handleMultipartData(HttpRequest& req);
+        int handleMultipartData(IO& event, HttpRequest& req);
         size_t _request_body_size;
 };
 

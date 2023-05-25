@@ -7,7 +7,7 @@
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 HttpRequest::HttpRequest():HttpMessage(),_header_size(0),_chunk_size(0),_current_chunk_size(0),_start(true){};
-HttpRequest::HttpRequest(const HttpRequest& rhs):HttpMessage(rhs)
+HttpRequest::HttpRequest(const HttpRequest& rhs):HttpMessage(rhs),BitsManipulation(rhs)
 {
     _header_size = rhs._header_size;
     _start = rhs._start;
@@ -134,12 +134,37 @@ void HttpRequest::appendToBuffer(const char *toAppend, const ssize_t& size)
         _header_size = len + 1;
 }
 
+int HttpRequest::open_file(IO& event, std::string& filepath)
+{
+    static int _nb;
+    TcpServer& instance = *(event.getServer() -> getInstance());
+    std::string& path = getHeaders().find(PATH) -> second; 
+    
+    /*ADD THIS INTO A TRY CATCH BLOCK*/
+
+    filepath = instance.getRootDir() + path + "/" + filepath;
+
+    std::cout << "Filepath: " << filepath << std::endl;
+
+    if (outfile.is_open()) outfile.close();
+    
+    outfile.clear();
+    
+    outfile.open(filepath.c_str(), std::ios::out);
+    
+    if (outfile.fail()) return FORBIDEN;
+    
+    _nb++;
+
+    return IO::IO_SUCCESS;
+}
+
 int HttpRequest::open_file(IO& event)
 {
     static int _nb;
     TcpServer& instance = *(event.getServer() -> getInstance());
     std::string& path = getHeaders().find(PATH) -> second; 
-    std::string fileExtenstion = UtilityMethod::getFileExtension(getHeaders().find(CONTENT_TYP) -> second);
+    std::string fileExtenstion = UtilityMethod::getFileExtension(getHeaders().find(CONTENT_TYP) -> second, 0);
     std::string filepath;
     
     /*ADD THIS INTO A TRY CATCH BLOCK*/

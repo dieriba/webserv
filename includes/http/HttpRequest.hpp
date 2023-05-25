@@ -37,6 +37,7 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         /*MEMBER FUNCTION*/
         int fillChunkBody(IO& object, Post& post);
         int open_file(IO& event);
+        int open_file(IO& event, std::string& filepath);
         int parseRequest(IO& object);
         int checkValidHeader(const int& _ws, struct epoll_event event) const;
         void clearCurrentChunkSize(void);

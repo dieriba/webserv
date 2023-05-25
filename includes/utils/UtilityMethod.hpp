@@ -20,7 +20,7 @@ class UtilityMethod
         static int switchEvents(const int& _ws, uint32_t mode, struct epoll_event& event, IO& ev);
         static std::string numberToString(const int& number);
         static const std::string& getMimeType(std::string& path, const std::string& index_path, const std::string& index, const bool& to_check);
-        static const std::string& getFileExtension(const std::string& content_type);
+        static std::string getFileExtension(const std::string& content_type, const short int& opt);
         static std::string decimalToHex(const int& number);
         static size_t hexToDecimal(const std::string& hex);
         static char *mystrstr(const char *big, const char *needle);

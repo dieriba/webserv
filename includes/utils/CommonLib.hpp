@@ -97,6 +97,7 @@
 # define TIMEOUT 1000
 # define MAX_HEADER_SIZE 4000
 # define NO_VALUE "NO_VALUE"
+# define DOUBLE_HIPHEN "--"
 /*
 
 

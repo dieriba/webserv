@@ -116,12 +116,24 @@ const std::string& UtilityMethod::getMimeType(std::string& path, const std::stri
         if (path[i] == '/' || path[i] == '.')
             break ;
     }
+    
     return TcpServer::getMimeType(&path[i]);
 }
 
-const std::string& UtilityMethod::getFileExtension(const std::string& content_type)
+std::string UtilityMethod::getFileExtension(const std::string& content_type, const short int& opt)
 {
-    return TcpServer::getMimeType(content_type);
+    if (opt == 0) return TcpServer::getMimeType(content_type);
+    
+    int i = content_type.size() - 1;
+
+    for (; i >= 0; i--)
+    {
+        if (content_type[i] == '.') break ;
+    }
+
+    if (content_type.size() == 0) return ".bin";
+    
+    return &content_type[i];
 }
 
 char *UtilityMethod::mystrstr(const char *big, const char *needle)

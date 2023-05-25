@@ -12,9 +12,9 @@
     <p>Select the files you want to upload and click the "Upload" button.</p>
   </div>
 
-  <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="image" accept="image/*">
+  <form action="http://localhost:8080/uploads" method="post" enctype="multipart/form-data">
     <input type="file" name="video" accept="video/*">
+    <input type="file" name="image" accept="image/*">
     <input type="file" name="music" accept="audio/*">
     <input type="submit" value="Upload">
   </form>

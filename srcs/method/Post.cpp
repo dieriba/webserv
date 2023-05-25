@@ -93,38 +93,72 @@ int Post::writeToFile(IO& object, HttpRequest& req)
     return IO::IO_SUCCESS;
 }
 
-int Post::handleMultipartData(HttpRequest& req)
+int Post::handleMultipartData(IO& event, HttpRequest& req)
 {
-    if (req.checkBits(HttpResponse::STARTED) == 0)
-    {
-        const std::map<std::string, std::string>& _map = req.getHeaders();
-        const std::string& boundary = _map.find(BOUNDARY) -> second;
-        std::string& s_buffer = req.getBuffer();
-
-        std::cout << s_buffer << std::endl;
-        size_t pos = s_buffer.find(boundary);
-
-        if (pos == std::string::npos) return IO::IO_SUCCESS;
-
-        s_buffer.erase(0, boundary.size());
-
-        pos = s_buffer.find(CRLF);
-
-        if (pos == std::string::npos) return IO::IO_SUCCESS;
-
-        std::vector<std::string> vec = UtilityMethod::stringSpliter(s_buffer.substr(0, pos), ";");
-        
-        req.setOptions(HttpResponse::STARTED, SET);
-
-        std::cout << s_buffer.substr(0, pos + LEN_CRLF) << std::endl;
-        s_buffer.erase(0, pos + LEN_CRLF);
-        exit(1);
-    }
-    else
+    while (1)
     {
 
+        if (req.checkBits(HttpResponse::STARTED) == 0)
+        {
+            const std::map<std::string, std::string>& _map = req.getHeaders();
+            const std::string& boundary = _map.find(BOUNDARY) -> second;
+            std::string& s_buffer = req.getBuffer();
+            static size_t pos_one;
+
+            if (pos_one == 0) pos_one = s_buffer.find(CRLF);
+
+            if (pos_one == std::string::npos) return (pos_one = 0, IO::IO_SUCCESS);
+
+            if (s_buffer.compare(0, boundary.size(), boundary.c_str()) != 0) return BAD_REQUEST;
+            
+            static size_t pos_two;
+
+            if (pos_two == 0) pos_two = s_buffer.find(CRLF, boundary.size() + LEN_CRLF);
+
+            if (pos_two == std::string::npos) return (pos_two = 0, IO::IO_SUCCESS);
+
+            std::string content_disp = s_buffer.substr(boundary.size() + LEN_CRLF, pos_two - (boundary.size() + LEN_CRLF));
+
+            std::vector<std::string> vec = UtilityMethod::stringSpliter(content_disp, ";");
+
+            if (vec.size() < 2 || vec.size() > 3) return BAD_REQUEST;
+
+            if (vec.size() == 3)
+            {
+                size_t pos_three = s_buffer.find(CRLF, pos_two + LEN_CRLF);
+                
+                std::vector<std::string> vector_filename = UtilityMethod::stringSpliter(*(vec.rbegin()), "=");
+                
+                if (vector_filename.size() != 2) return BAD_REQUEST;
+
+                std::string content = s_buffer.substr(pos_two + LEN_CRLF, pos_three - (pos_two + LEN_CRLF));
+                
+                std::vector<std::string> vec_content_type = UtilityMethod::stringSpliter(content, ": ");
+                
+                if (vec_content_type.size() != 2) return BAD_REQUEST;
+
+                vector_filename[1].erase(vector_filename[1].size() - 1);
+                vector_filename[1].erase(vector_filename[1].begin());
+                
+                if (UtilityMethod::getFileExtension(vector_filename[1] ,1)
+                    != UtilityMethod::getFileExtension(vec_content_type[1] ,0)) return BAD_REQUEST;
+                
+                if (vector_filename[1].size()) req.open_file(event, vector_filename[1]);
+            }
+
+            exit(1);
+            s_buffer.erase(0, pos_two + LEN_CRLF);
+            req.setOptions(HttpResponse::STARTED, SET);
+            pos_one = 0;
+            pos_two = 0;
+            exit(1);
+        }
+
+        if (req.checkBits(HttpResponse::STARTED))
+        {
+
+        }
     }
-    
     return IO::IO_SUCCESS;
 }
 
@@ -135,7 +169,7 @@ int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
         if (event.getEvents() & EPOLLIN)
         {
             if (res.checkBits(HttpResponse::MULTIPART_DATA))
-                handleMultipartData(req);
+                handleMultipartData(event, req);
             if (res.checkBits(HttpResponse::NO_ENCODING))
             {
                 if (event.checkBits(HttpRequest::CONTENT_LENGTH))
