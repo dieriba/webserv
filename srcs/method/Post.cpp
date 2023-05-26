@@ -120,12 +120,20 @@ int Post::handleMultipartDataTransferEncoding(IO& event, HttpRequest& req)
     const std::string& end_boundary = req.getHeaders().find(END_BOUNDARY) -> second;
     std::string& s_buffer = req.getBuffer();
 
+    std::cout << s_buffer << std::endl;
+    std::cout << std::endl;
+    for (size_t i = 0; i < s_buffer.size(); i++)
+    {
+        std::cout << static_cast<int>(s_buffer[i]) << ": " << s_buffer[i] << std::endl;
+    }
+    
     (void)_map;
     (void)boundary;
     (void)end_boundary;
     (void)s_buffer;
     (void)event;
     (void)req;
+    exit(1);
     return IO::IO_SUCCESS;
 }
 

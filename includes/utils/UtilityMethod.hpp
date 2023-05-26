@@ -24,7 +24,7 @@ class UtilityMethod
         static std::string decimalToHex(const int& number);
         static size_t hexToDecimal(const std::string& hex);
         static char *mystrstr(const char *big, const char *needle);
-        static const char *is_a_directory(const char *path);
+        static int is_a_directory(const char *path);
         static size_t myStrlen(const char *buffer);
     
     private:

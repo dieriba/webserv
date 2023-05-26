@@ -31,7 +31,7 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
 {
     int res = _response.serveResponse((*this), getRequest());
     
-    if (_response.checkBits(HttpResponse::FINISHED_RESPONSE) || res > 0)
+    if (_response.checkBits(HttpResponse::FINISHED_RESPONSE))
     {
         UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
         setErrorStatus(res);
@@ -66,8 +66,15 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         
         if (!req && ((checkBits(HttpRequest::CONTENT_LENGTH) || checkBits(HttpRequest::TRANSFER_ENCODING)) && !checkBits(HttpRequest::FINISH_BODY)))
         {
-            _response.serveResponse((*this), _request);
-            if (!checkBits(HttpRequest::FINISH_BODY)) return IO::IO_SUCCESS;
+            int res = _response.serveResponse((*this), _request);
+            
+            if (res)
+            {
+                _response.switchMethod((*this), TcpServer::ERROR, res);
+                req = res;
+            }
+            else if (!checkBits(HttpRequest::FINISH_BODY))
+                return IO::IO_SUCCESS;
         }
 
         if (_response.getHttpMethod() == NULL)

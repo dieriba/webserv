@@ -74,30 +74,33 @@ int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
 int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 {
     TcpServer& instance = *(event.getServer() -> getInstance());
-    std::string path(req.getHeaders().find(PATH) -> second);
-    res.setPath(instance.getRootDir() + req.getHeaders().find(PATH) -> second);
-    DIR *directory;
-
-    directory = opendir(res.getPath().c_str());
+    std::string path;
     
-    if ((directory && instance.getIndex().size()) || (directory == NULL && (errno == ENOENT || errno == ENOTDIR)))
+    std::vector<std::string> vec = UtilityMethod::stringSpliter(req.getHeaders().find(PATH) -> second, "/");
+    
+    if (vec.size() == 0) path = "/";
+
+    for (size_t i = 0; i < vec.size(); i++)
+        path += "/" + vec[i];
+
+    res.setPath(instance.getRootDir() + path);
+    
+    int directory = UtilityMethod::is_a_directory(res.getPath().c_str());
+
+    if ((directory && instance.getIndex().size()) || directory == 0)
     {
-        closedir(directory);
-        
         std::ifstream& file = res.getFile();
 
-        if (req.getHeaders().find(PATH) -> second == instance.getIndexPath())
+        if (path == instance.getIndexPath())
             res.setPath(instance.getRootDir() + instance.getIndexPath() + "/" + instance.getIndex());
-                
         file.open(res.getPath().c_str(), std::ifstream::in | std::ifstream::binary);
-            
-        if (!file) return res.switchMethod(event, TcpServer::ERROR, FORBIDEN);
-    
+        if (!file) return FORBIDEN;
+        
         file.seekg(0, std::ios::end);
         res.setBodySize(file.tellg());
         file.seekg(0, std::ios::beg);
 
-        if (file.fail()) return res.switchMethod(event, TcpServer::ERROR, 500);
+        if (file.fail()) return INTERNAL_SERVER_ERROR;
 
         makeStatusLine(OK);
 
@@ -119,7 +122,6 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     }
     else if (directory)
     {
-        closedir(directory);
         res.setOptions(HttpResponse::DIRECTORY, SET);
     }
     res.setOptions(HttpResponse::STARTED, SET);
