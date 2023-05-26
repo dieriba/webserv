@@ -250,8 +250,6 @@ int HttpRequest::parseRequest(IO& object)
         return getMethod();
     }
     
-    //std::cout << s_buffer << std::endl;
-
     if ((lenq = s_buffer.find(CRLF CRLF)) != std::string::npos)
     {
         lenq += 4;

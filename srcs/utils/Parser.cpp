@@ -558,7 +558,6 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_
             {
                 pos = line.find_first_not_of(SERVER_CONTEXT);
                 
-                std::cout << pos << std::endl;
                 if ((pos == std::string::npos && line.size() != UtilityMethod::myStrlen(SERVER_CONTEXT))
                     || (pos != std::string::npos && (UtilityMethod::myStrlen(SERVER_CONTEXT) != pos)))
                     throw ExceptionThrower("Unknow Context: " + line + " please refer to dieriba for the known context");

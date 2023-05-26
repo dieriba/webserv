@@ -172,8 +172,6 @@ int Post::handleMultipartDataContentLength(IO& event, HttpRequest& req)
 
             std::string content_disp = s_buffer.substr(start + boundary.size() + LEN_CRLF, pos_two - (start + boundary.size() + LEN_CRLF));
 
-            std::cout << content_disp << std::endl;
-
             std::vector<std::string> vec = UtilityMethod::stringSpliter(content_disp, ";");
 
             if (vec.size() < 2 || vec.size() > 3) return BAD_REQUEST;
