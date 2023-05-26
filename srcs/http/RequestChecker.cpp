@@ -24,12 +24,12 @@ RequestChecker::~RequestChecker(){};
 
 const TcpServer *RequestChecker::serverOrLocation(const Server& server, const HttpRequest& req)
 {
-    std::string path = req.getHeaders().find("PATH") -> second;
+    std::string path = req.getHeaders().find(PATH) -> second;
     const std::vector<Location>& locations = server.getLocations();
 
     for (size_t i = 0; i < locations.size(); i++)
     {
-        if ((path.size() == 1 && locations[i].getIndexPath() == path) || path.find(locations[i].getIndexPath()) != std::string::npos)
+        if ((path.size() == 1 && locations[i].getIndexPath() == path) || path.find(locations[i].getIndexPath()) == 0)
             return &locations[i];
     }
 
@@ -112,17 +112,12 @@ int RequestChecker::checkHeader(const TcpServer& instance, HttpRequest& req, Htt
 
 int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest& req)
 {
-    std::string root;
- 
     if (instance -> getRootDir().size() == 0) return NOT_FOUND;
+    
+    const std::string& full_path(req.getHeaders().find(FULLPATH) -> second);
 
-    root = instance -> getRootDir();
-    root += req.getHeaders().find(PATH) -> second;
-    
-    const char *root_c = root.c_str();
-    
-    //std::cout << "Root_c" << root_c << std::endl;
-    
+    const char *root_c = full_path.c_str();
+
     if (req.getMethod() != TcpServer::POST)
     {
         if (access(root_c, F_OK) != 0)
@@ -130,22 +125,22 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
         
         if (req.getMethod() == TcpServer::GET && (access(root_c, R_OK) != 0))
             return FORBIDEN;
-
     }
-    
-    if (req.getMethod() == TcpServer::POST)
+    else if (req.getMethod() == TcpServer::POST)
     {
 
-        size_t i = root.rfind('/');
+        size_t i = full_path.rfind('/');
         
         if (i == std::string::npos) return BAD_REQUEST;
 
-        char stop = root_c[i + 1];
         char *alias_root = (char *)root_c;
-        alias_root[i + 1] = 0;
-    
-        if (UtilityMethod::is_a_directory(alias_root) == NULL) return NOT_FOUND;
-
+        char stop = root_c[i + 1];
+        if (req.getHeaders().find(PATH) -> second != instance -> getIndexPath())
+        {
+            alias_root = (char *)root_c;
+            alias_root[i + 1] = 0;
+        }
+        if (UtilityMethod::is_a_directory(alias_root) == 0) return NOT_FOUND;
         alias_root[i + 1] = stop;
 
         if (access(alias_root, W_OK) && errno == EACCES) return FORBIDEN;

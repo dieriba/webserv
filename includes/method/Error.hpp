@@ -16,6 +16,8 @@ class Error: public Method
 
         /*MEMBER FUNCTION*/
         int sendResponse(IO&, HttpRequest&, HttpResponse&);
+    private:
+        std::string getErrorPage(const short int& err) const;
 };
 
 # endif

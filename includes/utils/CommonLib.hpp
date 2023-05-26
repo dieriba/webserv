@@ -56,6 +56,7 @@
 # define METHOD "METHOD"
 # define HTTP_VERSION "HTTP/1.1"
 # define PATH "PATH"
+# define FULLPATH "FULLPATH"
 # define MIME_FILENAME "mimes_types.txt"
 # define MULTIPART_FORM_DATA "multipart/form-data"
 # define BOUNDARY "boundary"
@@ -71,7 +72,7 @@
 # define SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\nContent-Length: 529\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Webserv Error Page</title>\n\t</head>\n\t<body style=\"display: flex; height: 100vh; align-items: center; font-family: 'Wix Madefor Text', sans-serif;  font-size: 2rem; flex-direction: column;\">\n\t\t<h1>500 Internal Server Error</h1>\n\t\t<p>Unfortunately, an error occured from the server, please try again later</p>\n\t</body>\n</html>"
 # define SERVER_ERROR_PAGE_BAD_REQUEST "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\nContent-Length: 437\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Webserv Error Page</title>\n\t</head>\n\t<body style=\"display: flex; height: 100vh; align-items: center; font-family: 'Wix Madefor Text', sans-serif;  font-size: 2rem; flex-direction: column;\">\n\t\t<h1>400 Bad Request</h1>\n\t</body>\n</html>"
 # define SERVER_ERROR_PAGE_FORBIDDEN "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html\r\nContent-Length: 435\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Webserv Error Page</title>\n\t</head>\n\t<body style=\"display: flex; height: 100vh; align-items: center; font-family: 'Wix Madefor Text', sans-serif;  font-size: 2rem; flex-direction: column;\">\n\t\t<h1>403 Forbidden</h1>\n\t</body>\n</html>"
-
+# define SERVER_ERROR_PAGE_METHOD_NOT_ALLOWED ""
 
 /*
 
@@ -93,8 +94,8 @@
 # define MAXEVENTS 64
 # define CRLF "\r\n"
 # define LEN_CRLF 2
-# define END_CHUNK "0\r\n\r\n"
-# define LEN_END_CHUNK 5
+# define END_CHUNK "\r\n0\r\n\r\n"
+# define LEN_END_CHUNK 7
 # define TIMEOUT 1000
 # define MAX_HEADER_SIZE 4000
 # define NO_VALUE "NO_VALUE"

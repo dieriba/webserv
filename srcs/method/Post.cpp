@@ -261,12 +261,10 @@ int Post::handleMultipartDataContentLength(IO& event, HttpRequest& req)
                 event.setOptions(HttpRequest::FINISH_BODY, SET);
                 break;
             }
-
             req.setOptions(HttpResponse::STARTED, CLEAR);
 
         }
     }
-
     return IO::IO_SUCCESS;
 }
 

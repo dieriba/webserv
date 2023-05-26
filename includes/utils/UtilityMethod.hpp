@@ -26,6 +26,7 @@ class UtilityMethod
         static char *mystrstr(const char *big, const char *needle);
         static int is_a_directory(const char *path);
         static size_t myStrlen(const char *buffer);
+        static std::string remove_dup(std::string& ressource);
     
     private:
         UtilityMethod& operator=(const UtilityMethod& rhs);        

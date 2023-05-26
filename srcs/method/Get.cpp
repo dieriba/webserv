@@ -74,16 +74,7 @@ int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
 int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 {
     TcpServer& instance = *(event.getServer() -> getInstance());
-    std::string path;
-    
-    std::vector<std::string> vec = UtilityMethod::stringSpliter(req.getHeaders().find(PATH) -> second, "/");
-    
-    if (vec.size() == 0) path = "/";
-
-    for (size_t i = 0; i < vec.size(); i++)
-        path += "/" + vec[i];
-
-    res.setPath(instance.getRootDir() + path);
+    std::string full_path(req.getHeaders().find(FULLPATH) -> second);
     
     int directory = UtilityMethod::is_a_directory(res.getPath().c_str());
 
@@ -91,9 +82,8 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     {
         std::ifstream& file = res.getFile();
 
-        if (path == instance.getIndexPath())
-            res.setPath(instance.getRootDir() + instance.getIndexPath() + "/" + instance.getIndex());
-        file.open(res.getPath().c_str(), std::ifstream::in | std::ifstream::binary);
+        file.open(full_path.c_str(), std::ifstream::in | std::ifstream::binary);
+
         if (!file) return FORBIDEN;
         
         file.seekg(0, std::ios::end);
@@ -104,7 +94,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 
         makeStatusLine(OK);
 
-        std::string ressource(res.getPath());
+        std::string ressource(full_path);
         
         appendToResponse(CONTENT_TYP, UtilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex(), true));
         appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()));

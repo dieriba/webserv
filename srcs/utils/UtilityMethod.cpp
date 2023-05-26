@@ -162,6 +162,28 @@ size_t  UtilityMethod::myStrlen(const char *buffer)
     return i;
 }
 
+std::string UtilityMethod::remove_dup(std::string& ressource)
+{
+    std::vector<std::string> vec = stringSpliter(ressource, "/");
+    if (vec.size() == 0) return "/";
+    
+    std::string path;
+    
+    size_t i = 0;
+    
+    if (vec[0] == ".")
+    {
+        path = ".";
+        i = 1;
+    }
+
+    for ( ; i < vec.size(); i++)
+    {
+        path += "/" + vec[i];
+    }
+    return path;
+}
+
 int UtilityMethod::is_a_directory(const char *path)
 {
    struct stat statbuf;

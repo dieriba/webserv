@@ -119,9 +119,14 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
             object.setOptions(HttpRequest::CARRIAGE_FEED, SET);
         };
 
+        if (s_buffer.find(END_CHUNK) == 0)
+        {
+            if (s_buffer.size() != LEN_END_CHUNK) return BAD_REQUEST;
+            object.setOptions(HttpRequest::FINISH_BODY, SET);
+            return IO::IO_SUCCESS;
+        }
         if (s_buffer.size() == 0) return IO::IO_SUCCESS;
     }
-
 
     return IO::IO_SUCCESS;
 }
@@ -163,14 +168,12 @@ int HttpRequest::open_file(IO& event)
     TcpServer& instance = *(event.getServer() -> getInstance());
     std::string& path = getHeaders().find(PATH) -> second; 
     std::string fileExtenstion = UtilityMethod::getFileExtension(getHeaders().find(CONTENT_TYP) -> second, 0);
-    std::string filepath;
+    std::string filepath(getHeaders().find(FULLPATH) -> second);
     
     /*ADD THIS INTO A TRY CATCH BLOCK*/
 
     if (path == instance.getIndexPath())
-        filepath = instance.getRootDir() + instance .getIndexPath() + DEFAULT_FILE_NAME + UtilityMethod::numberToString(_nb) + fileExtenstion;
-    else
-        filepath = instance.getRootDir() + path;
+        filepath += DEFAULT_FILE_NAME + UtilityMethod::numberToString(_nb) + fileExtenstion;
 
     if (outfile.is_open()) outfile.close();
     
@@ -199,12 +202,33 @@ int HttpRequest::parseRequest(IO& object)
     if (headers.size() == 0) return BAD_REQUEST;
 
     header = UtilityMethod::stringSpliter(headers[0], " ");
-    _headers[METHOD] =  header.size() > 0 ? header[0] : NO_VALUE;
-    _headers[PATH] =  header.size() > 1 ? header[1] : NO_VALUE;
-    _headers[VERSION] = header.size() > 2 ? header[2] : NO_VALUE;
+
+    if (header.size() != 3) return BAD_REQUEST;
+
+    _headers[METHOD] =  header[0];
+    _headers[PATH] = UtilityMethod::remove_dup(header[1]);
+    _headers[VERSION] = header[2];
 
     setMetod(TcpServer::getHttpMethod(header[0]));
 
+    Server& server = *(object.getServer());
+    server.setInstance((TcpServer *)RequestChecker::serverOrLocation(server, (*this)));
+    const TcpServer *instance = server.getInstance();
+
+    std::string full_path = instance -> getRootDir() + _headers[PATH];
+
+    int directory = UtilityMethod::is_a_directory(full_path.c_str());
+
+    if (getMethod() == TcpServer::GET)
+    {
+        if ((directory && instance -> getIndex().size()) && (_headers[PATH] == instance -> getIndexPath()))
+            full_path += '/' + instance -> getIndex();
+        else if (directory && instance -> getIndex().size() == 0)
+            full_path = "";
+    }
+    
+    _headers[FULLPATH] = full_path.size() > 0 ? UtilityMethod::remove_dup(full_path) : "";
+    
     for (size_t i = 1; i < len; i++)
     {
         header = UtilityMethod::stringSpliter(headers[i], ":");
@@ -219,9 +243,6 @@ int HttpRequest::parseRequest(IO& object)
     }
     
     size_t lenq;
-    
-    Server& server = *(object.getServer());
-    server.setInstance((TcpServer *)RequestChecker::serverOrLocation(server, (*this)));
 
     if (server.getInstance() -> getRedirect().size() > 0)
     {
@@ -252,6 +273,8 @@ int HttpRequest::parseRequest(IO& object)
 
     int _req = RequestChecker::checkAll(object, (*this), object.getReponse());
 
+    std::cout << "Req value: " << _req << std::endl;
+    
     if (_req != 0)  return _req;
     
     if (_it_transfert != _headers.end() || _it_content != _headers.end())
