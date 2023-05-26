@@ -90,7 +90,7 @@ void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Locat
     {
         if (*(it -> second.rbegin()) == '/')
             it -> second.erase(--(it -> second.end()));
-        location.setRootDir("." + it -> second);
+        location.setRootDir(UtilityMethod::rtrim("." + it -> second, "/"));
         location.setFullIndexPath(location.getRootDir() + location.getIndexPath());
 
     }
@@ -166,7 +166,7 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
     {
         if (*(it -> second.rbegin()) == '/')
             it -> second.erase(--(it -> second.end()));
-        server.setRootDir("." + it -> second);
+        server.setRootDir(UtilityMethod::rtrim("." + it -> second, "/"));
         server.setFullIndexPath(server.getRootDir() + "/");
     }
     
@@ -276,7 +276,7 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
     if (bracket && vec.size() == 2)
         vec[1].erase(vec[1].length() - 1);
 
-    _location.setIndexPath(vec[1]);
+    _location.setIndexPath(UtilityMethod::rtrim(vec[1], "/"));
 
     if (!bracket)
     {
