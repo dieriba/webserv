@@ -35,7 +35,6 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
         _response.switchMethod((*this), TcpServer::ERROR, res);
     else if (_response.checkBits(HttpResponse::FINISHED_RESPONSE))
     {
-        std::cout << "Res value: " << res << std::endl;
         UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
         setErrorStatus(res);
         clear();
@@ -108,6 +107,7 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
         _request.getBuffer().clear();
         UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
     }
+    
     return writeToSocket(_ws, event);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

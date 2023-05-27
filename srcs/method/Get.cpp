@@ -48,19 +48,20 @@ int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
 {
     try
     {
+        static size_t len;
         (void)req;
         char buffer[REQUEST_SIZE + 1] = {0};
 
         std::ifstream& file = res.getFile();
         
         file.read(buffer, REQUEST_SIZE);
-    
         if (sendBuffer(event.getFd(), buffer, file.gcount()))
         {
-            std::cout << "Socket Ended" << std::endl;
+            std::cout << "An error occurred with client: " << event.getFd() << std::endl;
             return (IO::IO_ERROR);
         }
 
+        len += file.gcount();
         if (file.fail() && file.eof())
             res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     }
@@ -99,7 +100,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         appendToResponse(CONTENT_TYP, UtilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex(), true));
         appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()));
         _response += CRLF;
-
+        
         if (sendBuffer(event.getFd(), _response.c_str(), _response.size())) return (IO::IO_ERROR);
 
         _response.clear();

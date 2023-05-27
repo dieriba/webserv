@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define FILE_SIZE_GB 1
+#define FILE_SIZE_GB 2
 #define BUFFER_SIZE 1024
 
 void generate_text_file(const char* file_path, size_t file_size) 
@@ -40,7 +40,8 @@ void generate_text_file(const char* file_path, size_t file_size)
 
 int main() {
     const char* file_path = "file.txt";
-    size_t file_size = FILE_SIZE * 1024;
+    size_t cal = 1024 * 1024 * 1024;
+    size_t file_size = FILE_SIZE_GB * cal;
 
     generate_text_file(file_path, file_size);
 

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>File Upload</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <h1>File Upload to C++ Server</h1>
+  
+  <div class="description">
+    <p>This page allows you to upload images, videos, and music files to a C++ server located at <code>localhost:8080</code>.</p>
+    <p>Select the files you want to upload and click the "Upload" button.</p>
+  </div>
+
+  <form action="http://localhost:8080/uploads" method="post" enctype="multipart/form-data">
+    <input type="file" name="video" accept="video/*">
+    <input type="file" name="video" accept="video/*">
+    <input type="file" name="video" accept="video/*">
+    <input type="file" name="video" accept="video/*">
+    <input type="submit" value="Upload">
+  </form>
+</body>
+</html>

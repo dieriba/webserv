@@ -167,10 +167,10 @@ void TcpServer::makeServerServe(void)
         for (int i = 0; i < to_proceed; i++)
         {
             events = static_cast<IO *>(_events[i].data.ptr);
-            res = events -> handleIoOperation(_epoll_ws, _events[i]) == IO::IO_ERROR;
+            res = events -> handleIoOperation(_epoll_ws, _events[i]);
             if (res == IO::IO_ERROR)
             {
-                std::cout << "ERROR" << std::endl;
+                std::cout << "Deletting client with fd: " << events -> getFd() << " from interests list" << std::endl;
                 Server *server = events -> getServer();
                 server -> deleteFromEventsMap(events);
             }

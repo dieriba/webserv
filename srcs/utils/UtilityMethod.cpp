@@ -89,7 +89,7 @@ int UtilityMethod::switchEvents(const int& _ws, uint32_t mode, struct epoll_even
     return IO::IO_SUCCESS;
 }
 
-std::string UtilityMethod::numberToString(const int& number)
+std::string UtilityMethod::numberToString(const size_t& number)
 {
     std::ostringstream ss;
 
