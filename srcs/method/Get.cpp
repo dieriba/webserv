@@ -78,7 +78,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     
     int directory = UtilityMethod::is_a_directory(res.getPath().c_str());
 
-    if ((directory && instance.getIndex().size()) || directory == 0)
+    if ((directory && instance.getAutoIndexValue()) || directory == 0)
     {
         std::ifstream& file = res.getFile();
 

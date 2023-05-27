@@ -36,7 +36,16 @@ std::string Error::getErrorPage(const short int& err) const
         case NOT_FOUND : res = SERVER_ERROR_PAGE_NOT_FOUND;
             break;
 
+        case METHOD_NOT_ALLOWED : res = SERVER_ERROR_PAGE_METHOD_NOT_ALLOWED;
+            break;
+
+        case TOO_LARGE_CONTENT : res = SERVER_ERROR_TOO_LARGE_CONTENT;
+            break;
+
         case INTERNAL_SERVER_ERROR : res = SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR;
+            break;
+
+        case METHOD_NOT_SUPPORTED : res = SERVER_ERROR_PAGE_METHOD_NOT_SUPPORTED;
             break;
 
         default: res = SERVER_ERROR_PAGE_BAD_REQUEST;
