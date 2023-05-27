@@ -134,7 +134,78 @@ int Post::handleMultipartDataTransferEncoding(IO& event, HttpRequest& req)
     (void)event;
     (void)req;
     exit(1);
+
+     /*while (1)
+    {
+        if (object.checkBits(HttpRequest::CHUNK_SET) == 0)
+        {
+            size_t start = 0;
+
+            if (object.checkBits(HttpRequest::CARRIAGE_FEED))
+            {
+                size_t pos = s_buffer.find_first_not_of(CRLF);
+
+                if (pos == std::string::npos || pos != LEN_CRLF) return BAD_REQUEST;
+                
+                start = pos;
+
+                object.setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
+            }
+
+            if (getCurrentChunkSize() > 0) clearCurrentChunkSize();
+
+            size_t pos = s_buffer.find(CRLF, start);
+            
+            if (pos == std::string::npos)  return IO::IO_SUCCESS;
+            
+            pos += LEN_CRLF;
+
+            char c = s_buffer[pos];
+            s_buffer[pos] = 0;
+
+            if (s_buffer.find_first_not_of(BASE_16 CRLF) != pos) return BAD_REQUEST;
+            
+            s_buffer[pos] = c;
+
+            setChunkSize(UtilityMethod::hexToDecimal(s_buffer.substr(start, pos - LEN_CRLF)));
+            
+            if (getChunkSize() == std::string::npos) return BAD_REQUEST;
+
+            s_buffer.erase(0, pos);
+
+            object.setOptions(HttpRequest::CHUNK_SET, SET);
+        }
+
+        size_t size = getChunkSize() - getCurrentChunkSize();
+
+        if (size > s_buffer.size())
+            size = s_buffer.size();
+            
+        updateCurrentChunkSize(size);
+
+        int err = post.writeToFile(object, (*this), size);
+        
+        if (err) return err;
+
+        s_buffer.erase(0, size);
+
+        if (getCurrentChunkSize() == getChunkSize())
+        {
+            object.setOptions(HttpRequest::CHUNK_SET, CLEAR);
+            object.setOptions(HttpRequest::CARRIAGE_FEED, SET);
+        };
+
+        if (s_buffer.find(END_CHUNK) == 0)
+        {
+            if (s_buffer.size() != LEN_END_CHUNK) return BAD_REQUEST;
+            object.setOptions(HttpRequest::FINISH_BODY, SET);
+            return IO::IO_SUCCESS;
+        }
+        if (s_buffer.size() == 0) return IO::IO_SUCCESS;
+    }
+
     return IO::IO_SUCCESS;
+*/    return IO::IO_SUCCESS;
 }
 
 int Post::handleMultipartDataContentLength(IO& event, HttpRequest& req)

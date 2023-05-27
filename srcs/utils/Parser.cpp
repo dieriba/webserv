@@ -28,7 +28,7 @@ void    Parser::setCommonDirectives(std::vector<std::string>& vec, std::map<std:
                 throw ExceptionThrower(MISSING_SEMICOLONS);
             vec[1].erase(vec[1].length() - 1);
         }
-
+        
         /*
             IF NO ERROR HAS BEEN THROWN
             ADD THE DIRECTIVE TO THE MAP
@@ -116,6 +116,10 @@ void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Locat
     it = _map.find(REDIRECT);
 
     if (it != end) location.setRedirect(it -> second);
+
+    it = _map.find(AUTO_INDEX);
+
+    if (it != end) location.setAutoIndexValue(it -> second == "on" ? true : false);
 }
 
 void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, Server& server)
@@ -193,6 +197,10 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
     it = _serv_conf.find(REDIRECT);
 
     if (it != end) server.setRedirect(it -> second);
+
+    it = _serv_conf.find(AUTO_INDEX);
+
+    if (it != end) server.setAutoIndexValue(it -> second == "on" ? true : false);
 }
 
 void    Parser::setAllowedMethods(TcpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _serv_conf)
@@ -351,6 +359,11 @@ void    Parser::fillMap(const std::string& line, Location& location, std::map<st
         TcpServer& instance = location;
         handleErrorPages(instance, vec);
     }
+    else if (vec[0] == AUTO_INDEX)
+    {
+        if (vec[1] != "on" || vec[1] != "off")
+            throw ExceptionThrower("auto_index possible value are either 'on' or 'off'");
+    }
     else
         setCommonDirectives(vec, _serv_conf);
 }
@@ -452,6 +465,11 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
     {
         TcpServer& instance = server;
         handleErrorPages(instance, vec);
+    }
+    else if (vec[0] == AUTO_INDEX)
+    {
+        if (vec[1] != "on" || vec[1] != "off")
+            throw ExceptionThrower("auto_index only possible values are either on or off");
     }
     else
         setCommonDirectives(vec, _serv_conf);

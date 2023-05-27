@@ -30,6 +30,7 @@ class TcpServer: public Parser, public BitsManipulation
         };
 
         /*GETTERS*/
+        const bool& getAutoIndexValue() const;
         std::vector<Server> getServers(void) const;
         const size_t& getBodySize(void) const;
         const std::string& getIndex(void) const;
@@ -43,6 +44,7 @@ class TcpServer: public Parser, public BitsManipulation
 
         /*SETTERS*/
         int addToErrorMap(const short int& error, std::string& file, const std::string& directory);
+        void setAutoIndexValue(const bool& auto_index);
         void pushNewServer(const Server& server);
         void setBodySize(const size_t& body);
         void setIndex(const std::string& index);
@@ -76,6 +78,7 @@ class TcpServer: public Parser, public BitsManipulation
         static short int g_signal;
     
     protected:
+        bool   _auto_index;
         size_t _body_size;
         std::string _index;
         std::string _root_dir;

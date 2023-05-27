@@ -7,17 +7,18 @@
 # include "../../includes/IO/CgiStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-TcpServer::TcpServer():BitsManipulation(),_body_size(0),
+TcpServer::TcpServer():BitsManipulation(),_auto_index(false),_body_size(0),
             _index(""),_root_dir(""),_redirect(""),_epoll_ws(-1){};
 
 TcpServer::TcpServer(const TcpServer& rhs)
-    :Parser(rhs),BitsManipulation(rhs),_body_size(rhs._body_size),_index(rhs._index),
+    :Parser(rhs),BitsManipulation(rhs),_auto_index(rhs._auto_index),_body_size(rhs._body_size),_index(rhs._index),
     _root_dir(rhs._root_dir),_redirect(rhs._redirect),_index_path(rhs._index_path),_error_pages(rhs._error_pages)
     ,_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
 
 TcpServer& TcpServer::operator=(const TcpServer& rhs)
 {
     if (this == &rhs) return *this;
+    _auto_index = rhs._auto_index;
     _error_pages = rhs._error_pages;
     _body_size = rhs._body_size;
     _options = rhs._options;
@@ -36,10 +37,11 @@ TcpServer::~TcpServer()
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
-const int& TcpServer::getEpollWs(void) const {return _epoll_ws;}
-const std::map<short int, std::string>& TcpServer::getErrorMaps() const {return _error_pages;}
 std::map<short int, std::string>& TcpServer::getErrorMaps() {return _error_pages;}
 std::vector<Server> TcpServer::getServers(void) const {return _servers;};
+const bool& TcpServer::getAutoIndexValue(void) const {return _auto_index;};
+const int& TcpServer::getEpollWs(void) const {return _epoll_ws;}
+const std::map<short int, std::string>& TcpServer::getErrorMaps() const {return _error_pages;}
 const size_t& TcpServer::getBodySize(void) const {return _body_size;};
 const std::string& TcpServer::getRootDir(void) const {return _root_dir;};
 const std::string& TcpServer::getIndex(void) const {return _index;};
@@ -59,6 +61,11 @@ int TcpServer::addToErrorMap(const short int& error, std::string& file, const st
 
     _error_pages[error] = file;
     return 0;
+}
+
+void TcpServer::setAutoIndexValue(const bool& auto_index)
+{
+    _auto_index = auto_index;
 }
 
 void TcpServer::pushNewServer(const Server& server)
@@ -203,6 +210,7 @@ bool TcpServer::isKnownLocationDirectives(const std::string& directive)
 
 void TcpServer::initknownLocationsDirectives(void)
 {
+    _knownDirectives[AUTO_INDEX] = true;
     _knownLocationsDirectives[ROOT] = true;
     _knownLocationsDirectives[ALLOWED_METHOD] = true;
     _knownLocationsDirectives[INDEX] = true;
@@ -215,6 +223,7 @@ void TcpServer::initknownLocationsDirectives(void)
 
 void TcpServer::initKnownDirectives(void)
 {
+    _knownDirectives[AUTO_INDEX] = true;
     _knownDirectives[ROOT_ERROR_PAGE] = true;
     _knownDirectives[LISTEN] = true;
     _knownDirectives[SERVER_NAMES] = true;

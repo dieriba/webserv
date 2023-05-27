@@ -154,6 +154,7 @@
 # define REDIRECT "redirect"
 # define CGI "cgi"
 # define ROOT_ERROR_PAGE "root_error_pages"
+# define AUTO_INDEX "auto_index"
 /*
 
 */
