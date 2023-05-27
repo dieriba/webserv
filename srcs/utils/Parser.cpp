@@ -561,7 +561,7 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_
     std::vector<Server> server;
     size_t  pos;
 
-    server.reserve(10);
+    server.reserve(BASE_VEC_ARR);
 
     while (std::getline(file, line))
     {

@@ -48,6 +48,7 @@ const std::string& TcpServer::getIndex(void) const {return _index;};
 const std::string& TcpServer::getIndexPath(void) const {return _index_path;};
 const std::string& TcpServer::getFullIndexPath(void) const {return _full_index_path;};
 const std::string& TcpServer::getRedirect(void) const {return _redirect;};
+const std::string& TcpServer::getUploadsFilesFolder(void) const {return _upload_file_folders;}
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
@@ -61,6 +62,11 @@ int TcpServer::addToErrorMap(const short int& error, std::string& file, const st
 
     _error_pages[error] = file;
     return 0;
+}
+
+void TcpServer::setUploadsFilesFolder(const std::string& uploads_files_foler)
+{
+    _upload_file_folders = uploads_files_foler;
 }
 
 void TcpServer::setAutoIndexValue(const bool& auto_index)
@@ -210,7 +216,7 @@ bool TcpServer::isKnownLocationDirectives(const std::string& directive)
 
 void TcpServer::initknownLocationsDirectives(void)
 {
-    _knownDirectives[AUTO_INDEX] = true;
+    _knownLocationsDirectives[AUTO_INDEX] = true;
     _knownLocationsDirectives[ROOT] = true;
     _knownLocationsDirectives[ALLOWED_METHOD] = true;
     _knownLocationsDirectives[INDEX] = true;
@@ -219,6 +225,7 @@ void TcpServer::initknownLocationsDirectives(void)
     _knownLocationsDirectives[CLIENT_BODY] = true;
     _knownLocationsDirectives[LOCATION] = true;
     _knownLocationsDirectives[ROOT_ERROR_PAGE] = true;
+    _knownDirectives[UPLOAD_FILE_FOLDERS] = true;
 }   
 
 void TcpServer::initKnownDirectives(void)
@@ -235,7 +242,8 @@ void TcpServer::initKnownDirectives(void)
     _knownDirectives[ERROR_PAGE] = true;
     _knownDirectives[REDIRECT] = true;
     _knownDirectives[CGI] = true;
-    _knownLocationsDirectives[ROOT_ERROR_PAGE] = true;
+    _knownDirectives[ROOT_ERROR_PAGE] = true;
+    _knownDirectives[UPLOAD_FILE_FOLDERS] = true;
 }
 
 void TcpServer::initHttpResponses(void)
