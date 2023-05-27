@@ -30,6 +30,7 @@ class Parser
         void    fillMap(const std::string& line, Location& server, std::map<std::string, std::string>& _serv_conf);
         int     fillInstance(TcpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _map);
         void    checkOpeningLine(std::ifstream& file, std::string& line);
+        void    checkEndSemicolons(std::vector<std::string>& vec);
         void    feedingUpLocation(std::map<std::string, std::string>& _map, Location& location);
         void    feedingUpServer(std::map<std::string, std::string>& _serv_conf, Server& server);
         void    feedingUpInstance(std::map<std::string, std::string>& _map, TcpServer& instance);

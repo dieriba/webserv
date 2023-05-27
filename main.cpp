@@ -31,6 +31,8 @@ void    print_location_config(const Location& location)
         << "Sub Path: " << location.getIndexPath() << std::endl
         << "Root Directory: " << (location.getRootDir().size() > 0 ? location.getRootDir() : "No root directory") << std::endl
         << "Redirect: "  << (location.getRedirect().size() > 0 ? location.getRedirect() : "No redirect") << std::endl
+        << "Upload Folder: " << ((location.getUploadsFilesFolder().size()) ? location.getUploadsFilesFolder() : "No uploads folder set") << std::endl
+        << "AUTO INDEX: " << ((location.getAutoIndexValue()) == true ? "Auto Index ON" : "Auto Index OFF") << std::endl
         << "Server: " << location.getServer() << std::endl;
         const TcpServer& instance = location;
     print_map_error_page(instance);
@@ -56,7 +58,9 @@ void    print_server_config(const Server& server)
         << "PORT: " << server.getPort() << std::endl
         << "Client Max Body Size: " << server.getBodySize() << std::endl
         << "Root Directory: " << ((server.getRootDir().size()) > 0 ? server.getRootDir() : "No root directory") << std::endl
-        << "Index HTML: " << ((server.getIndex().size()) > 0 ? server.getIndex() : "No index html") << std::endl;
+        << "Index HTML: " << ((server.getIndex().size()) > 0 ? server.getIndex() : "No index html") << std::endl
+        << "Upload Folder: " << ((server.getUploadsFilesFolder().size()) ? server.getUploadsFilesFolder() : "No uploads folder set") << std::endl
+        << "AUTO INDEX: " << ((server.getAutoIndexValue()) == true ? "Auto Index ON" : "Auto Index OFF") << std::endl;
         const TcpServer& instance = server;
         print_map_error_page(instance);
         if (serv_it_ != serv_it_end)

@@ -17,6 +17,8 @@ Server::Server(const Server& rhs):TcpServer(rhs)
 Server& Server::operator=(const Server& rhs)
 {
     if (this == &rhs) return *(this);
+    _auto_index = rhs._auto_index;
+    _upload_file_folders = rhs._upload_file_folders;
     _serv_socket = rhs._serv_socket;
     _error_pages = rhs._error_pages;
     _options = rhs._options;

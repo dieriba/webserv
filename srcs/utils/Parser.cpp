@@ -9,37 +9,27 @@ Parser::Parser(const Parser& rhs){(void)rhs;};
 Parser::~Parser(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
+void    Parser::checkEndSemicolons(std::vector<std::string>& vec)
+{
+    if (vec.size() == 3)
+    {
+        if (vec.rbegin() -> length() != 1 || vec.rbegin() -> at(0) != ';')
+            throw ExceptionThrower(LAST_ARGS);
+        if (vec[1].find(';') != std::string::npos)
+            throw ExceptionThrower(BAD_SYNTAX);
+        return ;
+    }
+    if (UtilityMethod::count(vec[1], ';') > 1 || vec[1].at(vec[1].size() - 1) != ';')
+        throw ExceptionThrower(MISSING_SEMICOLONS);
+    vec[1].erase(vec[1].length() - 1);
+}
+
 void    Parser::setCommonDirectives(std::vector<std::string>& vec, std::map<std::string, std::string>& _map)
 {
-    /*
-            CHECK IF DIRECTIVES FOLLOWS THE RIGHT FORMAT
-            IF NOT THROW AN ERROR
-        */
-        if (vec.size() == 3)
-        {
-            if (vec.rbegin() -> length() != 1 || vec.rbegin() -> at(0) != ';')
-                throw ExceptionThrower(LAST_ARGS);
-            if (vec[1].find(';') != std::string::npos)
-                throw ExceptionThrower(BAD_SYNTAX);
-        }
-        else
-        {
-            if (UtilityMethod::count(vec[1], ';') > 1 || vec[1].at(vec[1].size() - 1) != ';')
-                throw ExceptionThrower(MISSING_SEMICOLONS);
-            vec[1].erase(vec[1].length() - 1);
-        }
-        
-        /*
-            IF NO ERROR HAS BEEN THROWN
-            ADD THE DIRECTIVE TO THE MAP
-            CHECK IF DIRECTIVE HAVE ALREADY BEEN ADDED
-            IF SO THROW AN ERROR
-        */
-
-         if (_map.find(vec[0]) != _map.end())
-            throw ExceptionThrower("Redeclaration of the same directive");
-        //std::cout << vec[0] << " " << vec[1] << std::endl;
-        _map[vec[0]] = vec[1];
+    checkEndSemicolons(vec);
+    if (_map.find(vec[0]) != _map.end())
+        throw ExceptionThrower("Redeclaration of the same directive");
+    _map[vec[0]] = vec[1];
 }
 
 bool    Parser::validIpFormat(const std::string& ip)
@@ -124,6 +114,10 @@ void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, TcpS
     it = _map.find(AUTO_INDEX);
 
     if (it != end) instance.setAutoIndexValue(it -> second == "on" ? true : false);
+
+    it = _map.find(UPLOAD_FILE_FOLDERS);
+
+    if (it != end) instance.setUploadsFilesFolder(it -> second);
 }
 
 void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, Server& server)
@@ -304,8 +298,10 @@ int    Parser::fillInstance(TcpServer& instance, std::vector<std::string>& vec, 
         return handleErrorPages(instance, vec);
     else if (vec[0] == AUTO_INDEX)
     {
-        if (vec[1] != "on" || vec[1] != "off")
+        checkEndSemicolons(vec);
+        if (vec[1].compare("on") != 0 && vec[1].compare("off") != 0)
             throw ExceptionThrower("auto_index possible value are either 'on' or 'off'");
+        _map[vec[0]] = vec[1];
         return 1;
     }
 
@@ -318,10 +314,6 @@ void    Parser::fillMap(const std::string& line, Location& location, std::map<st
     
     vec = UtilityMethod::stringSpliter(line, WHITESPACES);
     
-    /*
-        CHECK IF DIRECTIVES EXIST
-        IF NOT THROW AN ERROR
-    */
     if (!TcpServer::isKnownLocationDirectives(vec[0]))
         throw ExceptionThrower("Directive " + vec[0] + " is unknown");
 
@@ -408,7 +400,6 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
         {
             SemicolonCheck(vec[i], i, len);
             server.pushNewServerName(vec[i]);
-           // std::cout << vec[i] << std::endl;
         }
     }
     else if (vec[0] == CGI)
@@ -426,12 +417,8 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
         vec[2].erase(vec[2].size() - 1);
         server.pushNewCGI(vec[1], vec[2]);
     }
-    else
-    {
-        if (fillInstance(static_cast<TcpServer&>(server), vec, _serv_conf))
-            return ;
+    else if (fillInstance(static_cast<TcpServer&>(server), vec, _serv_conf) == 0)
         setCommonDirectives(vec, _serv_conf);
-    }
 }
 
 Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
