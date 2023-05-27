@@ -12,13 +12,14 @@ TcpServer::TcpServer():BitsManipulation(),_auto_index(false),_body_size(0),
 
 TcpServer::TcpServer(const TcpServer& rhs)
     :Parser(rhs),BitsManipulation(rhs),_auto_index(rhs._auto_index),_body_size(rhs._body_size),_index(rhs._index),
-    _root_dir(rhs._root_dir),_redirect(rhs._redirect),_index_path(rhs._index_path),_error_pages(rhs._error_pages)
-    ,_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
+    _root_dir(rhs._root_dir),_redirect(rhs._redirect),_index_path(rhs._index_path),_upload_file_folders(rhs._upload_file_folders)
+    ,_error_pages(rhs._error_pages),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
 
 TcpServer& TcpServer::operator=(const TcpServer& rhs)
 {
     if (this == &rhs) return *this;
     _auto_index = rhs._auto_index;
+    _upload_file_folders = rhs._upload_file_folders;
     _error_pages = rhs._error_pages;
     _body_size = rhs._body_size;
     _options = rhs._options;

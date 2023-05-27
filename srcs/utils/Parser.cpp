@@ -72,8 +72,11 @@ bool    Parser::validIpFormat(const std::string& ip)
 
 void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Location& location)
 {
-    size_t val;
-    std::vector<std::string> vec;
+    feedingUpInstance(_map, static_cast<TcpServer&>(location));
+}
+
+void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, TcpServer& instance)
+{
     std::stringstream ss;
 
     std::map<std::string, std::string>::iterator it;
@@ -82,7 +85,7 @@ void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Locat
 
     it = _map.find(INDEX);
     
-    if (it != end) location.setIndex(it -> second);
+    if (it != end) instance.setIndex(it -> second);
     
     it = _map.find(ROOT);
 
@@ -90,36 +93,37 @@ void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Locat
     {
         if (*(it -> second.rbegin()) == '/')
             it -> second.erase(--(it -> second.end()));
-        location.setRootDir(UtilityMethod::rtrim("." + it -> second, "/"));
-        location.setFullIndexPath(location.getRootDir() + location.getIndexPath());
+        instance.setRootDir(UtilityMethod::rtrim("." + it -> second, "/"));
+        instance.setFullIndexPath(instance.getRootDir() + instance.getIndexPath());
 
     }
 
     it = _map.find(ALLOWED_METHOD);
 
-    if (it == end) location.setOptions(ALL_METHODS, SET);
+    if (it == end) instance.setOptions(ALL_METHODS, SET);
 
     it = _map.find(CLIENT_BODY);
 
     if (it != end)
     {
+        size_t val;
         ss << it -> second;
         ss >> val;
 
         if (val == std::string::npos) ExceptionThrower("Body Value insanely huge");
 
-        location.setBodySize(val);
+        instance.setBodySize(val);
     }
     else
-        location.setBodySize(std::string::npos);
+        instance.setBodySize(std::string::npos);
 
     it = _map.find(REDIRECT);
 
-    if (it != end) location.setRedirect(it -> second);
+    if (it != end) instance.setRedirect(it -> second);
 
     it = _map.find(AUTO_INDEX);
 
-    if (it != end) location.setAutoIndexValue(it -> second == "on" ? true : false);
+    if (it != end) instance.setAutoIndexValue(it -> second == "on" ? true : false);
 }
 
 void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, Server& server)
@@ -160,50 +164,10 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
 
     server.setPort(val);
 
-    it = _serv_conf.find(ALLOWED_METHOD);
-
-    if (it == end) server.setOptions(ALL_METHODS, SET);
-    
-    it = _serv_conf.find(ROOT);
-
-    if (it != end) 
-    {
-        if (*(it -> second.rbegin()) == '/')
-            it -> second.erase(--(it -> second.end()));
-        server.setRootDir(UtilityMethod::rtrim("." + it -> second, "/"));
-        server.setFullIndexPath(server.getRootDir() + "/");
-    }
-    
-    it = _serv_conf.find(INDEX);
-    
-    if (it != end) server.setIndex(it -> second);
-
-    it = _serv_conf.find(CLIENT_BODY);
-
-    if (it != end)
-    {
-        ss.clear();
-        ss.str("");
-        ss << it -> second;
-        ss >> val;
-
-        if (val == std::string::npos) ExceptionThrower("Body Value insanely huge");
-    
-        server.setBodySize(val);
-    }
-    else
-        server.setBodySize(std::string::npos);
-
-    it = _serv_conf.find(REDIRECT);
-
-    if (it != end) server.setRedirect(it -> second);
-
-    it = _serv_conf.find(AUTO_INDEX);
-
-    if (it != end) server.setAutoIndexValue(it -> second == "on" ? true : false);
+    feedingUpInstance(_serv_conf, static_cast<TcpServer&>(server));
 }
 
-void    Parser::setAllowedMethods(TcpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _serv_conf)
+int    Parser::setAllowedMethods(TcpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _serv_conf)
 {
     if (vec.size() > 4)
         throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
@@ -220,6 +184,8 @@ void    Parser::setAllowedMethods(TcpServer& instance, std::vector<std::string>&
         instance.setOptions(method, SET);
     }
     _serv_conf[vec[0]] = "HTTP METHODS";
+
+    return 1;
 }
 
 void    Parser::checkOpeningLine(std::ifstream& file, std::string& line)
@@ -330,7 +296,23 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
     return _location;
 }
 
-void    Parser::fillMap(const std::string& line, Location& location, std::map<std::string, std::string>& _serv_conf)
+int    Parser::fillInstance(TcpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _map)
+{
+    if (vec[0] == ALLOWED_METHOD)
+        return setAllowedMethods(instance, vec, _map);
+    else if (vec[0] == ERROR_PAGE)
+        return handleErrorPages(instance, vec);
+    else if (vec[0] == AUTO_INDEX)
+    {
+        if (vec[1] != "on" || vec[1] != "off")
+            throw ExceptionThrower("auto_index possible value are either 'on' or 'off'");
+        return 1;
+    }
+
+    return 0;
+}
+
+void    Parser::fillMap(const std::string& line, Location& location, std::map<std::string, std::string>& _map)
 {
     std::vector<std::string> vec;
     
@@ -349,26 +331,13 @@ void    Parser::fillMap(const std::string& line, Location& location, std::map<st
     if (vec.size() > 3 && (vec[0] != ALLOWED_METHOD && vec[0] != ERROR_PAGE))
         throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
 
-    if (vec[0] == ALLOWED_METHOD)
-    {
-        TcpServer& instance = location;
-        setAllowedMethods(instance, vec, _serv_conf);
-    }
-    else if (vec[0] == ERROR_PAGE)
-    {
-        TcpServer& instance = location;
-        handleErrorPages(instance, vec);
-    }
-    else if (vec[0] == AUTO_INDEX)
-    {
-        if (vec[1] != "on" || vec[1] != "off")
-            throw ExceptionThrower("auto_index possible value are either 'on' or 'off'");
-    }
+    if (fillInstance(static_cast<TcpServer&>(location), vec, _map))
+        return ;
     else
-        setCommonDirectives(vec, _serv_conf);
+        setCommonDirectives(vec, _map);
 }
 
-void    Parser::handleErrorPages(TcpServer& instance, std::vector<std::string>& vec)
+int    Parser::handleErrorPages(TcpServer& instance, std::vector<std::string>& vec)
 {
     size_t len = vec.size() - 1;
 
@@ -404,6 +373,7 @@ void    Parser::handleErrorPages(TcpServer& instance, std::vector<std::string>& 
 
     instance.setOptions(TcpServer::ERROR_PAGE_SET, SET);
     
+    return 1;
 }
 
 void    Parser::fillMap(const std::string& line, Server& server, std::map<std::string, std::string>& _serv_conf)
@@ -456,23 +426,12 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
         vec[2].erase(vec[2].size() - 1);
         server.pushNewCGI(vec[1], vec[2]);
     }
-    else if (vec[0] == ALLOWED_METHOD)
-    {
-        TcpServer& instance = server;
-        setAllowedMethods(instance, vec, _serv_conf);
-    }
-    else if (vec[0] == ROOT_ERROR_PAGE || vec[0] == ERROR_PAGE)
-    {
-        TcpServer& instance = server;
-        handleErrorPages(instance, vec);
-    }
-    else if (vec[0] == AUTO_INDEX)
-    {
-        if (vec[1] != "on" || vec[1] != "off")
-            throw ExceptionThrower("auto_index only possible values are either on or off");
-    }
     else
+    {
+        if (fillInstance(static_cast<TcpServer&>(server), vec, _serv_conf))
+            return ;
         setCommonDirectives(vec, _serv_conf);
+    }
 }
 
 Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
