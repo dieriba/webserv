@@ -96,8 +96,18 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
 
 int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& event)
 {
-    if (event.events & EPOLLIN)
-        return readFromSocket(_ws, event);
+    try
+    {
+        if (event.events & EPOLLIN)
+            return readFromSocket(_ws, event);
+    }
+    catch(const std::exception& e)
+    {
+        _response.switchMethod((*this), TcpServer::ERROR, INTERNAL_SERVER_ERROR);
+        resetOptions();
+        _request.getBuffer().clear();
+        UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
+    }
     return writeToSocket(_ws, event);
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

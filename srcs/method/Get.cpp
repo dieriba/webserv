@@ -100,11 +100,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()));
         _response += CRLF;
 
-        if (sendBuffer(event.getFd(), _response.c_str(), _response.size()))
-        {
-            std::cout << "Closing socket: " << event.getFd() << std::endl;
-            return (IO::IO_ERROR);
-        }
+        if (sendBuffer(event.getFd(), _response.c_str(), _response.size())) return (IO::IO_ERROR);
 
         _response.clear();
         
