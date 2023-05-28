@@ -43,6 +43,7 @@
 # define TOO_LARGE_CONTENT 413
 # define INTERNAL_SERVER_ERROR 500
 # define METHOD_NOT_SUPPORTED 501
+# define VERSION_NOT_SUPPORTED 505
 /*
 
 
@@ -75,7 +76,7 @@
 # define SERVER_ERROR_TOO_LARGE_CONTENT "HTTP/1.1 413 Too Large Content\r\nContent-Type: text/html\r\nContent-Length: 443\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Webserv Error Page</title>\n\t</head>\n\t<body style=\"display: flex; height: 100vh; align-items: center; font-family: 'Wix Madefor Text', sans-serif;  font-size: 2rem; flex-direction: column;\">\n\t\t<h1>413 Too Large Content</h1>\n\t</body>\n</html>"
 # define SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\nContent-Length: 528\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Webserv Error Page</title>\n\t</head>\n\t<body style=\"display: flex; height: 100vh; align-items: center; font-family: 'Wix Madefor Text', sans-serif;  font-size: 2rem; flex-direction: column;\">\n\t\t<h1>500 Internal Server Error</h1>\n\t\t<p>Unfortunately, an error occured from the server, please try again later</p>\n\t</body>\n</html>"
 # define SERVER_ERROR_PAGE_METHOD_NOT_SUPPORTED "HTTP/1.1 501 Method Not Supported\r\nContent-Type: text/html\r\nContent-Length: 446\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Webserv Error Page</title>\n\t</head>\n\t<body style=\"display: flex; height: 100vh; align-items: center; font-family: 'Wix Madefor Text', sans-serif;  font-size: 2rem; flex-direction: column;\">\n\t\t<h1>501 Method Not Supported</h1>\n\t</body>\n</html>"
-
+# define SERVER_ERROR_PAGE_VERSION_NOT_SUPPORTED "HTTP/1.1 505 Version Not Supported\r\nContent-Type: text/html\r\nContent-Length: 517\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Webserv Error Page</title>\n\t</head>\n\t<body style=\"display: flex; height: 100vh; align-items: center; font-family: 'Wix Madefor Text', sans-serif;  font-size: 2rem; flex-direction: column;\">\n\t\t<h1>HTTP Version Not Supported</h1>\n\t\t<p>The requested HTTP version is not supported by this server.</p>\n\t</body>\n</html>"
 /*
 
 */

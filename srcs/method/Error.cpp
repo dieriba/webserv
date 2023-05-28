@@ -48,6 +48,9 @@ std::string Error::getErrorPage(const short int& err) const
         case METHOD_NOT_SUPPORTED : res = SERVER_ERROR_PAGE_METHOD_NOT_SUPPORTED;
             break;
 
+        case VERSION_NOT_SUPPORTED : res = SERVER_ERROR_PAGE_VERSION_NOT_SUPPORTED;
+            break;
+            
         default: res = SERVER_ERROR_PAGE_BAD_REQUEST;
             break;
     }

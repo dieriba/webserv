@@ -131,6 +131,12 @@ int RequestChecker::checkGetMethod(const TcpServer& instance, HttpRequest& req, 
 
 int RequestChecker::checkHeader(const TcpServer& instance, HttpRequest& req, HttpResponse& res)
 {
+    std::map<std::string, std::string> _map = req.getHeaders();
+
+    if (TcpServer::getMethodIndex(_map[METHOD]) == -1) return METHOD_NOT_SUPPORTED;
+
+    if (_map[VERSION] != HTTP_VERSION) return VERSION_NOT_SUPPORTED;
+
     if (req.getMethod() == TcpServer::GET)
         return checkGetMethod(instance, req, res);
     else if (req.getMethod() == TcpServer::POST)
