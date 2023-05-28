@@ -23,7 +23,8 @@ class HttpRequest: public HttpMessage, public BitsManipulation
             RESPONSE_HEADER_FINISHED,
             CHUNK_SET,
             CHUNKED_FINISHED,
-            CARRIAGE_FEED
+            CARRIAGE_FEED,
+            CGI_STREAM = 8
         };
 
         /*GETTERS*/

@@ -13,7 +13,13 @@ ClientSocketStream& ClientSocketStream::operator=(const ClientSocketStream& rhs)
 {
     if (this == &rhs) return (*this);
     _fd = rhs._fd;
+    _err = rhs._err;
     _server = rhs._server;
+    _event = rhs._event;
+    _io = rhs._io;
+    _request = rhs._request;
+    _response = rhs._response;
+    _options = rhs._options;
     return (*this);
 };
 ClientSocketStream::~ClientSocketStream(){};
@@ -65,7 +71,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
     if (end_header != NULL || (checkBits(HttpRequest::CONTENT_LENGTH) || checkBits(HttpRequest::TRANSFER_ENCODING)))
     {
         int req = _request.parseRequest(*this);
-        
+
         if (!req && ((checkBits(HttpRequest::CONTENT_LENGTH) || checkBits(HttpRequest::TRANSFER_ENCODING)) && !checkBits(HttpRequest::FINISH_BODY)))
         {
             int res = _response.serveResponse((*this), _request);

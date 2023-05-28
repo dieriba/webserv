@@ -4,7 +4,6 @@
 # include "../../includes/IO/IO.hpp"
 # include "../../includes/IO/ServerStream.hpp"
 # include "../../includes/IO/ClientSocketStream.hpp"
-# include "../../includes/IO/CgiStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 TcpServer::TcpServer():BitsManipulation(),_auto_index(false),_body_size(0),

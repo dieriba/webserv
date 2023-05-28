@@ -13,6 +13,13 @@ ServerStream& ServerStream::operator=(const ServerStream& rhs)
 {
     if (this == &rhs) return (*this);
     _fd = rhs._fd;
+    _err = rhs._err;
+    _server = rhs._server;
+    _event = rhs._event;
+    _io = rhs._io;
+    _request = rhs._request;
+    _response = rhs._response;
+    _options = rhs._options;
     return (*this);
 };
 ServerStream::~ServerStream(){};
@@ -36,7 +43,7 @@ int ServerStream::handleIoOperation(const int& _ws, struct epoll_event& event)
         {
             client_fd = accept(_fd, NULL, NULL);
             if (client_fd == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
-                return 1;
+                return IO::IO_SUCCESS;
                         
             _ev.data.ptr = new ClientSocketStream(client_fd, getServer());
             _ev.events = EPOLLIN;
@@ -44,11 +51,9 @@ int ServerStream::handleIoOperation(const int& _ws, struct epoll_event& event)
             this -> getServer() -> addToEventsMap((const IO*)_ev.data.ptr);
                 
             if (TcpServer::makeNonBlockingFd(client_fd) || epoll_ctl(_ws, EPOLL_CTL_ADD, client_fd, &_ev))
-            {
                 return IO::IO_ERROR;
-            }
         }
     }
-    return 0;
+    return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

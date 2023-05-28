@@ -2,15 +2,20 @@
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 IO::IO(){};
-IO::IO(const int& fd, Server *server):BitsManipulation(),_fd(fd),_err(0),_server(server),_event(EPOLLIN){};
-IO::IO(const IO& rhs):BitsManipulation(rhs),_fd(rhs._fd),_server(rhs._server){};
+IO::IO(const int& fd, Server *server):BitsManipulation(),_fd(fd),_err(0),_server(server),_event(EPOLLIN),_io(NULL){};
+IO::IO(const IO& rhs):BitsManipulation(rhs),_fd(rhs._fd),_server(rhs._server),_event(rhs._event),_io(rhs._io)
+,_request(rhs._request),_response(rhs._response){};
 IO& IO::operator=(const IO& rhs)
 {
     if (this == &rhs) return (*this);
-    _options = rhs._options;
     _fd = rhs._fd;
-    _server = rhs._server;
     _err = rhs._err;
+    _server = rhs._server;
+    _event = rhs._event;
+    _io = rhs._io;
+    _request = rhs._request;
+    _response = rhs._response;
+    _options = rhs._options;
     return (*this);
 };
 IO::~IO()
@@ -28,12 +33,14 @@ const uint32_t& IO::getEvents(void) const {return _event;};
 Server* IO::getServer(void) const { return _server;}
 HttpRequest& IO::getRequest(void)  {return _request;}
 HttpResponse& IO::getReponse(void) {return _response;};
+IO* IO::getIO(void) const {return _io;}; 
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
 void IO::setFD(const int& fd) {_fd = fd;}
 void IO::setErrorStatus(const int& err) {_err = err;}
 void IO::setEvents(const uint32_t& event) {_event = event;};
+void IO::setIO(IO *io) {_io = io;};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
