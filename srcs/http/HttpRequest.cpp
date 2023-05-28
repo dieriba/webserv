@@ -67,11 +67,11 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
 
             if (object.checkBits(HttpRequest::CARRIAGE_FEED))
             {
-                size_t pos = s_buffer.find_first_not_of(CRLF);
+                size_t pos = s_buffer.find(CRLF);
 
-                if (pos == std::string::npos || pos != LEN_CRLF) return BAD_REQUEST;
-                
-                start = pos;
+                if (pos != 0 || pos == std::string::npos) return BAD_REQUEST;
+
+                start = LEN_CRLF;
 
                 object.setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
             }
@@ -79,8 +79,8 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
             if (getCurrentChunkSize() > 0) clearCurrentChunkSize();
 
             size_t pos = s_buffer.find(CRLF, start);
-            
-            if (pos == std::string::npos)  return IO::IO_SUCCESS;
+
+            if (pos == std::string::npos)  return (object.setOptions(HttpRequest::CARRIAGE_FEED, SET), IO::IO_SUCCESS);
             
             pos += LEN_CRLF;
 
@@ -88,9 +88,8 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
             s_buffer[pos] = 0;
 
             if (s_buffer.find_first_not_of(BASE_16 CRLF) != pos) return BAD_REQUEST;
-            
-            s_buffer[pos] = c;
 
+            s_buffer[pos] = c;
             setChunkSize(UtilityMethod::hexToDecimal(s_buffer.substr(start, pos - LEN_CRLF)));
             
             if (getChunkSize() == std::string::npos) return BAD_REQUEST;
@@ -125,7 +124,8 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
             object.setOptions(HttpRequest::FINISH_BODY, SET);
             return IO::IO_SUCCESS;
         }
-        if (s_buffer.size() == 0) return IO::IO_SUCCESS;
+
+        if (s_buffer.size() <= LEN_CRLF) return IO::IO_SUCCESS;
     }
 
     return IO::IO_SUCCESS;
