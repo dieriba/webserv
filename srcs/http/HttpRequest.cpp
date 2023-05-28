@@ -301,6 +301,7 @@ void HttpRequest::clear(void)
 {
     _headers.clear();
     s_buffer.clear();
+    resetOptions();
 }
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

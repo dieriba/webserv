@@ -124,6 +124,7 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
     {
         if (req.checkBits(HttpResponse::STARTED) == 0)
         {
+            std::cout << "Entered " << std::endl;
             size_t start = 0;
 
             if (event.checkBits(HttpRequest::CARRIAGE_FEED))
@@ -232,6 +233,7 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
             {
                 updateSize(end_boundary.size() + LEN_CRLF + LEN_CRLF);
                 std::cout << "request body: " << _request_body_size << std::endl;
+                req.resetOptions();
                 event.setOptions(HttpRequest::FINISH_BODY, SET);
                 break;
             }
