@@ -59,8 +59,11 @@ void HttpRequest::clearCurrentChunkSize(void)
 
 int HttpRequest::fillChunkBody(IO& object, Post& post)
 {
+
     while (1)
     {
+        size_t pos = 0;
+        
         if (object.checkBits(HttpRequest::CHUNK_SET) == 0)
         {
             size_t start = 0;
@@ -78,7 +81,7 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
 
             if (getCurrentChunkSize() > 0) clearCurrentChunkSize();
 
-            size_t pos = s_buffer.find(CRLF, start);
+            pos = s_buffer.find(CRLF, start);
 
             if (pos == std::string::npos)  return (object.setOptions(HttpRequest::CARRIAGE_FEED, SET), IO::IO_SUCCESS);
             
@@ -94,19 +97,17 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
             
             if (getChunkSize() == std::string::npos) return BAD_REQUEST;
 
-            s_buffer.erase(0, pos);
-
             object.setOptions(HttpRequest::CHUNK_SET, SET);
         }
 
         size_t size = getChunkSize() - getCurrentChunkSize();
 
-        if (size > s_buffer.size())
+        if (size > s_buffer.size() - pos)
             size = s_buffer.size();
             
-        updateCurrentChunkSize(size);
+        updateCurrentChunkSize(size - pos);
 
-        int err = post.writeToFile(object, (*this), size);
+        int err = post.writeToFile((*this), pos, size - pos);
         
         if (err) return err;
 
@@ -121,6 +122,9 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
         if (s_buffer.find(END_CHUNK) == 0)
         {
             if (s_buffer.size() != LEN_END_CHUNK) return BAD_REQUEST;
+            std::cout << "Total body size: " << post.getRequestBodySize() << std::endl;
+            post.clearRequestBodySize();
+            outfile.close();
             object.setOptions(HttpRequest::FINISH_BODY, SET);
             return IO::IO_SUCCESS;
         }

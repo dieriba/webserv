@@ -24,8 +24,8 @@ class Post: public Method
         void clearRequestBodySize(void);
         int sendResponse(IO&, HttpRequest&, HttpResponse&);
         int writeToFile(IO& object, HttpRequest& req);
-        int writeToFile(IO& object, HttpRequest& req, const size_t& bytes);
-        int writeToFileMutltipartData(IO& object, HttpRequest& req, const size_t& bytes);
+        int writeToFile(HttpRequest& req, const size_t& pos, const size_t& bytes);
+        int writeToFileMutltipartData(HttpRequest& req, const size_t& bytes);
 
     private:
         int handleMultipartData(IO& event, HttpRequest& req);

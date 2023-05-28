@@ -34,14 +34,13 @@ void Post::clearRequestBodySize(void)
     _request_body_size = 0;
 }
 
-int Post::writeToFileMutltipartData(IO& event, HttpRequest& req, const size_t& size)
+int Post::writeToFileMutltipartData(HttpRequest& req, const size_t& size)
 {
     std::ofstream& outfile = req.getOutfile();
     std::string& s_buffer = req.getBuffer();
     
     try
     {
-        (void)event;
         outfile.write(s_buffer.data(), size);
     }
     catch(const std::exception& e)
@@ -54,24 +53,17 @@ int Post::writeToFileMutltipartData(IO& event, HttpRequest& req, const size_t& s
     return IO::IO_SUCCESS;
 }
 
-int Post::writeToFile(IO& object, HttpRequest& req, const size_t& bytes)
+int Post::writeToFile(HttpRequest& req, const size_t& pos, const size_t& bytes)
 {
     std::ofstream& outfile = req.getOutfile();
     try
     {
         std::string& alias = req.getBuffer();
-        
         if (bytes)
         {
-            outfile.write(alias.data(), bytes);
+            const char *buffer = alias.data();
+            outfile.write(&buffer[pos], bytes);
             updateSize(bytes);
-        }
-        else
-        {
-            std::cout << _request_body_size << std::endl;
-            object.setOptions(HttpRequest::FINISH_BODY, SET);
-            clearRequestBodySize();
-            outfile.close();
         }
     }
     catch(const std::exception& e)
@@ -209,7 +201,7 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
             
             if (req.getOutfile().is_open() && size > 0)
             {
-                int res = writeToFileMutltipartData(event, req, size);
+                int res = writeToFileMutltipartData(req, size);
 
                 if (res) return res;
             }
