@@ -69,7 +69,7 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
             {
                 size_t pos = s_buffer.find(CRLF);
 
-                if (pos != 0 || pos == std::string::npos) return BAD_REQUEST;
+                if (pos != 0 || (pos == std::string::npos && s_buffer.size() > LEN_CRLF)) return BAD_REQUEST;
 
                 start = LEN_CRLF;
 
