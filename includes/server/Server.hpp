@@ -22,10 +22,8 @@ class Server: public TcpServer
         const int& getServSocket(void) const;
         const std::string& getIp(void) const;
         const unsigned int& getPort(void) const;
-        bool getCgiPath(const std::string& key, std::string& path);
         const std::vector<Location>& getLocations(void) const;
         std::vector<Location>& getLocations(void);
-        std::map<std::string, std::string> getCgiMap() const {return _cgi;};
         std::vector<std::string> getServerNames(void) const;
         TcpServer *getInstance(void) const;
 
@@ -34,7 +32,6 @@ class Server: public TcpServer
         void    setPort(const unsigned int& port);
         void    pushNewServerName(const std::string& server_name);
         void    pushNewLocation(const Location& server_name);
-        void    pushNewCGI(const std::string& key, const std::string& value);
         void    setIp(const std::string& ip);
         void    setServSocket(const int& socket);
         void    setInstance(TcpServer* instance);
@@ -53,7 +50,6 @@ class Server: public TcpServer
         TcpServer *_tcp_server; //REAL TCP SERVER POINTER
         std::map<const IO*, const IO*> _events;
         std::vector<std::string> _server_names;
-        std::map<std::string, std::string> _cgi;
         std::vector<Location> _locations;
 };
 #endif

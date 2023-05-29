@@ -41,6 +41,7 @@ std::map<short int, std::string>& TcpServer::getErrorMaps() {return _error_pages
 std::vector<Server> TcpServer::getServers(void) const {return _servers;};
 const bool& TcpServer::getAutoIndexValue(void) const {return _auto_index;};
 const int& TcpServer::getEpollWs(void) const {return _epoll_ws;}
+const std::map<std::string, std::string>& TcpServer::getCgiMap() const {return _cgi;}
 const std::map<short int, std::string>& TcpServer::getErrorMaps() const {return _error_pages;}
 const size_t& TcpServer::getBodySize(void) const {return _body_size;};
 const std::string& TcpServer::getRootDir(void) const {return _root_dir;};
@@ -49,6 +50,13 @@ const std::string& TcpServer::getIndexPath(void) const {return _index_path;};
 const std::string& TcpServer::getFullIndexPath(void) const {return _full_index_path;};
 const std::string& TcpServer::getRedirect(void) const {return _redirect;};
 const std::string& TcpServer::getUploadsFilesFolder(void) const {return _upload_file_folders;}
+
+bool TcpServer::getCgiPath(const std::string& key, std::string& path)
+{
+    it_map it = _cgi.find(key);
+    path = (it != _cgi.end()) ? it -> second : "";
+    return it != _cgi.end();
+};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
@@ -109,7 +117,10 @@ void    TcpServer::setFullIndexPath(const std::string& path)
     _full_index_path = path;
 }
 
-
+void    TcpServer::pushNewCGI(const std::string& key, const std::string& value)
+{
+    _cgi[key] = value;
+}
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

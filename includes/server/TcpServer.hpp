@@ -31,6 +31,7 @@ class TcpServer: public Parser, public BitsManipulation
 
         /*GETTERS*/
         const bool& getAutoIndexValue() const;
+        bool getCgiPath(const std::string& key, std::string& path);
         std::vector<Server> getServers(void) const;
         const size_t& getBodySize(void) const;
         const std::string& getIndex(void) const;
@@ -40,6 +41,7 @@ class TcpServer: public Parser, public BitsManipulation
         const std::string& getFullIndexPath(void) const;
         const std::string& getUploadsFilesFolder(void) const;
         const std::map<short int, std::string>& getErrorMaps() const;
+        const std::map<std::string, std::string>& getCgiMap() const;
         std::map<short int, std::string>& getErrorMaps();
         const int& getEpollWs(void) const ;
 
@@ -53,6 +55,7 @@ class TcpServer: public Parser, public BitsManipulation
         void setRedirect(const std::string& redirect);
         void setIndexPath(const std::string& path);
         void setFullIndexPath(const std::string& full_index_path);
+        void pushNewCGI(const std::string& key, const std::string& value);
         void setUploadsFilesFolder(const std::string& uploads_files_folders);
 
         /*MEMBER FUNCTION*/
@@ -89,6 +92,7 @@ class TcpServer: public Parser, public BitsManipulation
         std::string _full_index_path;
         std::string _upload_file_folders;
         std::map<short int, std::string> _error_pages;
+        std::map<std::string, std::string> _cgi;
 
     private:
         int _epoll_ws;

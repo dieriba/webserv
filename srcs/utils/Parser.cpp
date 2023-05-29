@@ -292,7 +292,22 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
 
 int    Parser::fillInstance(TcpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _map)
 {
-    if (vec[0] == ALLOWED_METHOD)
+    if (vec[0] == CGI)
+    {
+        std::string path;
+        
+        if (instance.getCgiPath(vec[1], path))
+            throw ExceptionThrower("CGI " + vec[1] + " already exists with path: " + vec[2]);
+
+        if (vec[1].find(';') != std::string::npos || (UtilityMethod::count(vec[2], ';') > 1))
+            throw ExceptionThrower("Bad Syntax");
+        
+        if (*(vec.rbegin() -> rbegin()) != ';')
+            throw ExceptionThrower("Missing Semicolon At the End");
+        vec[2].erase(vec[2].size() - 1);
+        instance.pushNewCGI(vec[1], vec[2]);
+    }
+    else if (vec[0] == ALLOWED_METHOD)
         return setAllowedMethods(instance, vec, _map);
     else if (vec[0] == ERROR_PAGE)
         return handleErrorPages(instance, vec);
@@ -401,21 +416,6 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
             SemicolonCheck(vec[i], i, len);
             server.pushNewServerName(vec[i]);
         }
-    }
-    else if (vec[0] == CGI)
-    {
-        std::string path;
-        
-        if (server.getCgiPath(vec[1], path))
-            throw ExceptionThrower("CGI " + vec[1] + " already exists with path: " + vec[2]);
-
-        if (vec[1].find(';') != std::string::npos || (UtilityMethod::count(vec[2], ';') > 1))
-            throw ExceptionThrower("Bad Syntax");
-        
-        if (*(vec.rbegin() -> rbegin()) != ';')
-            throw ExceptionThrower("Missing Semicolon At the End");
-        vec[2].erase(vec[2].size() - 1);
-        server.pushNewCGI(vec[1], vec[2]);
     }
     else if (fillInstance(static_cast<TcpServer&>(server), vec, _serv_conf) == 0)
         setCommonDirectives(vec, _serv_conf);

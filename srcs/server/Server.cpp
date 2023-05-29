@@ -60,12 +60,6 @@ Server::~Server()
 const int& Server::getServSocket(void) const {return _serv_socket;};
 const std::string& Server::getIp(void) const {return _ip;};
 const unsigned int& Server::getPort(void) const {return _port;};
-bool Server::getCgiPath(const std::string& key, std::string& path)
-{
-    it_map it = _cgi.find(key);
-    path = (it != _cgi.end()) ? it -> second : "";
-    return it != _cgi.end();
-};
 const std::vector<Location>& Server::getLocations(void) const {return _locations;};
 TcpServer *Server::getTcpServer(void) const {return _tcp_server;};
 std::vector<Location>& Server::getLocations(void) {return _locations;}
@@ -93,11 +87,6 @@ void    Server::pushNewLocation(const Location& location)
 {
     _locations.push_back(location);
 };
-
-void    Server::pushNewCGI(const std::string& key, const std::string& value)
-{
-    _cgi[key] = value;
-}
 
 void    Server::setServSocket(const int& socket)
 {

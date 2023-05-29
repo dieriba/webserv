@@ -122,6 +122,7 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
         if (s_buffer.find(END_CHUNK) == 0)
         {
             if (s_buffer.size() != LEN_END_CHUNK) return BAD_REQUEST;
+            updateCurrentChunkSize(LEN_END_CHUNK - LEN_CRLF);
             std::cout << "Total body size: " << post.getRequestBodySize() << std::endl;
             post.clearRequestBodySize();
             outfile.close();
