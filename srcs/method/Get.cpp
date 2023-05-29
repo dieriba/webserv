@@ -38,11 +38,8 @@ int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
         std::ifstream& file = res.getFile();
         
         file.read(buffer, REQUEST_SIZE);
-        if (sendBuffer(event.getFd(), buffer, file.gcount()))
-        {
-            std::cout << "An error occurred with client: " << event.getFd() << std::endl;
-            return (IO::IO_ERROR);
-        }
+
+        if (sendBuffer(event.getFd(), buffer, file.gcount())) return (IO::IO_ERROR);
 
         len += file.gcount();
         if (file.fail() && file.eof())
@@ -60,7 +57,10 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     TcpServer& instance = *(event.getServer() -> getInstance());
     std::string full_path(req.getHeaders().find(FULLPATH) -> second);
     
-    int directory = UtilityMethod::is_a_directory(res.getPath().c_str());
+    size_t directory = res.checkBits(HttpResponse::DIRECTORY);
+
+    //std::cout << "AutoIndex option is: " << (instance.getAutoIndexValue() ? "on" : "off") << std::endl;
+    //std::cout << "DIRECTORY" << (directory > 0 ? ": yes" : ": no") << std::endl;
 
     if ((directory && instance.getAutoIndexValue()) || directory == 0)
     {
@@ -92,7 +92,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     }
     else if (directory)
     {
-        res.setOptions(HttpResponse::DIRECTORY, SET);
+
     }
     res.setOptions(HttpResponse::STARTED, SET);
     
@@ -108,30 +108,19 @@ int Get::handleDirectoryRessource(IO& event, DIR *directory)
 
 int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 {
-    if (!res.checkBits(HttpResponse::REDIRECT_SET))
-    {
-        if (!res.checkBits(HttpResponse::STARTED))
-        {
-            int err = firstStep(event, req, res);
-            if (err) return err;
-        }
+    if (res.checkBits(HttpResponse::REDIRECT_SET)) return sendRedirect(event, res, FOUND_REDIRECT);
 
-        if (res.checkBits(HttpResponse::FILE))
-        {
-            return handleFileRessource(event, req, res);
-        }
-    }
-    else
+    if (!res.checkBits(HttpResponse::STARTED))
     {
-        if (sendBuffer(event.getFd(), FOUND_REDIRECT, UtilityMethod::myStrlen(FOUND_REDIRECT)))
-            return IO::IO_ERROR;
-        const std::string& link = event.getServer() -> getInstance() -> getRedirect();
-        
-        if (sendBuffer(event.getFd(), link.c_str(), link.size()) || sendBuffer(event.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
-            return IO::IO_ERROR;
-            
-        res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+        int err = firstStep(event, req, res);
+        if (err) return err;
     }
+
+    if (res.checkBits(HttpResponse::FILE))
+    {
+        return handleFileRessource(event, req, res);
+    }
+    
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

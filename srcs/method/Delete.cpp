@@ -25,23 +25,20 @@ Delete::~Delete(){};
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 int Delete::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 {
-    if (!res.checkBits(HttpResponse::REDIRECT_SET))
-    {
+    if (res.checkBits(HttpResponse::REDIRECT_SET)) return sendRedirect(event, res, FOUND_REDIRECT_IND_METHOD);
 
-    }
-    else
+    const std::string& full_path(req.getHeaders().find(FULLPATH) -> second);
+
+    res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+
+    if (std::remove(full_path.c_str()) != 0)
     {
-        if (sendBuffer(event.getFd(), FOUND_REDIRECT_IND_METHOD, UtilityMethod::myStrlen(FOUND_REDIRECT_IND_METHOD)))
+        if (sendBuffer(event.getFd(), SERVER_ERROR_PAGE_FORBIDDEN, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_FORBIDDEN)))
             return IO::IO_ERROR;
-        const std::string& link = event.getServer() -> getInstance() -> getRedirect();
-        
-        if (sendBuffer(event.getFd(), link.c_str(), link.size()) || sendBuffer(event.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
-            return IO::IO_ERROR;
-            
-        res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     }
-    (void)req;
-    (void)res;
+    else if (sendBuffer(event.getFd(), SERVER_SUCCESS_DELETE_RESPONSE, UtilityMethod::myStrlen(SERVER_SUCCESS_DELETE_RESPONSE)))
+            return IO::IO_ERROR;
+    
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

@@ -22,6 +22,7 @@ class Method
 
         /*MEMBER FUNCTION*/
         int sendBuffer(int client_socket, const char *buffer, int bytes);
+        int sendRedirect(const IO& event, HttpResponse& res, const char *status_line);
         void makeStatusLine(const int& status);
         void appendToResponse(const std::string& key, const std::string& value);
 

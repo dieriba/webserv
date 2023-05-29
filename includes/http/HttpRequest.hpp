@@ -28,6 +28,7 @@ class HttpRequest: public HttpMessage, public BitsManipulation
             STARTED,
             MULTIPART_DATA,
             NO_ENCODING,
+            DIRECTORY
         };
 
         /*GETTERS*/

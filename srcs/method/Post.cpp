@@ -116,7 +116,6 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
     {
         if (req.checkBits(HttpRequest::STARTED) == 0)
         {
-            std::cout << "Entered " << std::endl;
             size_t start = 0;
 
             if (req.checkBits(HttpRequest::CARRIAGE_FEED))
@@ -237,38 +236,26 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
 
 int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 {
-    if (!res.checkBits(HttpResponse::REDIRECT_SET))
+    if (res.checkBits(HttpResponse::REDIRECT_SET)) return sendRedirect(event, res, FOUND_REDIRECT_POST);
+
+    if (event.getEvents() & EPOLLIN)
     {
-        if (event.getEvents() & EPOLLIN)
-        {
-            if (req.checkBits(HttpRequest::MULTIPART_DATA))
-                return handleMultipartData(event, req);
-            else
-            {
-                if (req.checkBits(HttpRequest::CONTENT_LENGTH))
-                    return writeToFile(req);
-                return req.fillChunkBody(*this);
-            }
-        }
+        if (req.checkBits(HttpRequest::MULTIPART_DATA))
+            return handleMultipartData(event, req);
         else
         {
-            if (sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, UtilityMethod::myStrlen(SERVER_SUCCESS_POST_RESPONSE)))
-            {
-                res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
-                return IO::IO_ERROR;
-            }
-            res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+            if (req.checkBits(HttpRequest::CONTENT_LENGTH))
+                return writeToFile(req);
+            return req.fillChunkBody(*this);
         }
     }
     else
     {
-        if (sendBuffer(event.getFd(), FOUND_REDIRECT_POST, UtilityMethod::myStrlen(FOUND_REDIRECT_POST)))
+        if (sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, UtilityMethod::myStrlen(SERVER_SUCCESS_POST_RESPONSE)))
+        {
+            res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
             return IO::IO_ERROR;
-        const std::string& link = event.getServer() -> getInstance() -> getRedirect();
-        
-        if (sendBuffer(event.getFd(), link.c_str(), link.size()) || sendBuffer(event.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
-            return IO::IO_ERROR;
-            
+        }
         res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     }
     return IO::IO_SUCCESS;

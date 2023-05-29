@@ -82,7 +82,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         }
 
         if (_response.getHttpMethod() == NULL)
-            _response.setMethodObj((_req < 10 ? Method::_tab[_request.getMethod()]() : Method::_tab[3]()));
+            _response.setMethodObj((_req < 10 ? Method::_tab[_request.getMethod()]() : Method::_tab[TcpServer::ERROR]()));
 
         resetOptions();
 

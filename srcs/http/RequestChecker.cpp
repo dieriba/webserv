@@ -62,8 +62,10 @@ int RequestChecker::checkAll(IO& object, HttpRequest& req)
 
 int RequestChecker::checkDeleteMethod(const TcpServer& instance, HttpRequest& req)
 {
+    std::map<std::string, std::string>& _map = req.getHeaders();
+
+    if ((_map.find(CONTENT_LEN) != _map.end()) || (_map.find(TRANSFERT_ENCODING) != _map.end())) return BAD_REQUEST;
     (void)instance;
-    (void)req;
     return IO::IO_SUCCESS;
 }
 
@@ -139,34 +141,38 @@ int RequestChecker::checkHeader(const TcpServer& instance, HttpRequest& req)
         return checkGetMethod(instance, req);
     else if (req.getMethod() == TcpServer::POST)
         return checkPostMethod(instance, req);
+    else if (req.getMethod() == TcpServer::DELETE)
+        return checkDeleteMethod(instance, req);
 
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest& req)
+int RequestChecker::checkValidPath(const TcpServer *instance, HttpRequest& req)
 {
     if (instance -> getRootDir().size() == 0) return NOT_FOUND;
     
-    const std::string& full_path(req.getHeaders().find(FULLPATH) -> second);
+    const std::string& full_path(req.getHeaders()[FULLPATH]);
     
+    std::string dir_path = instance -> getRootDir() + req.getHeaders()[PATH];
+
     size_t i = full_path.rfind('/');
         
     if (i == std::string::npos) return BAD_REQUEST;
 
     const char *root_c = full_path.c_str();
+    char *alias_root = (char *)root_c;
+    char stop = root_c[i + 1];
 
-    if (req.getMethod() != TcpServer::POST)
+    if (UtilityMethod::is_a_directory(dir_path.c_str())) req.setOptions(HttpRequest::DIRECTORY, SET);
+
+    if (req.getMethod() == TcpServer::GET)
     {
-        if (access(root_c, F_OK) != 0)
-            return NOT_FOUND;
+        if (access(root_c, F_OK) != 0) return NOT_FOUND;
         
-        if (req.getMethod() == TcpServer::GET && (access(root_c, R_OK) != 0))
-            return FORBIDEN;
+        if ((access(root_c, R_OK) != 0)) return FORBIDEN;
     }
     else if (req.getMethod() == TcpServer::POST)
     {
-        char *alias_root = (char *)root_c;
-        char stop = root_c[i + 1];
         
         if (!req.checkBits(HttpRequest::MULTIPART_DATA) && req.getHeaders().find(PATH) -> second != instance -> getIndexPath())
             alias_root[i + 1] = 0;
@@ -178,18 +184,28 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
         if (access(alias_root, W_OK) && errno == EACCES) return FORBIDEN;
 
     }
+    else if (req.getMethod() == TcpServer::DELETE)
+    {
+        alias_root[i + 1] = 0;
 
-    return 0;
+        if (req.checkBits(HttpRequest::DIRECTORY) || access(alias_root, W_OK | X_OK) != 0) return FORBIDEN;
+
+        alias_root[i + 1] = stop;
+
+        if (access(root_c, F_OK) != 0) return NOT_FOUND;
+    }
+
+    return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkAllowedMethod(const TcpServer *instance, const HttpRequest& req)
+int RequestChecker::checkAllowedMethod(const TcpServer *instance, HttpRequest& req)
 {
     if (instance -> checkBits(req.getMethod()) == 0) return METHOD_NOT_ALLOWED;
     
-    return 0;
+    return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkBodySize(const TcpServer *instance, const HttpRequest& req)
+int RequestChecker::checkBodySize(const TcpServer *instance, HttpRequest& req)
 {
     if ((instance -> getBodySize() != std::string::npos) && (req.getBodySize() > instance -> getBodySize()))                                                                            
         return TOO_LARGE_CONTENT;

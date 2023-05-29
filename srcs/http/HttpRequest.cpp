@@ -276,6 +276,8 @@ int HttpRequest::parseRequest(IO& object)
 
     int _req = RequestChecker::checkAll(object, (*this));
 
+    if (checkBits(HttpRequest::DIRECTORY)) object.getReponse().setOptions(HttpResponse::DIRECTORY, SET);
+
     std::cout << "Req value: " << _req << std::endl;
     
     if (_req != 0)  return _req;

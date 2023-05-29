@@ -43,6 +43,20 @@ int Method::sendBuffer(int client_socket, const char *buffer, int bytes)
     return IO::IO_SUCCESS;
 }
 
+int Method::sendRedirect(const IO& event, HttpResponse& res, const char *status_line)
+{
+    if (sendBuffer(event.getFd(), status_line, UtilityMethod::myStrlen(status_line)))
+            return IO::IO_ERROR;
+    
+    const std::string& redirect_url = event.getServer() -> getInstance() -> getRedirect();
+
+    if (sendBuffer(event.getFd(), redirect_url.c_str(), redirect_url.size()) || sendBuffer(event.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
+        return IO::IO_ERROR;
+            
+    res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+    return IO::IO_SUCCESS;
+}
+
 void Method::makeStatusLine(const int& status)
 {
     std::string version(HTTP_VERSION);
