@@ -24,7 +24,10 @@ class HttpRequest: public HttpMessage, public BitsManipulation
             CHUNK_SET,
             CHUNKED_FINISHED,
             CARRIAGE_FEED,
-            CGI_STREAM = 8
+            CGI_STREAM = 8,
+            STARTED,
+            MULTIPART_DATA,
+            NO_ENCODING,
         };
 
         /*GETTERS*/
@@ -36,7 +39,7 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         std::ofstream& getOutfile(void);
 
         /*MEMBER FUNCTION*/
-        int fillChunkBody(IO& object, Post& post);
+        int fillChunkBody(Post& post);
         int open_file(IO& event);
         int open_file(IO& event, std::string& filepath);
         int parseRequest(IO& object);

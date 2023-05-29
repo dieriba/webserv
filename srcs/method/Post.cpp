@@ -77,7 +77,7 @@ int Post::writeToFile(HttpRequest& req, const size_t& pos, const size_t& bytes)
 }
 
 
-int Post::writeToFile(IO& object, HttpRequest& req)
+int Post::writeToFile(HttpRequest& req)
 {
     std::ofstream& outfile = req.getOutfile();
     try
@@ -89,7 +89,7 @@ int Post::writeToFile(IO& object, HttpRequest& req)
         if (getRequestBodySize() >= req.getBodySize())
         {
             std::cout << _request_body_size << std::endl;
-            object.setOptions(HttpRequest::FINISH_BODY, SET);
+            req.setOptions(HttpRequest::FINISH_BODY, SET);
             clearRequestBodySize();
             outfile.close();
         }
@@ -114,19 +114,19 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
 
     while (1)
     {
-        if (req.checkBits(HttpResponse::STARTED) == 0)
+        if (req.checkBits(HttpRequest::STARTED) == 0)
         {
             std::cout << "Entered " << std::endl;
             size_t start = 0;
 
-            if (event.checkBits(HttpRequest::CARRIAGE_FEED))
+            if (req.checkBits(HttpRequest::CARRIAGE_FEED))
             {
                 size_t pos = s_buffer.find_first_not_of(CRLF);
 
                 if (pos == std::string::npos || pos != LEN_CRLF) return BAD_REQUEST;
 
                 start = pos;
-                event.setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
+                req.setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
             }
 
             size_t pos_one = s_buffer.find(CRLF, start);
@@ -174,10 +174,10 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
 
             s_buffer.erase(0, pos_two + LEN_CRLF + LEN_CRLF);
             
-            req.setOptions(HttpResponse::STARTED, SET);
+            req.setOptions(HttpRequest::STARTED, SET);
         }
   
-        if (req.checkBits(HttpResponse::STARTED))
+        if (req.checkBits(HttpRequest::STARTED))
         {
             size_t boundary_br = s_buffer.find(CRLF + boundary);
             size_t size = boundary_br;
@@ -197,7 +197,7 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
                     size = pos_crlf;
             }
             else
-                event.setOptions(HttpRequest::CARRIAGE_FEED, SET);
+                req.setOptions(HttpRequest::CARRIAGE_FEED, SET);
             
             if (req.getOutfile().is_open() && size > 0)
             {
@@ -225,12 +225,11 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
             {
                 updateSize(end_boundary.size() + LEN_CRLF + LEN_CRLF);
                 std::cout << "request body: " << _request_body_size << std::endl;
-                req.resetOptions();
-                event.setOptions(HttpRequest::FINISH_BODY, SET);
+                req.setOptions(HttpRequest::FINISH_BODY, SET);
                 break;
             }
-            req.setOptions(HttpResponse::STARTED, CLEAR);
 
+            req.setOptions(HttpRequest::STARTED, CLEAR);
         }
     }
     return IO::IO_SUCCESS;
@@ -242,13 +241,13 @@ int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
     {
         if (event.getEvents() & EPOLLIN)
         {
-            if (res.checkBits(HttpResponse::MULTIPART_DATA))
+            if (req.checkBits(HttpRequest::MULTIPART_DATA))
                 return handleMultipartData(event, req);
             else
             {
-                if (event.checkBits(HttpRequest::CONTENT_LENGTH))
-                    return writeToFile(event, req);
-                return req.fillChunkBody(event, *this);
+                if (req.checkBits(HttpRequest::CONTENT_LENGTH))
+                    return writeToFile(req);
+                return req.fillChunkBody(*this);
             }
         }
         else

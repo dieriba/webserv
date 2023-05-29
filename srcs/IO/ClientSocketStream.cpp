@@ -68,31 +68,28 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
 
     char *end_header = UtilityMethod::mystrstr(_request.getBuffer().c_str(), CRLF CRLF);
     
-    if (end_header != NULL || (checkBits(HttpRequest::CONTENT_LENGTH) || checkBits(HttpRequest::TRANSFER_ENCODING)))
+    if (end_header != NULL || (_request.checkBits(HttpRequest::CONTENT_LENGTH) || _request.checkBits(HttpRequest::TRANSFER_ENCODING)))
     {
-        int req = _request.parseRequest(*this);
+        int _req = _request.parseRequest(*this);
 
-        if (!req && ((checkBits(HttpRequest::CONTENT_LENGTH) || checkBits(HttpRequest::TRANSFER_ENCODING)) && !checkBits(HttpRequest::FINISH_BODY)))
+        if (!_req && ((_request.checkBits(HttpRequest::CONTENT_LENGTH) || _request.checkBits(HttpRequest::TRANSFER_ENCODING)) && !_request.checkBits(HttpRequest::FINISH_BODY)))
         {
-            int res = _response.serveResponse((*this), _request);
-            if (res)
-            {
-                _response.switchMethod((*this), TcpServer::ERROR, res);
-                req = res;
-            }
-            else if (!checkBits(HttpRequest::FINISH_BODY))
+            _req = _response.serveResponse((*this), _request);
+            if (_req)
+                _response.switchMethod((*this), TcpServer::ERROR, _req);
+            else if (!_request.checkBits(HttpRequest::FINISH_BODY))
                 return IO::IO_SUCCESS;
         }
 
         if (_response.getHttpMethod() == NULL)
-            _response.setMethodObj((req < 10 ? Method::_tab[_request.getMethod()]() : Method::_tab[3]()));
+            _response.setMethodObj((_req < 10 ? Method::_tab[_request.getMethod()]() : Method::_tab[3]()));
 
         resetOptions();
 
-        setErrorStatus(req);
+        setErrorStatus(_req);
 
         _request.getBuffer().clear();
-        
+
         UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
     }
     

@@ -57,18 +57,18 @@ void HttpRequest::clearCurrentChunkSize(void)
     _current_chunk_size = 0;
 }
 
-int HttpRequest::fillChunkBody(IO& object, Post& post)
+int HttpRequest::fillChunkBody(Post& post)
 {
 
     while (1)
     {
         size_t pos = 0;
         
-        if (object.checkBits(HttpRequest::CHUNK_SET) == 0)
+        if (checkBits(HttpRequest::CHUNK_SET) == 0)
         {
             size_t start = 0;
 
-            if (object.checkBits(HttpRequest::CARRIAGE_FEED))
+            if (checkBits(HttpRequest::CARRIAGE_FEED))
             {
                 size_t pos = s_buffer.find(CRLF);
 
@@ -76,14 +76,14 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
 
                 start = LEN_CRLF;
 
-                object.setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
+                setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
             }
 
             if (getCurrentChunkSize() > 0) clearCurrentChunkSize();
 
             pos = s_buffer.find(CRLF, start);
 
-            if (pos == std::string::npos)  return (object.setOptions(HttpRequest::CARRIAGE_FEED, SET), IO::IO_SUCCESS);
+            if (pos == std::string::npos)  return (setOptions(HttpRequest::CARRIAGE_FEED, SET), IO::IO_SUCCESS);
             
             pos += LEN_CRLF;
 
@@ -97,7 +97,7 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
             
             if (getChunkSize() == std::string::npos) return BAD_REQUEST;
 
-            object.setOptions(HttpRequest::CHUNK_SET, SET);
+            setOptions(HttpRequest::CHUNK_SET, SET);
         }
 
         size_t size = getChunkSize() - getCurrentChunkSize();
@@ -115,8 +115,8 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
 
         if (getCurrentChunkSize() == getChunkSize())
         {
-            object.setOptions(HttpRequest::CHUNK_SET, CLEAR);
-            object.setOptions(HttpRequest::CARRIAGE_FEED, SET);
+            setOptions(HttpRequest::CHUNK_SET, CLEAR);
+            setOptions(HttpRequest::CARRIAGE_FEED, SET);
         };
 
         if (s_buffer.find(END_CHUNK) == 0)
@@ -126,7 +126,7 @@ int HttpRequest::fillChunkBody(IO& object, Post& post)
             std::cout << "Total body size: " << post.getRequestBodySize() << std::endl;
             post.clearRequestBodySize();
             outfile.close();
-            object.setOptions(HttpRequest::FINISH_BODY, SET);
+            setOptions(HttpRequest::FINISH_BODY, SET);
             return IO::IO_SUCCESS;
         }
 
@@ -195,7 +195,7 @@ int HttpRequest::open_file(IO& event)
 
 int HttpRequest::parseRequest(IO& object)
 {
-    if (object.checkBits(HttpRequest::CONTENT_LENGTH) || object.checkBits(HttpRequest::TRANSFER_ENCODING))
+    if (checkBits(HttpRequest::CONTENT_LENGTH) || checkBits(HttpRequest::TRANSFER_ENCODING))
         return 0;
     
     std::vector<std::string> headers = UtilityMethod::stringSpliter(s_buffer.substr(0, s_buffer.find(CRLF CRLF)), CRLF);
@@ -266,15 +266,15 @@ int HttpRequest::parseRequest(IO& object)
     _it_transfert = _headers.find(TRANSFERT_ENCODING);
 
     if (_it_transfert != _headers.end())
-        object.setOptions(HttpRequest::TRANSFER_ENCODING, SET);
+        setOptions(HttpRequest::TRANSFER_ENCODING, SET);
 
     if (_it_content != _headers.end())
     {
-        object.setOptions(HttpRequest::CONTENT_LENGTH, SET);
+        setOptions(HttpRequest::CONTENT_LENGTH, SET);
         setBodySize(_it_content -> second);
     }
 
-    int _req = RequestChecker::checkAll(object, (*this), object.getReponse());
+    int _req = RequestChecker::checkAll(object, (*this));
 
     std::cout << "Req value: " << _req << std::endl;
     
@@ -282,12 +282,11 @@ int HttpRequest::parseRequest(IO& object)
     
     if (_it_transfert != _headers.end() || _it_content != _headers.end())
     {
-        HttpRequest& req = object.getRequest();
         HttpResponse& res = object.getReponse();
 
-        res.setMethodObj(Method::_tab[req.getMethod()]());
+        res.setMethodObj(Method::_tab[getMethod()]());
 
-        if (res.checkBits(HttpResponse::NO_ENCODING)) open_file(object);
+        if (checkBits(HttpRequest::NO_ENCODING)) open_file(object);
 
     }
 

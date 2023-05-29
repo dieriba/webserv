@@ -36,13 +36,13 @@ const TcpServer *RequestChecker::serverOrLocation(const Server& server, const Ht
     return &server;
 }
 
-int RequestChecker::checkAll(IO& object, HttpRequest& req, HttpResponse& res)
+int RequestChecker::checkAll(IO& object, HttpRequest& req)
 {
     Server& server = *(object.getServer());
     
     const TcpServer *instance = server.getInstance();
     
-    int _res = checkHeader(*(instance), req, res);
+    int _res = checkHeader(*(instance), req);
     
     if (_res) return _res;
 
@@ -60,15 +60,14 @@ int RequestChecker::checkAll(IO& object, HttpRequest& req, HttpResponse& res)
     return _res;
 }
 
-int RequestChecker::checkDeleteMethod(const TcpServer& instance, HttpRequest& req, HttpResponse& res)
+int RequestChecker::checkDeleteMethod(const TcpServer& instance, HttpRequest& req)
 {
     (void)instance;
     (void)req;
-    (void)res;
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkPostMethod(const TcpServer& instance, HttpRequest& req, HttpResponse& res)
+int RequestChecker::checkPostMethod(const TcpServer& instance, HttpRequest& req)
 {
     std::map<std::string, std::string>& _map = req.getHeaders();
 
@@ -101,7 +100,7 @@ int RequestChecker::checkPostMethod(const TcpServer& instance, HttpRequest& req,
         
         _map[BOUNDARY] = DOUBLE_HIPHEN + it -> second.erase(0, len);
         _map[END_BOUNDARY] = DOUBLE_HIPHEN + it -> second + DOUBLE_HIPHEN;
-        res.setOptions(HttpResponse::MULTIPART_DATA, SET);       
+        req.setOptions(HttpRequest::MULTIPART_DATA, SET);       
     }
     else
     {
@@ -112,16 +111,15 @@ int RequestChecker::checkPostMethod(const TcpServer& instance, HttpRequest& req,
 
         if (path != instance.getIndexPath() && _pathMimeType != it -> second) return BAD_REQUEST;
 
-        res.setOptions(HttpResponse::NO_ENCODING, SET);       
+        req.setOptions(HttpRequest::NO_ENCODING, SET);       
     }
 
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkGetMethod(const TcpServer& instance, HttpRequest& req, HttpResponse& res)
+int RequestChecker::checkGetMethod(const TcpServer& instance, HttpRequest& req)
 {
     (void)instance;
-    (void)res;
     std::map<std::string, std::string>& _map = req.getHeaders();
 
     if ((_map.find(CONTENT_LEN) != _map.end()) || (_map.find(TRANSFERT_ENCODING) != _map.end())) return BAD_REQUEST;
@@ -129,7 +127,7 @@ int RequestChecker::checkGetMethod(const TcpServer& instance, HttpRequest& req, 
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkHeader(const TcpServer& instance, HttpRequest& req, HttpResponse& res)
+int RequestChecker::checkHeader(const TcpServer& instance, HttpRequest& req)
 {
     std::map<std::string, std::string> _map = req.getHeaders();
 
@@ -138,9 +136,9 @@ int RequestChecker::checkHeader(const TcpServer& instance, HttpRequest& req, Htt
     if (_map[VERSION] != HTTP_VERSION) return VERSION_NOT_SUPPORTED;
 
     if (req.getMethod() == TcpServer::GET)
-        return checkGetMethod(instance, req, res);
+        return checkGetMethod(instance, req);
     else if (req.getMethod() == TcpServer::POST)
-        return checkPostMethod(instance, req, res);
+        return checkPostMethod(instance, req);
 
     return IO::IO_SUCCESS;
 }
@@ -150,6 +148,10 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
     if (instance -> getRootDir().size() == 0) return NOT_FOUND;
     
     const std::string& full_path(req.getHeaders().find(FULLPATH) -> second);
+    
+    size_t i = full_path.rfind('/');
+        
+    if (i == std::string::npos) return BAD_REQUEST;
 
     const char *root_c = full_path.c_str();
 
@@ -163,19 +165,14 @@ int RequestChecker::checkValidPath(const TcpServer *instance, const HttpRequest&
     }
     else if (req.getMethod() == TcpServer::POST)
     {
-
-        size_t i = full_path.rfind('/');
-        
-        if (i == std::string::npos) return BAD_REQUEST;
-
         char *alias_root = (char *)root_c;
         char stop = root_c[i + 1];
-        if (req.getHeaders().find(PATH) -> second != instance -> getIndexPath())
-        {
-            alias_root = (char *)root_c;
+        
+        if (!req.checkBits(HttpRequest::MULTIPART_DATA) && req.getHeaders().find(PATH) -> second != instance -> getIndexPath())
             alias_root[i + 1] = 0;
-        }
+        
         if (UtilityMethod::is_a_directory(alias_root) == 0) return NOT_FOUND;
+        
         alias_root[i + 1] = stop;
 
         if (access(alias_root, W_OK) && errno == EACCES) return FORBIDEN;

@@ -25,10 +25,9 @@ class HttpResponse: public HttpMessage, public BitsManipulation
             FILE,
             DIRECTORY,
             FINISHED_RESPONSE,
-            MULTIPART_DATA,
             APPLICATION_FORM_URLENCODED,
             NO_ENCODING,
-            REDIRECT_SET = 8
+            REDIRECT_SET
         };
         
         /*GETTER*/

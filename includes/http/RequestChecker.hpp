@@ -21,11 +21,11 @@ class RequestChecker
         static int checkValidPath(const TcpServer *instance, const HttpRequest& req);
         static int checkAllowedMethod(const TcpServer *instance, const HttpRequest& req);
         static int checkBodySize(const TcpServer *instance, const HttpRequest& req);
-        static int checkAll(IO& object, HttpRequest& req, HttpResponse& res);
-        static int checkGetMethod(const TcpServer& instance, HttpRequest& req, HttpResponse& res);
-        static int checkPostMethod(const TcpServer& instance, HttpRequest& req, HttpResponse& res);
-        static int checkDeleteMethod(const TcpServer& instance, HttpRequest& req, HttpResponse& res);
-        static int checkHeader(const TcpServer& instance, HttpRequest& req, HttpResponse& res);
+        static int checkAll(IO& object, HttpRequest& req);
+        static int checkGetMethod(const TcpServer& instance, HttpRequest& req);
+        static int checkPostMethod(const TcpServer& instance, HttpRequest& req);
+        static int checkDeleteMethod(const TcpServer& instance, HttpRequest& req);
+        static int checkHeader(const TcpServer& instance, HttpRequest& req);
         static Checker tab[10];
     
     private:

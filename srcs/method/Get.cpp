@@ -27,23 +27,6 @@ Get::~Get(){};
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-int Get::handleChunkedRequest(HttpResponse& res, std::string& s_buffer)
-{
-    _response = UtilityMethod::decimalToHex(s_buffer.size()) + CRLF + s_buffer + CRLF;
-
-    if (res.getFile().eof() && res.getFile().fail())
-    {
-        _response += "0";
-        _response += CRLF CRLF;
-        res.resetOptions();
-        res.getFile().close();
-        res.getFile().clear();
-        res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
-    }
-    //std::cout << _response;
-    return (0);
-}
-
 int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
 {
     try
