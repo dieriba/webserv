@@ -99,9 +99,14 @@ int RequestChecker::checkPostMethod(const TcpServer& instance, HttpRequest& req)
 
         if (count <= 2) return BAD_REQUEST; 
 
-        
-        _map[BOUNDARY] = DOUBLE_HIPHEN + it -> second.erase(0, len);
-        _map[END_BOUNDARY] = DOUBLE_HIPHEN + it -> second + DOUBLE_HIPHEN;
+        req.setBoundary(DOUBLE_HIPHEN + it -> second.erase(0, len));
+        req.setEndBoundary(DOUBLE_HIPHEN + it -> second + DOUBLE_HIPHEN);
+        req.setCrlfBoundary(CRLF + req.getBoundary());
+        req.setCrlfEndBoundary(CRLF + req.getEndBoundary());
+        _map[BOUNDARY] = req.getBoundary();
+        _map[END_BOUNDARY] = req.getEndBoundary();
+        _map[CRLF_BOUNDARY] = req.getCrlfBoundary();
+        _map[CRLF_END_BOUNDARY] = req.getCrlfEndBoundary();
         req.setOptions(HttpRequest::MULTIPART_DATA, SET);       
     }
     else

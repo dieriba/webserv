@@ -7,6 +7,14 @@
 class IO;
 class Post;
 
+typedef struct multipart
+{
+    std::string boundary;
+    std::string end_boundary;
+    std::string crlf_boundary;
+    std::string crlf_end_boundary;
+}   mulitipart;
+
 class HttpRequest: public HttpMessage, public BitsManipulation
 {
     public:
@@ -39,6 +47,10 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         const std::string& getChunkBody(void) const;
         std::string& getChunkBody(void);
         std::ofstream& getOutfile(void);
+        const std::string& getBoundary(void) const;
+        const std::string& getCrlfBoundary(void) const;
+        const std::string& getEndBoundary(void) const;
+        const std::string& getCrlfEndBoundary(void) const;
 
         /*MEMBER FUNCTION*/
         int fillChunkBody(Post& post);
@@ -52,6 +64,10 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         void appendToChunkBody(const std::string& chunk, const ssize_t& size);
         void clear(void);
         void appendToBuffer(const char *toAppend, const ssize_t& size);
+        void setBoundary(const std::string& boundary);
+        void setCrlfBoundary(const std::string& CrlfBoundary);
+        void setEndBoundary(const std::string& Endboundary);
+        void setCrlfEndBoundary(const std::string& CrlfEndboundary);
 
     private:
         std::string _chunk_body;
@@ -60,6 +76,7 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         size_t _current_chunk_size;
         std::ofstream outfile;
         bool _start;
+        mulitipart _form_data;
 };
 
 # endif

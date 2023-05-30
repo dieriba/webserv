@@ -61,7 +61,9 @@
 # define MIME_FILENAME "mimes_types.txt"
 # define MULTIPART_FORM_DATA "multipart/form-data"
 # define BOUNDARY "boundary"
+# define CRLF_BOUNDARY "crlf_boundary"
 # define END_BOUNDARY "end_boundary"
+# define CRLF_END_BOUNDARY "crlf_end_boundary"
 # define FORM_URLENCODED "application/x-www-form-urlencoded"
 
 /*

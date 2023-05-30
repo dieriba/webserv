@@ -11,10 +11,18 @@ HttpRequest::HttpRequest(const HttpRequest& rhs):HttpMessage(rhs),BitsManipulati
 {
     _header_size = rhs._header_size;
     _start = rhs._start;
+    _form_data.boundary = rhs._form_data.boundary;
+    _form_data.crlf_boundary = rhs._form_data.crlf_boundary;
+    _form_data.end_boundary = rhs._form_data.end_boundary;
+    _form_data.crlf_end_boundary = rhs._form_data.crlf_end_boundary;
 };
 HttpRequest& HttpRequest::operator=(const HttpRequest& rhs)
 {
     if (this == &rhs) return *this;
+    _form_data.boundary = rhs._form_data.boundary;
+    _form_data.crlf_boundary = rhs._form_data.crlf_boundary;
+    _form_data.end_boundary = rhs._form_data.end_boundary;
+    _form_data.crlf_end_boundary = rhs._form_data.crlf_end_boundary;
     _start = rhs._start;
     _header_size = rhs._header_size;
     s_buffer = rhs.s_buffer;
@@ -32,6 +40,10 @@ const size_t& HttpRequest::getCurrentChunkSize(void) const {return _current_chun
 std::string& HttpRequest::getChunkBody(void) {return _chunk_body;}
 const size_t& HttpRequest::getHeaderSize(void) const {return _header_size;}
 std::ofstream& HttpRequest::getOutfile(void) {return outfile;}
+const std::string& HttpRequest::getBoundary(void) const {return _form_data.boundary; }
+const std::string& HttpRequest::getCrlfBoundary(void) const {return _form_data.crlf_boundary; }
+const std::string& HttpRequest::getEndBoundary(void) const {return _form_data.end_boundary; }
+const std::string& HttpRequest::getCrlfEndBoundary(void) const {return _form_data.crlf_end_boundary; }
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
@@ -45,6 +57,25 @@ void HttpRequest::updateCurrentChunkSize(const size_t& chunk_size)
     _current_chunk_size += chunk_size;
 }
 
+void HttpRequest::setBoundary(const std::string& boundary)
+{
+    _form_data.boundary = boundary;
+}
+
+void HttpRequest::setEndBoundary(const std::string& end_boundary)
+{
+    _form_data.end_boundary = end_boundary;
+}
+
+void HttpRequest::setCrlfBoundary(const std::string& crlf_boundary)
+{
+    _form_data.crlf_boundary = crlf_boundary;
+}
+
+void HttpRequest::setCrlfEndBoundary(const std::string& crlf_end_boundary)
+{
+    _form_data.crlf_end_boundary = crlf_end_boundary;
+}
 /*----------------------------------------SETTER----------------------------------------*/
 void HttpRequest::appendToChunkBody(const std::string& chunk, const ssize_t& size)
 {

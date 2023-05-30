@@ -42,8 +42,9 @@ int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
         if (sendBuffer(event.getFd(), buffer, file.gcount())) return (IO::IO_ERROR);
 
         len += file.gcount();
-        if (file.fail() && file.eof())
+        if (file.fail() || file.eof())
             res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+        std::cout << "Entered" << std::endl;
     }
     catch(const std::exception& e)
     {
@@ -58,9 +59,6 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     std::string full_path(req.getHeaders().find(FULLPATH) -> second);
     
     size_t directory = res.checkBits(HttpResponse::DIRECTORY);
-
-    //std::cout << "AutoIndex option is: " << (instance.getAutoIndexValue() ? "on" : "off") << std::endl;
-    //std::cout << "DIRECTORY" << (directory > 0 ? ": yes" : ": no") << std::endl;
 
     if ((directory && instance.getAutoIndexValue()) || directory == 0)
     {
@@ -92,7 +90,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     }
     else if (directory)
     {
-
+        exit(1);
     }
     res.setOptions(HttpResponse::STARTED, SET);
     
@@ -116,10 +114,7 @@ int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
         if (err) return err;
     }
 
-    if (res.checkBits(HttpResponse::FILE))
-    {
-        return handleFileRessource(event, req, res);
-    }
+    if (res.checkBits(HttpResponse::FILE)) return handleFileRessource(event, req, res);
     
     return IO::IO_SUCCESS;
 }
