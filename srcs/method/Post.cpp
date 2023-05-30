@@ -109,7 +109,7 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
         if (req.checkBits(HttpRequest::STARTED) == 0)
         {
             size_t start = 0;
-
+            
             if (req.checkBits(HttpRequest::CARRIAGE_FEED))
             {
                 size_t pos = req.getBuffer().find_first_not_of(CRLF);
