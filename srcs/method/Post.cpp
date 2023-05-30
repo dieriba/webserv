@@ -109,10 +109,12 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
         if (req.checkBits(HttpRequest::STARTED) == 0)
         {
             size_t start = 0;
+            std::string& s_buffer = req.getBuffer();
+            const std::string& boundary = req.getBoundary();
             
             if (req.checkBits(HttpRequest::CARRIAGE_FEED))
             {
-                size_t pos = req.getBuffer().find_first_not_of(CRLF);
+                size_t pos = s_buffer.find_first_not_of(CRLF);
 
                 if (pos == std::string::npos || pos != LEN_CRLF) return BAD_REQUEST;
 
@@ -120,17 +122,17 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
                 req.setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
             }
 
-            size_t pos_one = req.getBuffer().find(CRLF, start);
+            size_t pos_one = s_buffer.find(CRLF, start);
 
             if (pos_one == std::string::npos) return (IO::IO_SUCCESS);
 
-            if (req.getBuffer().find(req.getBoundary(), start) != start) return BAD_REQUEST;
+            if (s_buffer.find(boundary, start) != start) return BAD_REQUEST;
             
-            size_t pos_two = req.getBuffer().find(CRLF, start + req.getBoundary().size() + LEN_CRLF);
+            size_t pos_two = s_buffer.find(CRLF, start + boundary.size() + LEN_CRLF);
 
             if (pos_two == std::string::npos) return (IO::IO_SUCCESS);
 
-            std::string content_disp = req.getBuffer().substr(start + req.getBoundary().size() + LEN_CRLF, pos_two - (start + req.getBoundary().size() + LEN_CRLF));
+            std::string content_disp = s_buffer.substr(start + boundary.size() + LEN_CRLF, pos_two - (start + boundary.size() + LEN_CRLF));
 
             std::vector<std::string> vec = UtilityMethod::stringSpliter(content_disp, ";");
 
@@ -138,13 +140,13 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
 
             if (vec.size() == 3)
             {
-                size_t pos_three = req.getBuffer().find(CRLF, pos_two + LEN_CRLF);
+                size_t pos_three = s_buffer.find(CRLF, pos_two + LEN_CRLF);
                 
                 std::vector<std::string> vector_filename = UtilityMethod::stringSpliter(*(vec.rbegin()), "=");
                 
                 if (vector_filename.size() != 2) return BAD_REQUEST;
 
-                std::string content = req.getBuffer().substr(pos_two + LEN_CRLF, pos_three - (pos_two + LEN_CRLF));
+                std::string content = s_buffer.substr(pos_two + LEN_CRLF, pos_three - (pos_two + LEN_CRLF));
                 
                 std::vector<std::string> vec_content_type = UtilityMethod::stringSpliter(content, ": ");
                 
@@ -163,7 +165,7 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
 
             updateSize(pos_two + LEN_CRLF + LEN_CRLF);
 
-            req.getBuffer().erase(0, pos_two + LEN_CRLF + LEN_CRLF);
+            s_buffer.erase(0, pos_two + LEN_CRLF + LEN_CRLF);
             
             req.setOptions(HttpRequest::STARTED, SET);
         }
