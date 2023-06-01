@@ -31,6 +31,9 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         };
         
         /*GETTER*/
+        const int& getReadEnd(void) const;
+        const int& getWriteEnd(void) const;
+        int *getPipes(void);
         Error& getErrorMethod(void);
         Method *getHttpMethod(void) const;
         Method *getHttpMethod(void);
@@ -49,6 +52,7 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         int switchMethod(IO& event, const short int& method, const short int& status);
 
     private:
+        int     _pipes[2];
         std::string _path_req;
         Method  *_method;
         Error   _error;

@@ -1,7 +1,7 @@
 #ifndef __SERVER_HPP_
 #define __SERVER_HPP_
 
-# include "TcpServer.hpp"
+# include "HttpServer.hpp"
 # include "../IO/IO.hpp"
 # include "../utils/CommonLib.hpp"
 
@@ -9,7 +9,7 @@ typedef std::map<std::string, std::string>::iterator it_map;
 
 class Location;
 
-class Server: public TcpServer
+class Server: public HttpServer
 {
     public:
         Server();
@@ -18,23 +18,23 @@ class Server: public TcpServer
         ~Server();
 
         /*GETTERS*/
-        TcpServer *getTcpServer(void) const;
+        HttpServer *getHttpServer(void) const;
         const int& getServSocket(void) const;
         const std::string& getIp(void) const;
         const unsigned int& getPort(void) const;
         const std::vector<Location>& getLocations(void) const;
         std::vector<Location>& getLocations(void);
         std::vector<std::string> getServerNames(void) const;
-        TcpServer *getInstance(void) const;
+        HttpServer *getInstance(void) const;
 
         /*Setters*/
-        void    setTcpServer(TcpServer *tcp_server);
+        void    setHttpServer(HttpServer *tcp_server);
         void    setPort(const unsigned int& port);
         void    pushNewServerName(const std::string& server_name);
         void    pushNewLocation(const Location& server_name);
         void    setIp(const std::string& ip);
         void    setServSocket(const int& socket);
-        void    setInstance(TcpServer* instance);
+        void    setInstance(HttpServer* instance);
 
         /*MEMBER FUNCTION*/
         void addToEventsMap(const IO* event);
@@ -46,8 +46,8 @@ class Server: public TcpServer
         struct sockaddr_in _serv_address;
         unsigned int    _port;
         std::string _ip;
-        TcpServer *_instance; //POLYMORPHISM
-        TcpServer *_tcp_server; //REAL TCP SERVER POINTER
+        HttpServer *_instance; //POLYMORPHISM
+        HttpServer *_tcp_server; //REAL TCP SERVER POINTER
         std::map<const IO*, const IO*> _events;
         std::vector<std::string> _server_names;
         std::vector<Location> _locations;

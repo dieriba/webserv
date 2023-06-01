@@ -2,9 +2,9 @@
 # include "../../includes/server/Location.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-Server::Server():TcpServer(),_serv_socket(-1),_tcp_server(NULL){};
+Server::Server():HttpServer(),_serv_socket(-1),_tcp_server(NULL){};
 
-Server::Server(const Server& rhs):TcpServer(rhs)
+Server::Server(const Server& rhs):HttpServer(rhs)
 {
     _serv_socket = rhs._serv_socket;
     _ip = rhs._ip;
@@ -40,11 +40,11 @@ Server::~Server()
 {
     if (_serv_socket != -1) close(_serv_socket);
     
-    if (getTcpServer() != NULL)
+    if (getHttpServer() != NULL)
     {
         std::map<const IO*, const IO*>::const_iterator it = _events.begin();
         std::map<const IO*, const IO*>::const_iterator end = _events.end();
-        int _ws = getTcpServer() -> getEpollWs();
+        int _ws = getHttpServer() -> getEpollWs();
         
         for ( ; it != end; it++)
         {
@@ -61,10 +61,10 @@ const int& Server::getServSocket(void) const {return _serv_socket;};
 const std::string& Server::getIp(void) const {return _ip;};
 const unsigned int& Server::getPort(void) const {return _port;};
 const std::vector<Location>& Server::getLocations(void) const {return _locations;};
-TcpServer *Server::getTcpServer(void) const {return _tcp_server;};
+HttpServer *Server::getHttpServer(void) const {return _tcp_server;};
 std::vector<Location>& Server::getLocations(void) {return _locations;}
 std::vector<std::string> Server::getServerNames(void) const {return _server_names;};
-TcpServer *Server::getInstance(void) const {return _instance;}
+HttpServer *Server::getInstance(void) const {return _instance;}
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
@@ -93,12 +93,12 @@ void    Server::setServSocket(const int& socket)
     _serv_socket = socket;
 }
 
-void Server::setInstance(TcpServer* instance)
+void Server::setInstance(HttpServer* instance)
 {
     _instance = instance;
 }
 
-void Server::setTcpServer(TcpServer *tcp_server) 
+void Server::setHttpServer(HttpServer *tcp_server) 
 {
     _tcp_server = tcp_server;
 }
@@ -124,7 +124,7 @@ std::string Server::launchServer(void)
     if (bind(_serv_socket,(struct sockaddr *)&_serv_address,sizeof(_serv_address)) < 0)
         return "Failed to bind socket";
 
-    if (TcpServer::makeNonBlockingFd(_serv_socket) < 0)
+    if (HttpServer::makeNonBlockingFd(_serv_socket) < 0)
         return "Failled To Set Server Socket As Non Blocking";
 
     if (listen(_serv_socket, SOMAXCONN))

@@ -3,7 +3,7 @@
 
 # include "../utils/CommonLib.hpp"
 
-class TcpServer;
+class HttpServer;
 class Server;
 class IO;
 class HttpRequest;
@@ -12,20 +12,20 @@ class HttpResponse;
 class RequestChecker
 {
     public:
-        typedef int (*Checker)(const TcpServer *instance, HttpRequest&);
+        typedef int (*Checker)(const HttpServer *instance, HttpRequest&);
         RequestChecker();
         ~RequestChecker();
 
         /*STATIC FUNCTION*/
-        static const TcpServer* serverOrLocation(const Server& server, const HttpRequest& req);
-        static int checkValidPath(const TcpServer *instance, HttpRequest& req);
-        static int checkAllowedMethod(const TcpServer *instance, HttpRequest& req);
-        static int checkBodySize(const TcpServer *instance, HttpRequest& req);
+        static const HttpServer* serverOrLocation(const Server& server, const HttpRequest& req);
+        static int checkValidPath(const HttpServer *instance, HttpRequest& req);
+        static int checkAllowedMethod(const HttpServer *instance, HttpRequest& req);
+        static int checkBodySize(const HttpServer *instance, HttpRequest& req);
         static int checkAll(IO& object, HttpRequest& req);
-        static int checkGetMethod(const TcpServer& instance, HttpRequest& req);
-        static int checkPostMethod(const TcpServer& instance, HttpRequest& req);
-        static int checkDeleteMethod(const TcpServer& instance, HttpRequest& req);
-        static int checkHeader(const TcpServer& instance, HttpRequest& req);
+        static int checkGetMethod(const HttpServer& instance, HttpRequest& req);
+        static int checkPostMethod(const HttpServer& instance, HttpRequest& req);
+        static int checkDeleteMethod(const HttpServer& instance, HttpRequest& req);
+        static int checkHeader(const HttpServer& instance, HttpRequest& req);
         static Checker tab[10];
     
     private:

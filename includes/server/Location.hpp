@@ -2,10 +2,10 @@
 #define __LOCATION_HPP_
 
 # include "../utils/CommonLib.hpp"
-# include "TcpServer.hpp"
+# include "HttpServer.hpp"
 
 class Server;
-class Location: public TcpServer
+class Location: public HttpServer
 {
     public:
         Location();

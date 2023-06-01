@@ -2,7 +2,7 @@
 # include "../../includes/http/RequestChecker.hpp"
 # include "../../includes/utils/UtilityMethod.hpp"
 # include "../../includes/method/Post.hpp"
-# include "../../includes/server/TcpServer.hpp"
+# include "../../includes/server/HttpServer.hpp"
 # include "../../includes/IO/IO.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
@@ -178,7 +178,7 @@ void HttpRequest::appendToBuffer(const char *toAppend, const ssize_t& size)
 int HttpRequest::open_file(IO& event, std::string& filepath)
 {
     static int _nb;
-    TcpServer& instance = *(event.getServer() -> getInstance());
+    HttpServer& instance = *(event.getServer() -> getInstance());
     std::string& path = getHeaders().find(PATH) -> second; 
     
     /*ADD THIS INTO A TRY CATCH BLOCK*/
@@ -201,7 +201,7 @@ int HttpRequest::open_file(IO& event, std::string& filepath)
 int HttpRequest::open_file(IO& event)
 {
     static int _nb;
-    TcpServer& instance = *(event.getServer() -> getInstance());
+    HttpServer& instance = *(event.getServer() -> getInstance());
     std::string& path = getHeaders().find(PATH) -> second; 
     std::string fileExtenstion = UtilityMethod::getFileExtension(getHeaders().find(CONTENT_TYP) -> second, 0);
     std::string filepath(getHeaders().find(FULLPATH) -> second);
@@ -245,17 +245,17 @@ int HttpRequest::parseRequest(IO& object)
     _headers[PATH] = UtilityMethod::remove_dup(header[1]);
     _headers[VERSION] = header[2];
 
-    setMetod(TcpServer::getHttpMethod(header[0]));
+    setMetod(HttpServer::getHttpMethod(header[0]));
 
     Server& server = *(object.getServer());
-    server.setInstance((TcpServer *)RequestChecker::serverOrLocation(server, (*this)));
-    const TcpServer *instance = server.getInstance();
+    server.setInstance((HttpServer *)RequestChecker::serverOrLocation(server, (*this)));
+    const HttpServer *instance = server.getInstance();
 
     std::string full_path = instance -> getRootDir() + _headers[PATH];
 
     int directory = UtilityMethod::is_a_directory(full_path.c_str());
 
-    if (getMethod() == TcpServer::GET)
+    if (getMethod() == HttpServer::GET)
     {
         if ((directory && instance -> getIndex().size()) && (_headers[PATH] == instance -> getIndexPath()))
             full_path += '/' + instance -> getIndex();

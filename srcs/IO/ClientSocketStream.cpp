@@ -1,5 +1,5 @@
 # include "../../includes/IO/ClientSocketStream.hpp"
-# include "../../includes/server/TcpServer.hpp"
+# include "../../includes/server/HttpServer.hpp"
 # include "../../includes/http/RequestChecker.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
@@ -38,7 +38,7 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
     int res = _response.serveResponse((*this), getRequest());
     
     if (res > 0)
-        _response.switchMethod((*this), TcpServer::ERROR, res);
+        _response.switchMethod((*this), HttpServer::ERROR, res);
     else if (_response.checkBits(HttpResponse::FINISHED_RESPONSE))
     {
         UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
@@ -76,13 +76,13 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         {
             _req = _response.serveResponse((*this), _request);
             if (_req)
-                _response.switchMethod((*this), TcpServer::ERROR, _req);
+                _response.switchMethod((*this), HttpServer::ERROR, _req);
             else if (!_request.checkBits(HttpRequest::FINISH_BODY))
                 return IO::IO_SUCCESS;
         }
 
         if (_response.getHttpMethod() == NULL)
-            _response.setMethodObj((_req < 10 ? Method::_tab[_request.getMethod()]() : Method::_tab[TcpServer::ERROR]()));
+            _response.setMethodObj((_req < 10 ? Method::_tab[_request.getMethod()]() : Method::_tab[HttpServer::ERROR]()));
 
         resetOptions();
 
@@ -106,7 +106,7 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
         }
         catch(const std::exception& e)
         {
-            _response.switchMethod((*this), TcpServer::ERROR, INTERNAL_SERVER_ERROR);
+            _response.switchMethod((*this), HttpServer::ERROR, INTERNAL_SERVER_ERROR);
             resetOptions();
             _request.getBuffer().clear();
             UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));

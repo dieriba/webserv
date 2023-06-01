@@ -1,4 +1,4 @@
-# include "../../includes/server/TcpServer.hpp"
+# include "../../includes/server/HttpServer.hpp"
 # include "../../includes/server/Server.hpp"
 # include "../../includes/utils/ExceptionThrower.hpp"
 # include "../../includes/IO/IO.hpp"
@@ -6,15 +6,15 @@
 # include "../../includes/IO/ClientSocketStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-TcpServer::TcpServer():BitsManipulation(),_auto_index(false),_body_size(0),
+HttpServer::HttpServer():BitsManipulation(),_auto_index(false),_body_size(0),
             _index(""),_root_dir(""),_redirect(""),_epoll_ws(-1){};
 
-TcpServer::TcpServer(const TcpServer& rhs)
+HttpServer::HttpServer(const HttpServer& rhs)
     :Parser(rhs),BitsManipulation(rhs),_auto_index(rhs._auto_index),_body_size(rhs._body_size),_index(rhs._index),
     _root_dir(rhs._root_dir),_redirect(rhs._redirect),_index_path(rhs._index_path),_upload_file_folders(rhs._upload_file_folders)
     ,_error_pages(rhs._error_pages),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
 
-TcpServer& TcpServer::operator=(const TcpServer& rhs)
+HttpServer& HttpServer::operator=(const HttpServer& rhs)
 {
     if (this == &rhs) return *this;
     _auto_index = rhs._auto_index;
@@ -30,28 +30,28 @@ TcpServer& TcpServer::operator=(const TcpServer& rhs)
     return *this;
 }
 
-TcpServer::~TcpServer()
+HttpServer::~HttpServer()
 {
     if (_epoll_ws != -1) close(_epoll_ws);
 };
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
-std::map<short int, std::string>& TcpServer::getErrorMaps() {return _error_pages;}
-std::vector<Server> TcpServer::getServers(void) const {return _servers;};
-const bool& TcpServer::getAutoIndexValue(void) const {return _auto_index;};
-const int& TcpServer::getEpollWs(void) const {return _epoll_ws;}
-const std::map<std::string, std::string>& TcpServer::getCgiMap() const {return _cgi;}
-const std::map<short int, std::string>& TcpServer::getErrorMaps() const {return _error_pages;}
-const size_t& TcpServer::getBodySize(void) const {return _body_size;};
-const std::string& TcpServer::getRootDir(void) const {return _root_dir;};
-const std::string& TcpServer::getIndex(void) const {return _index;};
-const std::string& TcpServer::getIndexPath(void) const {return _index_path;};
-const std::string& TcpServer::getFullIndexPath(void) const {return _full_index_path;};
-const std::string& TcpServer::getRedirect(void) const {return _redirect;};
-const std::string& TcpServer::getUploadsFilesFolder(void) const {return _upload_file_folders;}
+std::map<short int, std::string>& HttpServer::getErrorMaps() {return _error_pages;}
+std::vector<Server> HttpServer::getServers(void) const {return _servers;};
+const bool& HttpServer::getAutoIndexValue(void) const {return _auto_index;};
+const int& HttpServer::getEpollWs(void) const {return _epoll_ws;}
+const std::map<std::string, std::string>& HttpServer::getCgiMap() const {return _cgi;}
+const std::map<short int, std::string>& HttpServer::getErrorMaps() const {return _error_pages;}
+const size_t& HttpServer::getBodySize(void) const {return _body_size;};
+const std::string& HttpServer::getRootDir(void) const {return _root_dir;};
+const std::string& HttpServer::getIndex(void) const {return _index;};
+const std::string& HttpServer::getIndexPath(void) const {return _index_path;};
+const std::string& HttpServer::getFullIndexPath(void) const {return _full_index_path;};
+const std::string& HttpServer::getRedirect(void) const {return _redirect;};
+const std::string& HttpServer::getUploadsFilesFolder(void) const {return _upload_file_folders;}
 
-bool TcpServer::getCgiPath(const std::string& key, std::string& path)
+bool HttpServer::getCgiPath(const std::string& key, std::string& path)
 {
     it_map it = _cgi.find(key);
     path = (it != _cgi.end()) ? it -> second : "";
@@ -61,7 +61,7 @@ bool TcpServer::getCgiPath(const std::string& key, std::string& path)
 
 /*----------------------------------------SETTER----------------------------------------*/
 
-int TcpServer::addToErrorMap(const short int& error, std::string& file, const std::string& directory)
+int HttpServer::addToErrorMap(const short int& error, std::string& file, const std::string& directory)
 {
     if (_error_pages.find(error) != _error_pages.end())
         return -1;
@@ -72,52 +72,52 @@ int TcpServer::addToErrorMap(const short int& error, std::string& file, const st
     return 0;
 }
 
-void TcpServer::setUploadsFilesFolder(const std::string& uploads_files_foler)
+void HttpServer::setUploadsFilesFolder(const std::string& uploads_files_foler)
 {
     _upload_file_folders = uploads_files_foler;
 }
 
-void TcpServer::setAutoIndexValue(const bool& auto_index)
+void HttpServer::setAutoIndexValue(const bool& auto_index)
 {
     _auto_index = auto_index;
 }
 
-void TcpServer::pushNewServer(const Server& server)
+void HttpServer::pushNewServer(const Server& server)
 {
     _servers.push_back(server);
 };
 
-void    TcpServer::setBodySize(const size_t& body)
+void    HttpServer::setBodySize(const size_t& body)
 {
     _body_size = body;
 };
 
-void    TcpServer::setRootDir(const std::string& root_dir)
+void    HttpServer::setRootDir(const std::string& root_dir)
 {
     _root_dir = root_dir;
 };
 
-void    TcpServer::setIndex(const std::string& index)
+void    HttpServer::setIndex(const std::string& index)
 {
     _index = index;
 };
 
-void    TcpServer::setRedirect(const std::string& redirect)
+void    HttpServer::setRedirect(const std::string& redirect)
 {
     _redirect = redirect;    
 }
 
-void    TcpServer::setIndexPath(const std::string& path)
+void    HttpServer::setIndexPath(const std::string& path)
 {
     _index_path = path;    
 }
 
-void    TcpServer::setFullIndexPath(const std::string& path)
+void    HttpServer::setFullIndexPath(const std::string& path)
 {
     _full_index_path = path;
 }
 
-void    TcpServer::pushNewCGI(const std::string& key, const std::string& value)
+void    HttpServer::pushNewCGI(const std::string& key, const std::string& value)
 {
     _cgi[key] = value;
 }
@@ -125,7 +125,7 @@ void    TcpServer::pushNewCGI(const std::string& key, const std::string& value)
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-void TcpServer::settingUpServer(const char *filename)
+void HttpServer::settingUpServer(const char *filename)
 {
     std::ifstream file;   
     _servers.reserve(BASE_VEC_ARR);
@@ -134,7 +134,7 @@ void TcpServer::settingUpServer(const char *filename)
     _servers = Parser::getServerConfig(file, this);
 }
 
-void TcpServer::runningUpServer(void)
+void HttpServer::runningUpServer(void)
 {
     std::string message;
     struct epoll_event event;
@@ -162,7 +162,7 @@ void TcpServer::runningUpServer(void)
 
 }
 
-void TcpServer::makeServerServe(void)
+void HttpServer::makeServerServe(void)
 {
     int to_proceed;
     int res;
@@ -171,7 +171,7 @@ void TcpServer::makeServerServe(void)
 
     IO  *events;
 
-    while (TcpServer::g_signal == 1)
+    while (HttpServer::g_signal == 1)
     {
         to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, -1);
         for (int i = 0; i < to_proceed; i++)
@@ -193,7 +193,7 @@ void TcpServer::makeServerServe(void)
 
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 
-int TcpServer::getHttpMethod(const std::string& method)
+int HttpServer::getHttpMethod(const std::string& method)
 {
     rev_it it = _httpMethods.find(method);
     if (it == _httpMethods.end())
@@ -201,7 +201,7 @@ int TcpServer::getHttpMethod(const std::string& method)
     return (it -> second);
 }
 
-const std::string& TcpServer::getMimeType(const std::string& key)
+const std::string& HttpServer::getMimeType(const std::string& key)
 {
     std::map<std::string, std::string>::iterator it = _mimeTypes.find(key);
 
@@ -210,22 +210,22 @@ const std::string& TcpServer::getMimeType(const std::string& key)
     return it -> second;
 }
 
-const vec_it TcpServer::getHttpResponse(const short int& response)
+const vec_it HttpServer::getHttpResponse(const short int& response)
 {
     return _httpResponses.find(response);
 }
 
-bool TcpServer::isKnownDirective(const std::string& directive)
+bool HttpServer::isKnownDirective(const std::string& directive)
 {
     return (_knownDirectives.find(directive) != _knownDirectives.end());
 }
 
-bool TcpServer::isKnownLocationDirectives(const std::string& directive)
+bool HttpServer::isKnownLocationDirectives(const std::string& directive)
 {
     return (_knownLocationsDirectives.find(directive) != _knownDirectives.end());
 }
 
-void TcpServer::initknownLocationsDirectives(void)
+void HttpServer::initknownLocationsDirectives(void)
 {
     _knownLocationsDirectives[AUTO_INDEX] = true;
     _knownLocationsDirectives[ROOT] = true;
@@ -239,7 +239,7 @@ void TcpServer::initknownLocationsDirectives(void)
     _knownDirectives[UPLOAD_FILE_FOLDERS] = true;
 }   
 
-void TcpServer::initKnownDirectives(void)
+void HttpServer::initKnownDirectives(void)
 {
     _knownDirectives[AUTO_INDEX] = true;
     _knownDirectives[ROOT_ERROR_PAGE] = true;
@@ -257,7 +257,7 @@ void TcpServer::initKnownDirectives(void)
     _knownDirectives[UPLOAD_FILE_FOLDERS] = true;
 }
 
-void TcpServer::initHttpResponses(void)
+void HttpServer::initHttpResponses(void)
 {
     _httpResponses[100] = "Continue";
     _httpResponses[101] = "Switching Protocols";
@@ -319,7 +319,7 @@ void TcpServer::initHttpResponses(void)
     _httpResponses[511] = "Network Authentification Required";
 }
 
-void TcpServer::initMimeTypes(void)
+void HttpServer::initMimeTypes(void)
 {
     _mimeTypes[DEFAULT] = MIME_PLAIN;
     _mimeTypes[HTM] = MIME_HTM;
@@ -360,14 +360,14 @@ void TcpServer::initMimeTypes(void)
     }
 }
 
-void TcpServer::initHttpMethods(void)
+void HttpServer::initHttpMethods(void)
 {
     _httpMethods["GET"] = GET;
     _httpMethods["POST"] = POST;
     _httpMethods["DELETE"] = DELETE;
 }
 
-int TcpServer::getMethodIndex(const std::string& method)
+int HttpServer::getMethodIndex(const std::string& method)
 {
     std::map<std::string, short int>::iterator it = _httpMethods.find(method);
     if (it == _httpMethods.end()) return -1;
@@ -378,22 +378,22 @@ int TcpServer::getMethodIndex(const std::string& method)
     @brief 
 */
 
-int TcpServer::makeNonBlockingFd(const int& fd)
+int HttpServer::makeNonBlockingFd(const int& fd)
 {
     if (fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK) == -1)
         return -1;
     return 0;
 }
 
-void TcpServer::switch_off_signal(int)
+void HttpServer::switch_off_signal(int)
 {
-    TcpServer::g_signal = 0;
+    HttpServer::g_signal = 0;
 }
 
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
-short int TcpServer::g_signal = 1;
-std::map<short int, std::string> TcpServer::_httpResponses;
-std::map<std::string, bool> TcpServer::_knownDirectives;
-std::map<std::string, bool> TcpServer::_knownLocationsDirectives;
-std::map<std::string, short int> TcpServer::_httpMethods;
-std::map<std::string, std::string> TcpServer::_mimeTypes;
+short int HttpServer::g_signal = 1;
+std::map<short int, std::string> HttpServer::_httpResponses;
+std::map<std::string, bool> HttpServer::_knownDirectives;
+std::map<std::string, bool> HttpServer::_knownLocationsDirectives;
+std::map<std::string, short int> HttpServer::_httpMethods;
+std::map<std::string, std::string> HttpServer::_mimeTypes;

@@ -21,7 +21,7 @@
 .html   text/html
 .htm    text/html
 .ico 	image/vnd.microsoft.icon
-.iso    application/x-iso9660-image
+.iso    application/x-cd-image
 .ics 	text/calendar
 .jar 	application/java-archive
 .jpeg   image/jpeg

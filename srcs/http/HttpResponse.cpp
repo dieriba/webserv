@@ -1,7 +1,7 @@
 # include "../../includes/http/HttpResponse.hpp"
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/IO/IO.hpp"
-# include "../../includes/server/TcpServer.hpp"
+# include "../../includes/server/HttpServer.hpp"
 
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
@@ -31,6 +31,9 @@ Error& HttpResponse::getErrorMethod(void) {return _error;};
 const std::string& HttpResponse::getPath(void) const {return _path_req;};
 const DIR *HttpResponse::getDirectory(void) const {return _directory;}
 std::ifstream& HttpResponse::getFile(void) {return _file;}
+const int& HttpResponse::getReadEnd(void) const {return _pipes[0];};
+const int& HttpResponse::getWriteEnd(void) const {return _pipes[1];};
+int *HttpResponse::getPipes(void) {return _pipes;}
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/

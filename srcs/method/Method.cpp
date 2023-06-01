@@ -1,5 +1,5 @@
 # include "../../includes/method/Method.hpp"
-# include "../../includes/server/TcpServer.hpp"
+# include "../../includes/server/HttpServer.hpp"
 # include "../../includes/method/Get.hpp"
 # include "../../includes/method/Post.hpp"
 # include "../../includes/method/Delete.hpp"
@@ -65,7 +65,7 @@ void Method::makeStatusLine(const int& status)
     ss << status;
     std::string code(ss.str());
     
-    _response = version + " " + code + " " + TcpServer::getHttpResponse(status) -> second + CRLF;
+    _response = version + " " + code + " " + HttpServer::getHttpResponse(status) -> second + CRLF;
 }
 
 void Method::appendToResponse(const std::string& key, const std::string& value)

@@ -1,6 +1,6 @@
 # include "../../includes/utils/Parser.hpp"
 # include "../../includes/utils/ExceptionThrower.hpp"
-# include "../../includes/server/TcpServer.hpp"
+# include "../../includes/server/HttpServer.hpp"
 # include "../../includes/server/Server.hpp"
 # include "../../includes/server/Location.hpp"
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
@@ -62,10 +62,10 @@ bool    Parser::validIpFormat(const std::string& ip)
 
 void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Location& location)
 {
-    feedingUpInstance(_map, static_cast<TcpServer&>(location));
+    feedingUpInstance(_map, static_cast<HttpServer&>(location));
 }
 
-void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, TcpServer& instance)
+void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, HttpServer& instance)
 {
     std::stringstream ss;
 
@@ -158,10 +158,10 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
 
     server.setPort(val);
 
-    feedingUpInstance(_serv_conf, static_cast<TcpServer&>(server));
+    feedingUpInstance(_serv_conf, static_cast<HttpServer&>(server));
 }
 
-int    Parser::setAllowedMethods(TcpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _serv_conf)
+int    Parser::setAllowedMethods(HttpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _serv_conf)
 {
     if (vec.size() > 4)
         throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
@@ -172,7 +172,7 @@ int    Parser::setAllowedMethods(TcpServer& instance, std::vector<std::string>& 
     {
         SemicolonCheck(vec[i], i, len);
         if (vec[i].size() == 0 && i == len) break ;
-        int method = TcpServer::getHttpMethod(vec[i]);
+        int method = HttpServer::getHttpMethod(vec[i]);
         if (method < 0)
             throw ExceptionThrower("Unknown HTTP Method");
         instance.setOptions(method, SET);
@@ -290,7 +290,7 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
     return _location;
 }
 
-int    Parser::fillInstance(TcpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _map)
+int    Parser::fillInstance(HttpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _map)
 {
     if (vec[0] == CGI)
     {
@@ -329,7 +329,7 @@ void    Parser::fillMap(const std::string& line, Location& location, std::map<st
     
     vec = UtilityMethod::stringSpliter(line, WHITESPACES);
     
-    if (!TcpServer::isKnownLocationDirectives(vec[0]))
+    if (!HttpServer::isKnownLocationDirectives(vec[0]))
         throw ExceptionThrower("Directive " + vec[0] + " is unknown");
 
     if (vec.size() == 1)
@@ -338,13 +338,13 @@ void    Parser::fillMap(const std::string& line, Location& location, std::map<st
     if (vec.size() > 3 && (vec[0] != ALLOWED_METHOD && vec[0] != ERROR_PAGE))
         throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
 
-    if (fillInstance(static_cast<TcpServer&>(location), vec, _map))
+    if (fillInstance(static_cast<HttpServer&>(location), vec, _map))
         return ;
     else
         setCommonDirectives(vec, _map);
 }
 
-int    Parser::handleErrorPages(TcpServer& instance, std::vector<std::string>& vec)
+int    Parser::handleErrorPages(HttpServer& instance, std::vector<std::string>& vec)
 {
     size_t len = vec.size() - 1;
 
@@ -378,7 +378,7 @@ int    Parser::handleErrorPages(TcpServer& instance, std::vector<std::string>& v
             throw ExceptionThrower("Cannot rewrite the same status code");
     }
 
-    instance.setOptions(TcpServer::ERROR_PAGE_SET, SET);
+    instance.setOptions(HttpServer::ERROR_PAGE_SET, SET);
     
     return 1;
 }
@@ -395,7 +395,7 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
         IF NOT THROW AN ERROR
     */
 
-    if (!TcpServer::isKnownDirective(vec[0]))
+    if (!HttpServer::isKnownDirective(vec[0]))
         throw ExceptionThrower("Directive " + vec[0] + " is unknown");
 
     if (vec.size() == 1)
@@ -417,7 +417,7 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
             server.pushNewServerName(vec[i]);
         }
     }
-    else if (fillInstance(static_cast<TcpServer&>(server), vec, _serv_conf) == 0)
+    else if (fillInstance(static_cast<HttpServer&>(server), vec, _serv_conf) == 0)
         setCommonDirectives(vec, _serv_conf);
 }
 
@@ -500,7 +500,7 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
 }
 
 /*----------------------------------------MEMBER FUNCTION-----line.find('{') != std::string::npos-----------------------------------*/
-std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_serv)
+std::vector<Server> Parser::getServerConfig(std::ifstream& file, HttpServer *tcp_serv)
 {
     std::string line;
     Server serv;
@@ -538,7 +538,7 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, TcpServer *tcp_
                 
                 serv.setIndexPath("/");
 
-                serv.setTcpServer(tcp_serv);
+                serv.setHttpServer(tcp_serv);
                 
                 server.push_back(serv);
 

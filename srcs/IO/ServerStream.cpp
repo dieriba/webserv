@@ -1,6 +1,6 @@
 # include "../../includes/IO/ServerStream.hpp"
 # include "../../includes/IO/ClientSocketStream.hpp"
-# include "../../includes/server/TcpServer.hpp"
+# include "../../includes/server/HttpServer.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 ServerStream::ServerStream(){};
@@ -50,7 +50,7 @@ int ServerStream::handleIoOperation(const int& _ws, struct epoll_event& event)
 
             this -> getServer() -> addToEventsMap((const IO*)_ev.data.ptr);
                 
-            if (TcpServer::makeNonBlockingFd(client_fd) || epoll_ctl(_ws, EPOLL_CTL_ADD, client_fd, &_ev))
+            if (HttpServer::makeNonBlockingFd(client_fd) || epoll_ctl(_ws, EPOLL_CTL_ADD, client_fd, &_ev))
                 return IO::IO_ERROR;
         }
     }

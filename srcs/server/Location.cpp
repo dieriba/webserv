@@ -1,9 +1,9 @@
 # include "../../includes/server/Location.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-Location::Location():TcpServer(),_server(0){};
+Location::Location():HttpServer(),_server(0){};
 
-Location::Location(const Location& rhs):TcpServer(rhs)
+Location::Location(const Location& rhs):HttpServer(rhs)
 {
     _sub_path = rhs._sub_path;
     _sub_locations = rhs._sub_locations;

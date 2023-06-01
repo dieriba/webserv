@@ -3,7 +3,8 @@
 # include "../../includes/http/HttpResponse.hpp"
 # include "../../includes/IO/IO.hpp"
 # include "../../includes/utils/UtilityMethod.hpp"
-# include "../../includes/server/TcpServer.hpp"
+# include "../../includes/server/HttpServer.hpp"
+
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Get::Get(){};
@@ -55,10 +56,10 @@ int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
 
 int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 {
-    TcpServer& instance = *(event.getServer() -> getInstance());
+    HttpServer& instance = *(event.getServer() -> getInstance());
     std::string full_path(req.getHeaders().find(FULLPATH) -> second);
     
-    size_t directory = res.checkBits(HttpResponse::DIRECTORY);
+    bool directory = res.checkBits(HttpResponse::DIRECTORY);
 
     if ((directory && instance.getAutoIndexValue()) || directory == 0)
     {
@@ -82,25 +83,76 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()));
         _response += CRLF;
         
-        if (sendBuffer(event.getFd(), _response.c_str(), _response.size())) return (IO::IO_ERROR);
-
-        _response.clear();
-        
         res.setOptions(HttpResponse::FILE, SET);
     }
     else if (directory)
     {
-        exit(1);
+        if (pipe(res.getPipes()) == -1) return INTERNAL_SERVER_ERROR;
+
+        if (HttpServer::makeNonBlockingFd(res.getReadEnd()) == -1) return INTERNAL_SERVER_ERROR;
+
+        if (access(PATH_TO_DIRECTORY_LISTING_SCRIPT, F_OK) != 0) return NOT_FOUND;
+        
+        if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
+        
+        makeStatusLine(OK);
+        appendToResponse(CONTENT_TYP, MIME_HTML);
+        appendToResponse(TRANSFERT_ENCODING, "chunked");
+        _response += CRLF;
+        
+        pid_t pid = fork();
+
+        if (pid == -1) return INTERNAL_SERVER_ERROR;
+
+        if (pid == 0)
+        {
+            close(res.getReadEnd());
+
+            if (dup2(res.getWriteEnd(), STDOUT_FILENO) == -1)
+            {
+                write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
+                close(res.getWriteEnd());
+                exit(1);
+            }
+            
+            close(res.getWriteEnd());
+
+            const std::string& path(PATH"=" + req.getHeaders().find(PATH)-> second);
+            std::string root(ROOT"=" + instance.getRootDir() + req.getHeaders().find(PATH)-> second);
+
+            char *envp[] = {(char *)root.c_str(), (char *)path.c_str(), NULL};
+
+            char *argv[] = {NULL};
+
+            execve(PATH_TO_DIRECTORY_LISTING_SCRIPT, argv, envp);
+            
+            exit(1);
+        }
+
+        close(res.getWriteEnd());
     }
+
+    if (sendBuffer(event.getFd(), _response.c_str(), _response.size())) return (IO::IO_ERROR);
+
+    _response.clear();
+    
     res.setOptions(HttpResponse::STARTED, SET);
     
     return IO::IO_SUCCESS;
 }
 
-int Get::handleDirectoryRessource(IO& event, DIR *directory)
+int Get::handleDirectoryRessource(IO& event, const HttpRequest& req, HttpResponse& res)
 {
+    static int i;
     (void)event;
-    (void)directory;
+    (void)req;
+    char buffer[REQUEST_SIZE + 1] = {0};
+    
+    int bytes = read(res.getReadEnd(), buffer, REQUEST_SIZE);
+    
+    if (bytes > 0)
+        std::cout << bytes << std::endl;
+    i++;
     return (0);
 }
 
@@ -116,6 +168,8 @@ int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 
     if (res.checkBits(HttpResponse::FILE)) return handleFileRessource(event, req, res);
     
+    if (res.checkBits(HttpResponse::DIRECTORY)) return handleDirectoryRessource(event, req, res);
+
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

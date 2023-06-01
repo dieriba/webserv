@@ -117,12 +117,12 @@ const std::string& UtilityMethod::getMimeType(std::string& path, const std::stri
             break ;
     }
     
-    return TcpServer::getMimeType(&path[i]);
+    return HttpServer::getMimeType(&path[i]);
 }
 
 std::string UtilityMethod::getFileExtension(const std::string& content_type, const short int& opt)
 {
-    if (opt == 0) return TcpServer::getMimeType(content_type);
+    if (opt == 0) return HttpServer::getMimeType(content_type);
     
     int i = content_type.size() - 1;
 

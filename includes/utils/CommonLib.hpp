@@ -49,6 +49,7 @@
 
 
 */
+# define PATH_TO_DIRECTORY_LISTING_SCRIPT "./cgi/c++/directory"
 # define CONTENT_TYP "Content-Type"
 # define CONTENT_LEN "Content-Length"
 # define TRANSFERT_ENCODING "Transfer-Encoding"

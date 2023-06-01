@@ -1,5 +1,5 @@
 # include "../../includes/http/RequestChecker.hpp"
-# include "../../includes/server/TcpServer.hpp"
+# include "../../includes/server/HttpServer.hpp"
 # include "../../includes/server/Server.hpp"
 # include "../../includes/server/Location.hpp"
 # include "../../includes/IO/IO.hpp"
@@ -22,7 +22,7 @@ RequestChecker::~RequestChecker(){};
 
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 
-const TcpServer *RequestChecker::serverOrLocation(const Server& server, const HttpRequest& req)
+const HttpServer *RequestChecker::serverOrLocation(const Server& server, const HttpRequest& req)
 {
     std::string path = req.getHeaders().find(PATH) -> second;
     const std::vector<Location>& locations = server.getLocations();
@@ -40,16 +40,11 @@ int RequestChecker::checkAll(IO& object, HttpRequest& req)
 {
     Server& server = *(object.getServer());
     
-    const TcpServer *instance = server.getInstance();
+    const HttpServer *instance = server.getInstance();
     
     int _res = checkHeader(*(instance), req);
     
     if (_res) return _res;
-
-
-    //if (loc) server.setOptions(LOCATION_BLOCK, SET);
-
-    //std::cout << "I should look to serve data from: " << (loc == 1 ? "Location Block" : "Server Block") << std::endl;
 
     for (size_t i = 0; tab[i] != 0; i++)
     {
@@ -60,7 +55,7 @@ int RequestChecker::checkAll(IO& object, HttpRequest& req)
     return _res;
 }
 
-int RequestChecker::checkDeleteMethod(const TcpServer& instance, HttpRequest& req)
+int RequestChecker::checkDeleteMethod(const HttpServer& instance, HttpRequest& req)
 {
     std::map<std::string, std::string>& _map = req.getHeaders();
 
@@ -69,7 +64,7 @@ int RequestChecker::checkDeleteMethod(const TcpServer& instance, HttpRequest& re
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkPostMethod(const TcpServer& instance, HttpRequest& req)
+int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req)
 {
     std::map<std::string, std::string>& _map = req.getHeaders();
 
@@ -124,7 +119,7 @@ int RequestChecker::checkPostMethod(const TcpServer& instance, HttpRequest& req)
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkGetMethod(const TcpServer& instance, HttpRequest& req)
+int RequestChecker::checkGetMethod(const HttpServer& instance, HttpRequest& req)
 {
     (void)instance;
     std::map<std::string, std::string>& _map = req.getHeaders();
@@ -134,25 +129,25 @@ int RequestChecker::checkGetMethod(const TcpServer& instance, HttpRequest& req)
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkHeader(const TcpServer& instance, HttpRequest& req)
+int RequestChecker::checkHeader(const HttpServer& instance, HttpRequest& req)
 {
     std::map<std::string, std::string> _map = req.getHeaders();
 
-    if (TcpServer::getMethodIndex(_map[METHOD]) == -1) return METHOD_NOT_SUPPORTED;
+    if (HttpServer::getMethodIndex(_map[METHOD]) == -1) return METHOD_NOT_SUPPORTED;
 
     if (_map[VERSION] != HTTP_VERSION) return VERSION_NOT_SUPPORTED;
 
-    if (req.getMethod() == TcpServer::GET)
+    if (req.getMethod() == HttpServer::GET)
         return checkGetMethod(instance, req);
-    else if (req.getMethod() == TcpServer::POST)
+    else if (req.getMethod() == HttpServer::POST)
         return checkPostMethod(instance, req);
-    else if (req.getMethod() == TcpServer::DELETE)
+    else if (req.getMethod() == HttpServer::DELETE)
         return checkDeleteMethod(instance, req);
 
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkValidPath(const TcpServer *instance, HttpRequest& req)
+int RequestChecker::checkValidPath(const HttpServer *instance, HttpRequest& req)
 {
     if (instance -> getRootDir().size() == 0) return NOT_FOUND;
     
@@ -170,13 +165,13 @@ int RequestChecker::checkValidPath(const TcpServer *instance, HttpRequest& req)
 
     if (UtilityMethod::is_a_directory(dir_path.c_str())) req.setOptions(HttpRequest::DIRECTORY, SET);
 
-    if (req.getMethod() == TcpServer::GET)
+    if (req.getMethod() == HttpServer::GET)
     {
         if (access(root_c, F_OK) != 0) return NOT_FOUND;
         
         if ((access(root_c, R_OK) != 0)) return FORBIDEN;
     }
-    else if (req.getMethod() == TcpServer::POST)
+    else if (req.getMethod() == HttpServer::POST)
     {
         
         if (!req.checkBits(HttpRequest::MULTIPART_DATA) && req.getHeaders().find(PATH) -> second != instance -> getIndexPath())
@@ -189,7 +184,7 @@ int RequestChecker::checkValidPath(const TcpServer *instance, HttpRequest& req)
         if (access(alias_root, W_OK) && errno == EACCES) return FORBIDEN;
 
     }
-    else if (req.getMethod() == TcpServer::DELETE)
+    else if (req.getMethod() == HttpServer::DELETE)
     {
         alias_root[i + 1] = 0;
 
@@ -203,14 +198,14 @@ int RequestChecker::checkValidPath(const TcpServer *instance, HttpRequest& req)
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkAllowedMethod(const TcpServer *instance, HttpRequest& req)
+int RequestChecker::checkAllowedMethod(const HttpServer *instance, HttpRequest& req)
 {
     if (instance -> checkBits(req.getMethod()) == 0) return METHOD_NOT_ALLOWED;
     
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkBodySize(const TcpServer *instance, HttpRequest& req)
+int RequestChecker::checkBodySize(const HttpServer *instance, HttpRequest& req)
 {
     if ((instance -> getBodySize() != std::string::npos) && (req.getBodySize() > instance -> getBodySize()))                                                                            
         return TOO_LARGE_CONTENT;

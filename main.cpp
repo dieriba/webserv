@@ -1,12 +1,12 @@
 # include "./includes/utils/CommonLib.hpp"
-# include "./includes/server/TcpServer.hpp"
+# include "./includes/server/HttpServer.hpp"
 # include "./includes/server/Server.hpp"
 # include "./includes/utils/ExceptionThrower.hpp"
 # include "./includes/server/Location.hpp"
 # include "./includes/http/RequestChecker.hpp"
 # include "./includes/method/Method.hpp"
 
-void    print_map_error_page(const TcpServer& instance)
+void    print_map_error_page(const HttpServer& instance)
 {
     std::map<short int, std::string>::const_iterator it = instance.getErrorMaps().begin();
     std::map<short int, std::string>::const_iterator end = instance.getErrorMaps().end();
@@ -23,9 +23,9 @@ void    print_location_config(const Location& location)
     std::cout << std::endl << std::endl ;
     std::cout << "----------Location----------";
     std::cout << std::endl << std::endl
-        << "METHOD GET: " << (location.checkBits(TcpServer::GET) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD POST: " << (location.checkBits(TcpServer::POST) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD DELETE: " << (location.checkBits(TcpServer::DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
+        << "METHOD GET: " << (location.checkBits(HttpServer::GET) > 0 ? "Enabled" : "Disabled") << std::endl
+        << "METHOD POST: " << (location.checkBits(HttpServer::POST) > 0 ? "Enabled" : "Disabled") << std::endl
+        << "METHOD DELETE: " << (location.checkBits(HttpServer::DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
         << "Client Max Body Size: " << location.getBodySize() << std::endl
         << "Index HTML: " << (location.getIndex().size() > 0 ? location.getIndex() : "No root index") << std::endl
         << "Sub Path: " << location.getIndexPath() << std::endl
@@ -34,7 +34,7 @@ void    print_location_config(const Location& location)
         << "Upload Folder: " << ((location.getUploadsFilesFolder().size()) ? location.getUploadsFilesFolder() : "No uploads folder set") << std::endl
         << "AUTO INDEX: " << ((location.getAutoIndexValue()) == true ? "Auto Index ON" : "Auto Index OFF") << std::endl
         << "Server: " << location.getServer() << std::endl;
-        const TcpServer& instance = location;
+        const HttpServer& instance = location;
     print_map_error_page(instance);
 }
 
@@ -50,9 +50,9 @@ void    print_server_config(const Server& server)
     std::map<std::string, std::string>::iterator m_it = map.begin();
     std::map<std::string, std::string>::iterator m_end = map.end();
     std::cout
-        << "METHOD GET: " << (server.checkBits(TcpServer::GET) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD POST: " << (server.checkBits(TcpServer::POST) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD DELETE: " << (server.checkBits(TcpServer::DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
+        << "METHOD GET: " << (server.checkBits(HttpServer::GET) > 0 ? "Enabled" : "Disabled") << std::endl
+        << "METHOD POST: " << (server.checkBits(HttpServer::POST) > 0 ? "Enabled" : "Disabled") << std::endl
+        << "METHOD DELETE: " << (server.checkBits(HttpServer::DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
         << "IP: " << (server.getIp().size() > 0 ? server.getIp() : "NO IP SET") << std::endl
         << "Redirect: " << (server.getRedirect().size() > 0 ? server.getRedirect(): "No redirection") << std::endl
         << "PORT: " << server.getPort() << std::endl
@@ -61,7 +61,7 @@ void    print_server_config(const Server& server)
         << "Index HTML: " << ((server.getIndex().size()) > 0 ? server.getIndex() : "No index html") << std::endl
         << "Upload Folder: " << ((server.getUploadsFilesFolder().size()) ? server.getUploadsFilesFolder() : "No uploads folder set") << std::endl
         << "AUTO INDEX: " << ((server.getAutoIndexValue()) == true ? "Auto Index ON" : "Auto Index OFF") << std::endl;
-        const TcpServer& instance = server;
+        const HttpServer& instance = server;
         print_map_error_page(instance);
         if (serv_it_ != serv_it_end)
         {
@@ -85,10 +85,10 @@ void    init_static_data(void)
     RequestChecker::tab[0] = RequestChecker::checkValidPath;
     RequestChecker::tab[1] = RequestChecker::checkAllowedMethod;
     RequestChecker::tab[2] = RequestChecker::checkBodySize;
-    TcpServer::initMimeTypes();
-    TcpServer::initHttpResponses();
-    TcpServer::initHttpMethods();
-    TcpServer::initKnownDirectives();
+    HttpServer::initMimeTypes();
+    HttpServer::initHttpResponses();
+    HttpServer::initHttpMethods();
+    HttpServer::initKnownDirectives();
     Method::_tab[0] = Method::createGet;
     Method::_tab[1] = Method::createPost;
     Method::_tab[2] = Method::createDelete;
@@ -99,10 +99,10 @@ int main (int argc, char **argv)
 {
     try
     {
-        signal(SIGINT, TcpServer::switch_off_signal);
+        signal(SIGINT, HttpServer::switch_off_signal);
         signal(SIGPIPE, SIG_IGN);
         init_static_data();
-        TcpServer tcp_servers;
+        HttpServer tcp_servers;
         tcp_servers.settingUpServer(argc > 1 ? argv[1] : NULL);
         tcp_servers.runningUpServer();
         tcp_servers.makeServerServe();

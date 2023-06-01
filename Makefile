@@ -1,6 +1,6 @@
 SRCS_MAIN   = main.cpp
 
-SRCS_SERVER	= ./srcs/server/TcpServer.cpp \
+SRCS_SERVER	= ./srcs/server/HttpServer.cpp \
               ./srcs/server/Server.cpp \
               ./srcs/server/Location.cpp \
               

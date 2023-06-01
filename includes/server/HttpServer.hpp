@@ -1,5 +1,5 @@
-#ifndef __TcpServer_HPP_
-#define __TcpServer_HPP_
+#ifndef __HttpServer_HPP_
+#define __HttpServer_HPP_
 
 # include "../utils/CommonLib.hpp"
 # include "../utils/Parser.hpp"
@@ -9,14 +9,14 @@ class Server;
 class IO;
 typedef std::map<short int, std::string>::iterator vec_it;
 typedef std::map<std::string, short int>::iterator rev_it;
-class TcpServer: public Parser, public BitsManipulation
+class HttpServer: public Parser, public BitsManipulation
 {
     public:
         /*CONSTRUCTOR/DESTRUCTOR/COPY/ASSIGNEMENT*/
-        TcpServer();
-        TcpServer(const TcpServer& rhs);
-        TcpServer& operator=(const TcpServer& rhs);
-        ~TcpServer();
+        HttpServer();
+        HttpServer(const HttpServer& rhs);
+        HttpServer& operator=(const HttpServer& rhs);
+        ~HttpServer();
 
         enum
         {

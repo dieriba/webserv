@@ -5,7 +5,7 @@
 
 class IO;
 class HttpRequest;
-class TcpServer;
+class HttpServer;
 
 class Get: public Method
 {
@@ -22,7 +22,7 @@ class Get: public Method
 
     private:
         int handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res);
-        int handleDirectoryRessource(IO& event, DIR *directory);
+        int handleDirectoryRessource(IO& event, const HttpRequest& req, HttpResponse& res);
 };
 
 
