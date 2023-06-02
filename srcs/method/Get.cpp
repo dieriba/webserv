@@ -41,7 +41,7 @@ int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
         
         file.read(buffer, REQUEST_SIZE);
 
-        if (sendBuffer(event.getFd(), buffer, file.gcount())) return (IO::IO_ERROR);
+        if (UtilityMethod::sendBuffer(event.getFd(), buffer, file.gcount())) return (IO::IO_ERROR);
 
         len += file.gcount();
         if (file.fail() || file.eof())
@@ -96,19 +96,17 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         
         if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
         
-        IO* object = new CgiStream(res.getReadEnd(), &event, res.getPipes());
-
-        event.getServer() -> addToEventsMap(static_cast<const IO*> (object));
+        CgiStream* cgi = static_cast<CgiStream *>(event.getIO());
+        
+        cgi -> setPipes(res.getPipes());
 
         epoll_event ev;
 
         ev.events = EPOLLIN;
-        object -> setEvents(EPOLLIN);
-        ev.data.ptr = object;
+        cgi -> setEvents(EPOLLIN);
+        ev.data.ptr = cgi;
 
         if (epoll_ctl(event.getWs(), EPOLL_CTL_ADD, res.getReadEnd(), &ev) == -1) return IO::IO_ERROR;
-
-        event.setIO(object);
 
         makeStatusLine(OK);
         appendToResponse(CONTENT_TYP, MIME_HTML);
@@ -144,36 +142,16 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
             exit(1);
         }
 
+        event.setOptions(IO::CGI_ON, SET);
         close(res.getWriteEnd());
     }
 
-    if (sendBuffer(event.getFd(), _response.c_str(), _response.size())) return (IO::IO_ERROR);
+    if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size())) return (IO::IO_ERROR);
 
     _response.clear();
     
     res.setOptions(HttpResponse::STARTED, SET);
     
-    return IO::IO_SUCCESS;
-}
-
-int Get::handleDirectoryRessource(IO& event, const HttpRequest& req, HttpResponse& res)
-{
-    (void)req;
-    CgiStream *cgi = static_cast<CgiStream*>(event.getIO());
-
-    int bytes = cgi -> getBytes();
-
-    if (bytes == 0) return event.deleteAndResetIO(res, static_cast<IO*>(cgi));
-
-    if (bytes == CgiStream::NO_DATA_AVAILABLE) return IO::IO_SUCCESS;
-    
-    const char *buffer = cgi -> getBuffer();
-
-    std::cout << bytes << std::endl;
-    std::cout << buffer << std::endl;
-    
-    cgi -> setBytes(CgiStream::NO_DATA_AVAILABLE);
-
     return IO::IO_SUCCESS;
 }
 
@@ -189,8 +167,6 @@ int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 
     if (res.checkBits(HttpResponse::FILE)) return handleFileRessource(event, req, res);
     
-    if (res.checkBits(HttpResponse::DIRECTORY)) return handleDirectoryRessource(event, req, res);
-
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

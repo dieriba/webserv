@@ -9,6 +9,20 @@ UtilityMethod::~UtilityMethod(){};
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
 
+int UtilityMethod::sendBuffer(int client_socket, const char *buffer, int bytes)
+{
+    while (bytes > 0)
+    {
+        int bytesSent = send(client_socket, buffer, bytes, 0);
+        if (bytesSent <= 0) return IO::IO_ERROR;
+
+        bytes -= bytesSent;
+
+        buffer += bytesSent;
+    }
+    return IO::IO_SUCCESS;
+}
+
 size_t UtilityMethod::hexToDecimal(const std::string& hex)
 {
     std::stringstream ss;
@@ -73,6 +87,10 @@ size_t  UtilityMethod::count(const std::string& line, char to_find)
     return count;
 }
 
+void UtilityMethod::deleteEventFromEpollInstance(const int& _ws, const int& _fd)
+{
+    if (_fd > 0) epoll_ctl(_ws, EPOLL_CTL_DEL, _fd, NULL);
+}
 
 int UtilityMethod::switchEvents(const int& _ws, uint32_t mode, struct epoll_event& event, IO& ev)
 {

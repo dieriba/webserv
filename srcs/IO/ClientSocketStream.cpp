@@ -1,4 +1,5 @@
 # include "../../includes/IO/ClientSocketStream.hpp"
+# include "../../includes/IO/CgiStream.hpp"
 # include "../../includes/server/HttpServer.hpp"
 # include "../../includes/http/RequestChecker.hpp"
 
@@ -6,9 +7,13 @@
 ClientSocketStream::ClientSocketStream(){};
 ClientSocketStream::ClientSocketStream(const int& ws, const int& fd, Server* server):IO(ws, fd, server)
 {
+    _io = new CgiStream(-1, this, NULL);
+    _io -> setIO(this);
     _type = IO::CLIENT_SOCKET;
 };
+
 ClientSocketStream::ClientSocketStream(const ClientSocketStream& rhs):IO(rhs){};
+
 ClientSocketStream& ClientSocketStream::operator=(const ClientSocketStream& rhs)
 {
     if (this == &rhs) return (*this);
@@ -23,7 +28,11 @@ ClientSocketStream& ClientSocketStream::operator=(const ClientSocketStream& rhs)
     _options = rhs._options;
     return (*this);
 };
-ClientSocketStream::~ClientSocketStream(){};
+
+ClientSocketStream::~ClientSocketStream()
+{
+    delete _io;
+};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
@@ -43,7 +52,6 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
     else if (_response.checkBits(HttpResponse::FINISHED_RESPONSE))
     {
         UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
-        setErrorStatus(res);
         clear();
     }
 
@@ -114,7 +122,9 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
         }
     }
     
-    return writeToSocket(_ws, event);
+    if (checkBits(IO::CGI_ON) == 0) return writeToSocket(_ws, event);
+
+    return IO::IO_SUCCESS;
 }
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

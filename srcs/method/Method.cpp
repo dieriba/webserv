@@ -29,28 +29,14 @@ std::string& Method::getResponse(void) {return _response;}
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-int Method::sendBuffer(int client_socket, const char *buffer, int bytes)
-{
-    while (bytes > 0)
-    {
-        int bytesSent = send(client_socket, buffer, bytes, 0);
-        if (bytesSent <= 0) return IO::IO_ERROR;
-
-        bytes -= bytesSent;
-
-        buffer += bytesSent;
-    }
-    return IO::IO_SUCCESS;
-}
-
 int Method::sendRedirect(const IO& event, HttpResponse& res, const char *status_line)
 {
-    if (sendBuffer(event.getFd(), status_line, UtilityMethod::myStrlen(status_line)))
+    if (UtilityMethod::sendBuffer(event.getFd(), status_line, UtilityMethod::myStrlen(status_line)))
             return IO::IO_ERROR;
     
     const std::string& redirect_url = event.getServer() -> getInstance() -> getRedirect();
 
-    if (sendBuffer(event.getFd(), redirect_url.c_str(), redirect_url.size()) || sendBuffer(event.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
+    if (UtilityMethod::sendBuffer(event.getFd(), redirect_url.c_str(), redirect_url.size()) || UtilityMethod::sendBuffer(event.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
         return IO::IO_ERROR;
             
     res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);

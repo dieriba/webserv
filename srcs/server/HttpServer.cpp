@@ -180,6 +180,7 @@ void HttpServer::makeServerServe(void)
             res = events -> handleIoOperation(_epoll_ws, _events[i]);
             if (res == IO::IO_ERROR)
             {
+                if (events -> getType() == IO::CGI_STREAM) events = events -> getIO();
                 std::cout << "Deletting client with fd: " << events -> getFd() << " from interests list" << std::endl;
                 Server *server = events -> getServer();
                 server -> deleteFromEventsMap(events);

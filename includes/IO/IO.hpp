@@ -20,6 +20,7 @@ class IO: public BitsManipulation
 
     
         /*GETTERS*/
+        int getType(void) const;
         const uint32_t& getEvents() const;
         const int& getFd(void) const;
         const HttpRequest& getRequest(void) const;
@@ -52,14 +53,15 @@ class IO: public BitsManipulation
         enum
         {
             IO_ERROR = -1,
-            IO_SUCCESS
+            IO_SUCCESS,
+            CGI_ON
         };
 
         enum type
         {
             VIRTUAL_SERV,
             CLIENT_SOCKET,
-            CGI_PIPE
+            CGI_STREAM
         };
         
         protected:

@@ -27,6 +27,7 @@ IO::~IO()
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
+int IO::getType(void) const {return _type;}
 const int& IO::getFd(void) const { return _fd ;};
 const int& IO::getErrStatus(void) const {return _err;}
 const HttpResponse& IO::getReponse(void) const {return _response;};
@@ -50,6 +51,7 @@ void IO::setWs(const int& ws) {_ws = ws;}
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 int IO::deleteAndResetIO(HttpResponse& res, IO* io)
 {
+    (void)io;
     close(res.getReadEnd());
     res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     return IO::IO_SUCCESS;

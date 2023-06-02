@@ -62,7 +62,7 @@ int Error::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 {
     (void)req;
     std::string error_page = getErrorPage(event.getErrStatus());
-    if (sendBuffer(event.getFd(), error_page.c_str(), error_page.size()))
+    if (UtilityMethod::sendBuffer(event.getFd(), error_page.c_str(), error_page.size()))
         return IO::IO_ERROR;
     res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     return IO::IO_SUCCESS;

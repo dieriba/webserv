@@ -17,6 +17,7 @@ class CgiStream: public IO
         const char* getBuffer(void) const;
 
         /*SETTERS*/
+        void setPipes(int *pipes);
         void setBytes(const int& bytes);
         enum
         {

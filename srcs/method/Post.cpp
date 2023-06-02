@@ -243,7 +243,7 @@ int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
     }
     else
     {
-        if (sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, UtilityMethod::myStrlen(SERVER_SUCCESS_POST_RESPONSE)))
+        if (UtilityMethod::sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, UtilityMethod::myStrlen(SERVER_SUCCESS_POST_RESPONSE)))
         {
             res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
             return IO::IO_ERROR;
