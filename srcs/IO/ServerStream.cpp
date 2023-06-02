@@ -42,10 +42,11 @@ int ServerStream::handleIoOperation(const int& _ws, struct epoll_event& event)
         while (1)
         {
             client_fd = accept(_fd, NULL, NULL);
+
             if (client_fd == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
                 return IO::IO_SUCCESS;
                         
-            _ev.data.ptr = new ClientSocketStream(client_fd, getServer());
+            _ev.data.ptr = new ClientSocketStream(_ws, client_fd, getServer());
             _ev.events = EPOLLIN;
 
             this -> getServer() -> addToEventsMap((const IO*)_ev.data.ptr);

@@ -13,6 +13,7 @@ class IO: public BitsManipulation
     public:
         IO();
         IO(const int& fd, Server *server);
+        IO(const int& ws, const int& fd, Server *server);
         IO(const IO& rhs);
         IO& operator=(const IO& rhs);
         virtual ~IO();
@@ -27,11 +28,13 @@ class IO: public BitsManipulation
         HttpRequest& getRequest(void);
         HttpResponse& getReponse(void);
         Server* getServer(void) const;
+        const int& getWs(void) const;
 
         /*GETTERS*/
         IO* getIO(void) const;
 
         /*SETTERS*/
+        void setWs(const int& ws);
         void setIO(IO* io);
         void setEvents(const uint32_t& events);
         void setFD(const int& fd);
@@ -42,6 +45,8 @@ class IO: public BitsManipulation
 
         /*PURE VIRTUAL FUNCTION*/
         virtual int handleIoOperation(const int& _ws, struct epoll_event& event) = 0;
+        /*MEMBER FUNCTION*/
+        int deleteAndResetIO(HttpResponse& res, IO *_io);
         void clear(void);
 
         enum
@@ -58,6 +63,7 @@ class IO: public BitsManipulation
         };
         
         protected:
+            int _ws;
             int _fd;
             int _err;
             Server *_server;

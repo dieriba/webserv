@@ -2,6 +2,7 @@
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/http/HttpResponse.hpp"
 # include "../../includes/IO/IO.hpp"
+# include "../../includes/IO/CgiStream.hpp"
 # include "../../includes/utils/UtilityMethod.hpp"
 # include "../../includes/server/HttpServer.hpp"
 
@@ -95,6 +96,20 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         
         if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
         
+        IO* object = new CgiStream(res.getReadEnd(), &event, res.getPipes());
+
+        event.getServer() -> addToEventsMap(static_cast<const IO*> (object));
+
+        epoll_event ev;
+
+        ev.events = EPOLLIN;
+        object -> setEvents(EPOLLIN);
+        ev.data.ptr = object;
+
+        if (epoll_ctl(event.getWs(), EPOLL_CTL_ADD, res.getReadEnd(), &ev) == -1) return IO::IO_ERROR;
+
+        event.setIO(object);
+
         makeStatusLine(OK);
         appendToResponse(CONTENT_TYP, MIME_HTML);
         appendToResponse(TRANSFERT_ENCODING, "chunked");
@@ -143,17 +158,23 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 
 int Get::handleDirectoryRessource(IO& event, const HttpRequest& req, HttpResponse& res)
 {
-    static int i;
-    (void)event;
     (void)req;
-    char buffer[REQUEST_SIZE + 1] = {0};
+    CgiStream *cgi = static_cast<CgiStream*>(event.getIO());
+
+    int bytes = cgi -> getBytes();
+
+    if (bytes == 0) return event.deleteAndResetIO(res, static_cast<IO*>(cgi));
+
+    if (bytes == CgiStream::NO_DATA_AVAILABLE) return IO::IO_SUCCESS;
     
-    int bytes = read(res.getReadEnd(), buffer, REQUEST_SIZE);
+    const char *buffer = cgi -> getBuffer();
+
+    std::cout << bytes << std::endl;
+    std::cout << buffer << std::endl;
     
-    if (bytes > 0)
-        std::cout << bytes << std::endl;
-    i++;
-    return (0);
+    cgi -> setBytes(CgiStream::NO_DATA_AVAILABLE);
+
+    return IO::IO_SUCCESS;
 }
 
 int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)

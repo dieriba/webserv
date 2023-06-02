@@ -4,7 +4,7 @@
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 ClientSocketStream::ClientSocketStream(){};
-ClientSocketStream::ClientSocketStream(const int& fd, Server* server):IO(fd, server)
+ClientSocketStream::ClientSocketStream(const int& ws, const int& fd, Server* server):IO(ws, fd, server)
 {
     _type = IO::CLIENT_SOCKET;
 };
@@ -12,6 +12,7 @@ ClientSocketStream::ClientSocketStream(const ClientSocketStream& rhs):IO(rhs){};
 ClientSocketStream& ClientSocketStream::operator=(const ClientSocketStream& rhs)
 {
     if (this == &rhs) return (*this);
+    _ws = rhs._ws;
     _fd = rhs._fd;
     _err = rhs._err;
     _server = rhs._server;
@@ -115,4 +116,5 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
     
     return writeToSocket(_ws, event);
 }
+
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

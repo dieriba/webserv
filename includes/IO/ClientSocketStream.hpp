@@ -7,7 +7,7 @@ class ClientSocketStream: public IO
 {
     public:
         ClientSocketStream();
-        ClientSocketStream(const int& fd, Server* server);
+        ClientSocketStream(const int& ws, const int& fd, Server* server);
         ClientSocketStream(const ClientSocketStream& rhs);
         ClientSocketStream& operator=(const ClientSocketStream& rhs);
         ~ClientSocketStream();

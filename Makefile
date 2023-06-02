@@ -12,6 +12,7 @@ SRCS_UTILS	= ./srcs/utils/ExceptionThrower.cpp \
 SRCS_IO     = ./srcs/IO/IO.cpp \
               ./srcs/IO/ServerStream.cpp \
               ./srcs/IO/ClientSocketStream.cpp \
+              ./srcs/IO/CgiStream.cpp \
 
 SRCS_HTTP   = ./srcs/http/HttpMessage.cpp \
               ./srcs/http/HttpRequest.cpp \
