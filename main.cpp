@@ -32,7 +32,8 @@ void    print_location_config(const Location& location)
         << "Root Directory: " << (location.getRootDir().size() > 0 ? location.getRootDir() : "No root directory") << std::endl
         << "Redirect: "  << (location.getRedirect().size() > 0 ? location.getRedirect() : "No redirect") << std::endl
         << "Upload Folder: " << ((location.getUploadsFilesFolder().size()) ? location.getUploadsFilesFolder() : "No uploads folder set") << std::endl
-        << "AUTO INDEX: " << ((location.getAutoIndexValue()) == true ? "Auto Index ON" : "Auto Index OFF") << std::endl
+        << "AUTO INDEX: " << ((location.checkBits(HttpServer::AUTO_INDEX_)) > 0 ? "Auto Index ON" : "Auto Index OFF") << std::endl
+        << "FILE_UPLOAD: " << ((location.checkBits(HttpServer::FILE_UPLOAD_)) > 0? "FILE_UPLOAD ON" : "FILE_UPLOAD OFF") << std::endl
         << "Server: " << location.getServer() << std::endl;
         const HttpServer& instance = location;
     print_map_error_page(instance);
@@ -60,7 +61,8 @@ void    print_server_config(const Server& server)
         << "Root Directory: " << ((server.getRootDir().size()) > 0 ? server.getRootDir() : "No root directory") << std::endl
         << "Index HTML: " << ((server.getIndex().size()) > 0 ? server.getIndex() : "No index html") << std::endl
         << "Upload Folder: " << ((server.getUploadsFilesFolder().size()) ? server.getUploadsFilesFolder() : "No uploads folder set") << std::endl
-        << "AUTO INDEX: " << ((server.getAutoIndexValue()) == true ? "Auto Index ON" : "Auto Index OFF") << std::endl;
+        << "AUTO INDEX: " << ((server.checkBits(HttpServer::AUTO_INDEX_)) > 0 ? "Auto Index ON" : "Auto Index OFF") << std::endl
+        << "FILE_UPLOAD: " << ((server.checkBits(HttpServer::FILE_UPLOAD_)) > 0? "FILE_UPLOAD ON" : "FILE_UPLOAD OFF") << std::endl;
         const HttpServer& instance = server;
         print_map_error_page(instance);
         if (serv_it_ != serv_it_end)
@@ -102,11 +104,11 @@ int main (int argc, char **argv)
         signal(SIGINT, HttpServer::switch_off_signal);
         signal(SIGPIPE, SIG_IGN);
         init_static_data();
-        HttpServer tcp_servers;
-        tcp_servers.settingUpServer(argc > 1 ? argv[1] : NULL);
-        tcp_servers.runningUpServer();
-        tcp_servers.makeServerServe();
-        /*std::vector<Server> tmp(tcp_servers.getServers());
+        HttpServer http_server;
+        http_server.settingUpServer(argc > 1 ? argv[1] : NULL);
+        http_server.runningUpServer();
+        http_server.makeServerServe();
+        /*std::vector<Server> tmp(http_server.getServers());
         std::vector<Server>::iterator it = tmp.begin();
         std::vector<Server>::iterator end = tmp.end();
         for ( ; it != end ; it++)

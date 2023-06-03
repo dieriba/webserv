@@ -57,7 +57,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     
     bool directory = res.checkBits(HttpResponse::DIRECTORY);
 
-    if ((directory && instance.getAutoIndexValue()) || directory == 0)
+    if ((directory && instance.checkBits(HttpServer::AUTO_INDEX_)) || directory == 0)
     {
         std::ifstream& file = res.getFile();
 

@@ -81,11 +81,8 @@ void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, Http
 
     if (it != end)
     {
-        if (*(it -> second.rbegin()) == '/')
-            it -> second.erase(--(it -> second.end()));
         instance.setRootDir(UtilityMethod::rtrim("." + it -> second, "/"));
         instance.setFullIndexPath(instance.getRootDir() + instance.getIndexPath());
-
     }
 
     it = _map.find(ALLOWED_METHOD);
@@ -113,11 +110,17 @@ void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, Http
 
     it = _map.find(AUTO_INDEX);
 
-    if (it != end) instance.setAutoIndexValue(it -> second == "on" ? true : false);
+    if (it != end && it -> second ==  "on") instance.setOptions(HttpServer::AUTO_INDEX_, SET);
+
+    it = _map.find(FILE_UPLOAD);
+
+    instance.setOptions(HttpServer::FILE_UPLOAD_, SET);
+
+    if (it != end && it -> second ==  "off") instance.setOptions(HttpServer::FILE_UPLOAD_, CLEAR);
 
     it = _map.find(UPLOAD_FILE_FOLDERS);
 
-    if (it != end) instance.setUploadsFilesFolder(it -> second);
+    if (it != end) instance.setUploadsFilesFolder(UtilityMethod::rtrim("." + it -> second, "/"));
 }
 
 void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, Server& server)
@@ -311,7 +314,7 @@ int    Parser::fillInstance(HttpServer& instance, std::vector<std::string>& vec,
         return setAllowedMethods(instance, vec, _map);
     else if (vec[0] == ERROR_PAGE)
         return handleErrorPages(instance, vec);
-    else if (vec[0] == AUTO_INDEX)
+    else if (vec[0] == AUTO_INDEX || vec[0] == FILE_UPLOAD)
     {
         checkEndSemicolons(vec);
         if (vec[1].compare("on") != 0 && vec[1].compare("off") != 0)

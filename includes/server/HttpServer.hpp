@@ -26,11 +26,12 @@ class HttpServer: public Parser, public BitsManipulation
             ERROR,
             HEADER,
             LOCATION_BLOCK,
-            ERROR_PAGE_SET
+            ERROR_PAGE_SET,
+            AUTO_INDEX_ = 8,
+            FILE_UPLOAD_
         };
 
         /*GETTERS*/
-        const bool& getAutoIndexValue() const;
         bool getCgiPath(const std::string& key, std::string& path);
         std::vector<Server> getServers(void) const;
         const size_t& getBodySize(void) const;
@@ -47,7 +48,6 @@ class HttpServer: public Parser, public BitsManipulation
 
         /*SETTERS*/
         int addToErrorMap(const short int& error, std::string& file, const std::string& directory);
-        void setAutoIndexValue(const bool& auto_index);
         void pushNewServer(const Server& server);
         void setBodySize(const size_t& body);
         void setIndex(const std::string& index);
@@ -83,7 +83,6 @@ class HttpServer: public Parser, public BitsManipulation
         static short int g_signal;
     
     protected:
-        bool   _auto_index;
         size_t _body_size;
         std::string _index;
         std::string _root_dir;

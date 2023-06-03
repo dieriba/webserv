@@ -161,7 +161,8 @@
 # define CGI "cgi"
 # define ROOT_ERROR_PAGE "root_error_pages"
 # define AUTO_INDEX "auto_index"
-# define UPLOAD_FILE_FOLDERS "upload_file_folders"
+# define UPLOAD_FILE_FOLDERS "uploads_folder"
+# define FILE_UPLOAD "file_upload"
 /*
 
 */

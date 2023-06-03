@@ -13,7 +13,6 @@ Location::Location(const Location& rhs):HttpServer(rhs)
 Location& Location::operator=(const Location& rhs)
 {
     if (this == &rhs) return *this;
-    _auto_index = rhs._auto_index;
     _upload_file_folders = rhs._upload_file_folders;
     _sub_path = rhs._sub_path;
     _options = rhs._options;

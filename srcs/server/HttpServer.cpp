@@ -6,18 +6,17 @@
 # include "../../includes/IO/ClientSocketStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-HttpServer::HttpServer():BitsManipulation(),_auto_index(false),_body_size(0),
+HttpServer::HttpServer():BitsManipulation(),_body_size(0),
             _index(""),_root_dir(""),_redirect(""),_epoll_ws(-1){};
 
 HttpServer::HttpServer(const HttpServer& rhs)
-    :Parser(rhs),BitsManipulation(rhs),_auto_index(rhs._auto_index),_body_size(rhs._body_size),_index(rhs._index),
+    :Parser(rhs),BitsManipulation(rhs),_body_size(rhs._body_size),_index(rhs._index),
     _root_dir(rhs._root_dir),_redirect(rhs._redirect),_index_path(rhs._index_path),_upload_file_folders(rhs._upload_file_folders)
     ,_error_pages(rhs._error_pages),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
 
 HttpServer& HttpServer::operator=(const HttpServer& rhs)
 {
     if (this == &rhs) return *this;
-    _auto_index = rhs._auto_index;
     _upload_file_folders = rhs._upload_file_folders;
     _error_pages = rhs._error_pages;
     _body_size = rhs._body_size;
@@ -39,7 +38,6 @@ HttpServer::~HttpServer()
 /*----------------------------------------GETTER----------------------------------------*/
 std::map<short int, std::string>& HttpServer::getErrorMaps() {return _error_pages;}
 std::vector<Server> HttpServer::getServers(void) const {return _servers;};
-const bool& HttpServer::getAutoIndexValue(void) const {return _auto_index;};
 const int& HttpServer::getEpollWs(void) const {return _epoll_ws;}
 const std::map<std::string, std::string>& HttpServer::getCgiMap() const {return _cgi;}
 const std::map<short int, std::string>& HttpServer::getErrorMaps() const {return _error_pages;}
@@ -75,11 +73,6 @@ int HttpServer::addToErrorMap(const short int& error, std::string& file, const s
 void HttpServer::setUploadsFilesFolder(const std::string& uploads_files_foler)
 {
     _upload_file_folders = uploads_files_foler;
-}
-
-void HttpServer::setAutoIndexValue(const bool& auto_index)
-{
-    _auto_index = auto_index;
 }
 
 void HttpServer::pushNewServer(const Server& server)
@@ -238,6 +231,7 @@ void HttpServer::initknownLocationsDirectives(void)
     _knownLocationsDirectives[LOCATION] = true;
     _knownLocationsDirectives[ROOT_ERROR_PAGE] = true;
     _knownDirectives[UPLOAD_FILE_FOLDERS] = true;
+    _knownDirectives[FILE_UPLOAD] = true;
 }   
 
 void HttpServer::initKnownDirectives(void)
@@ -256,6 +250,7 @@ void HttpServer::initKnownDirectives(void)
     _knownDirectives[CGI] = true;
     _knownDirectives[ROOT_ERROR_PAGE] = true;
     _knownDirectives[UPLOAD_FILE_FOLDERS] = true;
+    _knownDirectives[FILE_UPLOAD] = true;
 }
 
 void HttpServer::initHttpResponses(void)

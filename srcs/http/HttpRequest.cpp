@@ -262,7 +262,17 @@ int HttpRequest::parseRequest(IO& object)
         else if (directory && instance -> getIndex().size() == 0)
             full_path = "";
     }
-    
+    else if (getMethod() == HttpServer::POST)
+    {
+        if (instance -> getUploadsFilesFolder().size())
+        {
+            if (directory)
+                full_path = instance -> getUploadsFilesFolder();
+            else
+                full_path = instance -> getUploadsFilesFolder() + "/" + full_path.substr(full_path.rfind('/') + 1);
+        }
+    }
+
     _headers[FULLPATH] = full_path.size() > 0 ? UtilityMethod::remove_dup(full_path) : "";
     
     for (size_t i = 1; i < len; i++)

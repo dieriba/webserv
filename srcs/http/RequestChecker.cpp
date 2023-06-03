@@ -29,7 +29,7 @@ const HttpServer *RequestChecker::serverOrLocation(const Server& server, const H
 
     for (size_t i = 0; i < locations.size(); i++)
     {
-        if ((path.size() == 1 && locations[i].getIndexPath() == path) || path.compare(locations[i].getIndexPath()) == 0)
+        if ((path.size() == 1 && locations[i].getIndexPath() == path) || path.find(locations[i].getIndexPath()) == 0)
             return &locations[i];
     }
 
@@ -77,7 +77,9 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
         return BAD_REQUEST;
 
     size_t len = UtilityMethod::myStrlen(MULTIPART_FORM_DATA"; boundary=");
-        
+    
+    if (!instance.checkBits(HttpServer::FILE_UPLOAD_)) return METHOD_NOT_ALLOWED;
+
     if (it -> second.compare(0, len, MULTIPART_FORM_DATA"; boundary=") == 0)
     {
         if (it_transfer != _map.end()) return BAD_REQUEST;
