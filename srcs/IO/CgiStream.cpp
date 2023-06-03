@@ -86,7 +86,6 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event&)
     {
         return IO::IO_ERROR;
     }
-    
 
     return IO::IO_SUCCESS;
 }

@@ -29,7 +29,7 @@ const HttpServer *RequestChecker::serverOrLocation(const Server& server, const H
 
     for (size_t i = 0; i < locations.size(); i++)
     {
-        if ((path.size() == 1 && locations[i].getIndexPath() == path) || path.find(locations[i].getIndexPath()) == 0)
+        if ((path.size() == 1 && locations[i].getIndexPath() == path) || path.compare(locations[i].getIndexPath()) == 0)
             return &locations[i];
     }
 
