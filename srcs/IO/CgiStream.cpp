@@ -39,36 +39,44 @@ void CgiStream::setPipes(int *pipes) { _pipes = pipes; }
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+int CgiStream::resetCgi(IO* object, const int& _ws)
+{
+    epoll_event ev;
+    ev.events = EPOLLIN;
+    ev.data.ptr = object;
+    UtilityMethod::switchEvents(_ws, EPOLLIN, ev, (*object));
+    UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
+    object -> clear();
+    this -> clear();
+
+    return IO::IO_SUCCESS;
+}
+
 int CgiStream::handleIoOperation(const int& _ws, struct epoll_event&)
 {
     _bytes = read(_pipes[0], _buffer, REQUEST_SIZE);
-    IO* object = getIO();
 
-    if (_bytes <= 0)
-    {
-        epoll_event ev;
-        ev.events = EPOLLIN;
-        ev.data.ptr = object;
-        UtilityMethod::switchEvents(_ws, EPOLLIN, ev, (*object));
-        UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
-        object -> clear();
-        this -> clear();
-        return IO::IO_SUCCESS;
-    }
+    IO* object = getIO();
 
     std::string hex = UtilityMethod::decimalToHex(_bytes);
 
-    
+    _response.appendToBuffer(hex.c_str(), hex.size());
+    _response.appendToBuffer(CRLF, LEN_CRLF);
+    _response.appendToBuffer(_buffer, _bytes);
+    _response.appendToBuffer(CRLF, LEN_CRLF);
 
-    /*if (UtilityMethod::sendBuffer(object -> getFd(), _buffer, _bytes) == IO::IO_ERROR)
+    std::string& resp = _response.getBuffer();
+
+    if (UtilityMethod::sendBuffer(object -> getFd(), resp.data(), resp.size()) == IO::IO_ERROR)
     {
         UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
         return IO::IO_ERROR;
-    }*/
-
-    std::cout << _bytes << std::endl;
+    }
     
-    exit(1);
+    resp.clear();
+
+    if (_bytes <= 0) return resetCgi(object, _ws);
+
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

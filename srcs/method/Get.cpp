@@ -96,10 +96,13 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         
         if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
         
+        std::cout << "Read end: " << res.getReadEnd() << std::endl;
+
         CgiStream* cgi = static_cast<CgiStream *>(event.getIO());
         
         cgi -> setPipes(res.getPipes());
-
+        cgi -> setFD(res.getReadEnd());
+        
         epoll_event ev;
 
         ev.events = EPOLLIN;

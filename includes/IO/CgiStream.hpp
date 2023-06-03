@@ -30,6 +30,8 @@ class CgiStream: public IO
         int *_pipes;
         int _bytes;
         char _buffer[REQUEST_SIZE + 1];
+
+        int resetCgi(IO* object, const int& _ws);
 };
 
 # endif
