@@ -63,11 +63,9 @@ int Error::firstStep(IO& event, HttpResponse& res, const int& err)
     std::map<short int, std::string>& _map = event.getServer() -> getInstance() -> getErrorMaps();
     std::map<short int, std::string>::iterator it = _map.find(event.getErrStatus());
 
-
     if (it == _map.end()) it = _map.find(DEFAULT_ERROR_PAGE_VALUE);
 
     if (it == _map.end()) return IO::IO_ERROR;
-    
 
     if (access(it -> second.c_str(), F_OK) != 0) return IO::IO_ERROR;
 
@@ -112,14 +110,11 @@ int Error::sendResponse(IO& event, HttpRequest& /* req */, HttpResponse& res)
 
         if (err == IO::IO_SUCCESS && res.checkBits(HttpResponse::FILE)) return handleFileRessource(event, res);
     }
-
-    if (instance.checkBits(HttpServer::ERROR_PAGE_SET) == 0 && err <= 0)
-    {
-        std::string error_page = getErrorPage(event.getErrStatus());
-        if (UtilityMethod::sendBuffer(event.getFd(), error_page.c_str(), error_page.size())) 
-            return IO::IO_ERROR;
-        res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
-    }
+    
+    std::string error_page = getErrorPage(event.getErrStatus());
+    if (UtilityMethod::sendBuffer(event.getFd(), error_page.c_str(), error_page.size())) 
+        return IO::IO_ERROR;
+    res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
