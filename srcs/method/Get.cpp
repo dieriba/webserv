@@ -29,12 +29,10 @@ Get::~Get(){};
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
+int Get::handleFileRessource(IO& event, HttpResponse& res)
 {
     try
     {
-        static size_t len;
-        (void)req;
         char buffer[REQUEST_SIZE + 1] = {0};
 
         std::ifstream& file = res.getFile();
@@ -43,10 +41,7 @@ int Get::handleFileRessource(IO& event, HttpRequest& req, HttpResponse& res)
 
         if (UtilityMethod::sendBuffer(event.getFd(), buffer, file.gcount())) return (IO::IO_ERROR);
 
-        len += file.gcount();
-        if (file.fail() || file.eof())
-            res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
-        std::cout << "Entered" << std::endl;
+        if (file.fail() || file.eof()) res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     }
     catch(const std::exception& e)
     {
@@ -95,8 +90,6 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         if (access(PATH_TO_DIRECTORY_LISTING_SCRIPT, F_OK) != 0) return NOT_FOUND;
         
         if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
-        
-        std::cout << "Read end: " << res.getReadEnd() << std::endl;
 
         CgiStream* cgi = static_cast<CgiStream *>(event.getIO());
         
@@ -168,7 +161,7 @@ int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
         if (err) return err;
     }
 
-    if (res.checkBits(HttpResponse::FILE)) return handleFileRessource(event, req, res);
+    if (res.checkBits(HttpResponse::FILE)) return handleFileRessource(event, res);
     
     return IO::IO_SUCCESS;
 }

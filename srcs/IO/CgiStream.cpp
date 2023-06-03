@@ -54,28 +54,39 @@ int CgiStream::resetCgi(IO* object, const int& _ws)
 
 int CgiStream::handleIoOperation(const int& _ws, struct epoll_event&)
 {
-    _bytes = read(_pipes[0], _buffer, REQUEST_SIZE);
-
-    IO* object = getIO();
-
-    std::string hex = UtilityMethod::decimalToHex(_bytes);
-
-    _response.appendToBuffer(hex.c_str(), hex.size());
-    _response.appendToBuffer(CRLF, LEN_CRLF);
-    _response.appendToBuffer(_buffer, _bytes);
-    _response.appendToBuffer(CRLF, LEN_CRLF);
-
-    std::string& resp = _response.getBuffer();
-
-    if (UtilityMethod::sendBuffer(object -> getFd(), resp.data(), resp.size()) == IO::IO_ERROR)
+    try
     {
-        UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
+        _bytes = read(_pipes[0], _buffer, REQUEST_SIZE);
+
+        IO* object = getIO();
+        
+        if (_bytes < 0) return resetCgi(object, _ws);
+        
+        std::string hex = UtilityMethod::decimalToHex(_bytes);
+
+        _response.appendToBuffer(hex.c_str(), hex.size());
+        _response.appendToBuffer(CRLF, LEN_CRLF);
+        _response.appendToBuffer(_buffer, _bytes);
+        _response.appendToBuffer(CRLF, LEN_CRLF);
+
+        std::string& resp = _response.getBuffer();
+
+        if (UtilityMethod::sendBuffer(object -> getFd(), resp.data(), resp.size()) == IO::IO_ERROR)
+        {
+            UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
+            resp.clear();
+            return IO::IO_ERROR;
+        }
+    
+        resp.clear();
+
+        if (_bytes == 0) return resetCgi(object, _ws);
+    }
+    catch(const std::exception& e)
+    {
         return IO::IO_ERROR;
     }
     
-    resp.clear();
-
-    if (_bytes <= 0) return resetCgi(object, _ws);
 
     return IO::IO_SUCCESS;
 }
