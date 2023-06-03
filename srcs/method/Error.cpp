@@ -58,13 +58,68 @@ std::string Error::getErrorPage(const short int& err) const
     return res;
 }
 
-int Error::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
+int Error::firstStep(IO& event, HttpResponse& res, const int& err)
 {
-    (void)req;
-    std::string error_page = getErrorPage(event.getErrStatus());
-    if (UtilityMethod::sendBuffer(event.getFd(), error_page.c_str(), error_page.size()))
-        return IO::IO_ERROR;
-    res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+    std::map<short int, std::string>& _map = event.getServer() -> getInstance() -> getErrorMaps();
+    std::map<short int, std::string>::iterator it = _map.find(event.getErrStatus());
+
+
+    if (it == _map.end()) it = _map.find(DEFAULT_ERROR_PAGE_VALUE);
+
+    if (it == _map.end()) return IO::IO_ERROR;
+    
+
+    if (access(it -> second.c_str(), F_OK) != 0) return IO::IO_ERROR;
+
+    if (access(it -> second.c_str(), R_OK) != 0) return IO::IO_ERROR;
+
+    std::ifstream& file = res.getFile();
+
+    file.open(it -> second.c_str(), std::ifstream::in | std::ifstream::binary);
+
+    if (!file) return IO::IO_ERROR;
+        
+    file.seekg(0, std::ios::end);
+    res.setBodySize(file.tellg());
+    file.seekg(0, std::ios::beg);
+
+    if (file.fail()) return IO::IO_ERROR;
+
+    makeStatusLine(err);
+    appendToResponse(CONTENT_TYP, UtilityMethod::getMimeType(it -> second, "", "", false));
+    appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()));
+    _response += CRLF;
+
+    if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size())) return (IO::IO_ERROR);
+
+    _response.clear();
+
+    res.setOptions(HttpResponse::STARTED, SET);
+    res.setOptions(HttpResponse::FILE, SET);
+
+    return IO::IO_SUCCESS;
+}
+
+int Error::sendResponse(IO& event, HttpRequest& /* req */, HttpResponse& res)
+{    
+    HttpServer& instance = *(event.getServer() -> getInstance());
+    
+    int err = 0;
+
+    if (instance.checkBits(HttpServer::ERROR_PAGE_SET))
+    {
+        if (!res.checkBits(HttpResponse::STARTED)) err = firstStep(event, res, event.getErrStatus());
+
+        if (err == IO::IO_SUCCESS && res.checkBits(HttpResponse::FILE)) return handleFileRessource(event, res);
+    }
+
+    if (instance.checkBits(HttpServer::ERROR_PAGE_SET) == 0 && err <= 0)
+    {
+        std::string error_page = getErrorPage(event.getErrStatus());
+        if (UtilityMethod::sendBuffer(event.getFd(), error_page.c_str(), error_page.size())) 
+            return IO::IO_ERROR;
+        res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+    }
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

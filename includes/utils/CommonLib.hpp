@@ -28,7 +28,7 @@
 /*
 
 */
-
+# define DEFAULT_ERROR_PAGE_VALUE -1
 # define DEFAULT_FILE_NAME "/ressource_"
 /*
 

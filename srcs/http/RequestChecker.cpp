@@ -109,7 +109,7 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
     else
     {
         std::string& path(_map.find(PATH) -> second);
-        std::string _pathMimeType = UtilityMethod::getMimeType(path, "", "", true);
+        std::string _pathMimeType = UtilityMethod::getMimeType(path, "", "", false);
 
         if (path.size() > 2 && *(path.rbegin()) == '/') path.erase(path.size() - 1);
 

@@ -15,6 +15,7 @@ class Error: public Method
         ~Error();
 
         /*MEMBER FUNCTION*/
+        int firstStep(IO& event, HttpResponse& res, const int& err);
         int sendResponse(IO&, HttpRequest&, HttpResponse&);
     private:
         std::string getErrorPage(const short int& err) const;

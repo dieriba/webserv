@@ -29,6 +29,27 @@ std::string& Method::getResponse(void) {return _response;}
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
+int Method::handleFileRessource(IO& event, HttpResponse& res)
+{
+    try
+    {
+        char buffer[REQUEST_SIZE + 1] = {0};
+
+        std::ifstream& file = res.getFile();
+        
+        file.read(buffer, REQUEST_SIZE);
+
+        if (UtilityMethod::sendBuffer(event.getFd(), buffer, file.gcount())) return (IO::IO_ERROR);
+
+        if (file.fail() || file.eof()) res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+    }
+    catch(const std::exception& e)
+    {
+        res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+    }
+    return IO::IO_SUCCESS;
+}
+
 int Method::sendRedirect(const IO& event, HttpResponse& res, const char *status_line)
 {
     if (UtilityMethod::sendBuffer(event.getFd(), status_line, UtilityMethod::myStrlen(status_line)))

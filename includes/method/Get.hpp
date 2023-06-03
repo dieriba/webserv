@@ -21,7 +21,6 @@ class Get: public Method
         int handleChunkedRequest(HttpResponse& res, std::string& s_buffer);
 
     private:
-        int handleFileRessource(IO& event, HttpResponse& res);
         int handleDirectoryRessource(IO& event, const HttpRequest& req, HttpResponse& res);
 };
 

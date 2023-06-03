@@ -52,7 +52,7 @@ int CgiStream::resetCgi(IO* object, const int& _ws)
     return IO::IO_SUCCESS;
 }
 
-int CgiStream::handleIoOperation(const int& _ws, struct epoll_event&)
+int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */)
 {
     try
     {
