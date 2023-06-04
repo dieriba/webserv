@@ -336,10 +336,8 @@ int HttpRequest::parseRequest(IO& object)
     return IO::IO_SUCCESS;
 }
 
-int HttpRequest::checkValidHeader(const int& _ws, struct epoll_event event) const
+int HttpRequest::checkValidHeader(const int& /* _ws */ , struct epoll_event /* event */) const
 {
-    (void)_ws;
-    (void)event;
     
     return 0;
 }

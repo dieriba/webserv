@@ -55,12 +55,11 @@ int RequestChecker::checkAll(IO& object, HttpRequest& req)
     return _res;
 }
 
-int RequestChecker::checkDeleteMethod(const HttpServer& instance, HttpRequest& req)
+int RequestChecker::checkDeleteMethod(const HttpServer& /* instance */, HttpRequest& req)
 {
     std::map<std::string, std::string>& _map = req.getHeaders();
 
     if ((_map.find(CONTENT_LEN) != _map.end()) || (_map.find(TRANSFERT_ENCODING) != _map.end())) return BAD_REQUEST;
-    (void)instance;
     return IO::IO_SUCCESS;
 }
 
@@ -121,9 +120,8 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkGetMethod(const HttpServer& instance, HttpRequest& req)
+int RequestChecker::checkGetMethod(const HttpServer& /* instance */, HttpRequest& req)
 {
-    (void)instance;
     std::map<std::string, std::string>& _map = req.getHeaders();
 
     if ((_map.find(CONTENT_LEN) != _map.end()) || (_map.find(TRANSFERT_ENCODING) != _map.end())) return BAD_REQUEST;

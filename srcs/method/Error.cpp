@@ -88,7 +88,7 @@ int Error::firstStep(IO& event, HttpResponse& res, const int& err)
     appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()));
     _response += CRLF;
 
-    if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size())) return (IO::IO_ERROR);
+    if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
 
     _response.clear();
 
@@ -112,8 +112,7 @@ int Error::sendResponse(IO& event, HttpRequest& /* req */, HttpResponse& res)
     }
     
     std::string error_page = getErrorPage(event.getErrStatus());
-    if (UtilityMethod::sendBuffer(event.getFd(), error_page.c_str(), error_page.size())) 
-        return IO::IO_ERROR;
+    if (UtilityMethod::sendBuffer(event.getFd(), error_page.c_str(), error_page.size()) == IO::IO_ERROR) return IO::IO_ERROR;
     res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     return IO::IO_SUCCESS;
 }

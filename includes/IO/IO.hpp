@@ -47,21 +47,22 @@ class IO: public BitsManipulation
         /*PURE VIRTUAL FUNCTION*/
         virtual int handleIoOperation(const int& _ws, struct epoll_event& event) = 0;
         /*MEMBER FUNCTION*/
-        int deleteAndResetIO(HttpResponse& res, IO *_io);
+        int deleteAndResetIO(HttpResponse& res);
         void clear(void);
 
         enum
         {
             IO_ERROR = -1,
             IO_SUCCESS,
-            CGI_ON
+            CGI_ON,
+            COOKIE
         };
 
         enum type
         {
             VIRTUAL_SERV,
             CLIENT_SOCKET,
-            CGI_STREAM
+            CGI_STREAM,
         };
         
         protected:

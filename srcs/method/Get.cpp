@@ -121,7 +121,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         close(res.getWriteEnd());
     }
 
-    if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size())) return (IO::IO_ERROR);
+    if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
 
     _response.clear();
     

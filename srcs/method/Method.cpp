@@ -39,7 +39,7 @@ int Method::handleFileRessource(IO& event, HttpResponse& res)
         
         file.read(buffer, REQUEST_SIZE);
 
-        if (UtilityMethod::sendBuffer(event.getFd(), buffer, file.gcount())) return (IO::IO_ERROR);
+        if (UtilityMethod::sendBuffer(event.getFd(), buffer, file.gcount()) == IO::IO_ERROR) return (IO::IO_ERROR);
 
         if (file.fail() || file.eof()) res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     }
@@ -52,7 +52,7 @@ int Method::handleFileRessource(IO& event, HttpResponse& res)
 
 int Method::sendRedirect(const IO& event, HttpResponse& res, const char *status_line)
 {
-    if (UtilityMethod::sendBuffer(event.getFd(), status_line, UtilityMethod::myStrlen(status_line)))
+    if (UtilityMethod::sendBuffer(event.getFd(), status_line, UtilityMethod::myStrlen(status_line)) == IO::IO_ERROR)
             return IO::IO_ERROR;
     
     const std::string& redirect_url = event.getServer() -> getInstance() -> getRedirect();

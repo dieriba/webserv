@@ -49,9 +49,8 @@ void IO::setWs(const int& ws) {_ws = ws;}
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-int IO::deleteAndResetIO(HttpResponse& res, IO* io)
+int IO::deleteAndResetIO(HttpResponse& res)
 {
-    (void)io;
     close(res.getReadEnd());
     res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     return IO::IO_SUCCESS;
