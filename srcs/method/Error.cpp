@@ -83,7 +83,7 @@ int Error::firstStep(IO& event, HttpResponse& res, const int& err)
 
     if (file.fail()) return IO::IO_ERROR;
 
-    makeStatusLine(err);
+    makeStatusLine(event, err);
     appendToResponse(CONTENT_TYP, UtilityMethod::getMimeType(it -> second, "", "", false));
     appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()));
     _response += CRLF;

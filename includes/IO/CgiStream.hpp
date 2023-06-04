@@ -12,10 +12,6 @@ class CgiStream: public IO
         CgiStream& operator=(const CgiStream& rhs);
         ~CgiStream();
         
-        /*GETTERS*/
-        const int& getBytes(void) const;
-        const char* getBuffer(void) const;
-
         /*SETTERS*/
         void setPipes(int *pipes);
         void setBytes(const int& bytes);
@@ -28,7 +24,6 @@ class CgiStream: public IO
     private:
         IO *_io;
         int *_pipes;
-        int _bytes;
         char _buffer[REQUEST_SIZE + 1];
 
         int resetCgi(IO* object, const int& _ws);

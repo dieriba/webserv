@@ -50,7 +50,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 
         if (file.fail()) return INTERNAL_SERVER_ERROR;
 
-        makeStatusLine(OK);
+        makeStatusLine(event, OK);
 
         std::string ressource(full_path);
         
@@ -83,7 +83,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 
         if (epoll_ctl(event.getWs(), EPOLL_CTL_ADD, res.getReadEnd(), &ev) == -1) return IO::IO_ERROR;
 
-        makeStatusLine(OK);
+        makeStatusLine(event, OK);
         appendToResponse(CONTENT_TYP, MIME_HTML);
         appendToResponse(TRANSFERT_ENCODING, "chunked");
         _response += CRLF;

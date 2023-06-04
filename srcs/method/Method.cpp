@@ -64,7 +64,19 @@ int Method::sendRedirect(const IO& event, HttpResponse& res, const char *status_
     return IO::IO_SUCCESS;
 }
 
-void Method::makeStatusLine(const int& status)
+void Method::setCookieHeader(IO& object)
+{
+    static int counter = 0;
+
+    std::time_t currentTime = std::time(NULL);
+    std::string uniqueCookie = UtilityMethod::numberToString(currentTime) + "_" + UtilityMethod::numberToString(counter++);
+    
+    uniqueCookie = WELCOME_COOKIES + uniqueCookie + "; PATH=/;";
+    appendToResponse(SET_COOKIE, uniqueCookie);
+    object.setOptions(IO::COOKIE, SET);
+}
+
+void Method::makeStatusLine(IO& object, const int& status)
 {
     std::string version(HTTP_VERSION);
     std::ostringstream ss;
@@ -73,6 +85,8 @@ void Method::makeStatusLine(const int& status)
     std::string code(ss.str());
     
     _response = version + " " + code + " " + HttpServer::getHttpResponse(status) -> second + CRLF;
+
+    if (object.checkBits(IO::COOKIE) == 0) setCookieHeader(object);
 }
 
 void Method::appendToResponse(const std::string& key, const std::string& value)

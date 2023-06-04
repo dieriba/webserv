@@ -30,6 +30,8 @@
 */
 # define DEFAULT_ERROR_PAGE_VALUE -1
 # define DEFAULT_FILE_NAME "/ressource_"
+# define WELCOME_COOKIES "Welcome_Cookie="
+# define SET_COOKIE "Set-Cookie"
 /*
 
 

@@ -3,17 +3,16 @@
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 CgiStream::CgiStream(){};
-CgiStream::CgiStream(const int& fd, IO *event, int *pipes):_io(event),_pipes(pipes),_bytes(CgiStream::NO_DATA_AVAILABLE)
+CgiStream::CgiStream(const int& fd, IO *event, int *pipes):_io(event),_pipes(pipes)
 {
     setFD(fd);
     _type = IO::CGI_STREAM;
 };
-CgiStream::CgiStream(const CgiStream& rhs):IO(rhs),_io(rhs._io),_pipes(rhs._pipes),_bytes(rhs._bytes)
+CgiStream::CgiStream(const CgiStream& rhs):IO(rhs),_io(rhs._io),_pipes(rhs._pipes)
 {};
 CgiStream& CgiStream::operator=(const CgiStream& rhs)
 {
     if (this == &rhs) return (*this);
-    _bytes = rhs._bytes;
     _fd = rhs._fd;
     _err = rhs._err;
     _server = rhs._server;
@@ -29,12 +28,9 @@ CgiStream::~CgiStream(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
-const int& CgiStream::getBytes(void) const {return _bytes;};
-const char *CgiStream::getBuffer(void) const {return _buffer;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
-void CgiStream::setBytes(const int& bytes) { _bytes = bytes; }
 void CgiStream::setPipes(int *pipes) { _pipes = pipes; }
 /*----------------------------------------SETTER----------------------------------------*/
 
@@ -56,17 +52,17 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
 {
     try
     {
-        _bytes = read(_pipes[0], _buffer, REQUEST_SIZE);
+        int bytes = read(_pipes[0], _buffer, REQUEST_SIZE);
 
         IO* object = getIO();
         
-        if (_bytes < 0) return resetCgi(object, _ws);
+        if (bytes < 0) return resetCgi(object, _ws);
         
-        std::string hex = UtilityMethod::decimalToHex(_bytes);
+        std::string hex = UtilityMethod::decimalToHex(bytes);
 
         _response.appendToBuffer(hex.c_str(), hex.size());
         _response.appendToBuffer(CRLF, LEN_CRLF);
-        _response.appendToBuffer(_buffer, _bytes);
+        _response.appendToBuffer(_buffer, bytes);
         _response.appendToBuffer(CRLF, LEN_CRLF);
 
         std::string& resp = _response.getBuffer();
@@ -80,7 +76,7 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
     
         resp.clear();
 
-        if (_bytes == 0) return resetCgi(object, _ws);
+        if (bytes == 0) return resetCgi(object, _ws);
     }
     catch(const std::exception& e)
     {

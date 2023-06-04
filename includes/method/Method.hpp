@@ -24,7 +24,8 @@ class Method
         int sendBuffer(int client_socket, const char *buffer, int bytes);
         int handleFileRessource(IO& event, HttpResponse& res);
         int sendRedirect(const IO& event, HttpResponse& res, const char *status_line);
-        void makeStatusLine(const int& status);
+        void makeStatusLine(IO& event, const int& status);
+        void setCookieHeader(IO& event);
         void appendToResponse(const std::string& key, const std::string& value);
 
         /*VIRTUAL FUNCTION*/
