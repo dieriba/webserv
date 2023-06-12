@@ -29,6 +29,67 @@ Get::~Get(){};
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
+int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
+{
+    HttpServer& instance = *(event.getServer() -> getInstance());
+
+    if (access(PATH_TO_DIRECTORY_LISTING_SCRIPT, F_OK) != 0) return NOT_FOUND;
+        
+    if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
+
+    CgiStream* cgi = static_cast<CgiStream *>(event.getIO());
+        
+    cgi -> setPipes(res.getPipes());
+    cgi -> setFD(res.getReadEnd());
+        
+    epoll_event ev;
+
+    ev.events = EPOLLIN;
+    cgi -> setEvents(EPOLLIN);
+    ev.data.ptr = cgi;
+
+    if (epoll_ctl(event.getWs(), EPOLL_CTL_ADD, res.getReadEnd(), &ev) == -1) return IO::IO_ERROR;
+
+    makeStatusLine(event, OK);
+    appendToResponse(CONTENT_TYP, MIME_HTML);
+    appendToResponse(TRANSFERT_ENCODING, "chunked");
+    _response += CRLF;
+        
+    pid_t pid = fork();
+
+    if (pid == -1) return INTERNAL_SERVER_ERROR;
+
+    if (pid == 0)
+    {
+        close(res.getReadEnd());
+
+        if (dup2(res.getWriteEnd(), STDOUT_FILENO) == -1)
+        {
+            write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
+            close(res.getWriteEnd());
+            exit(1);
+        }
+            
+        close(res.getWriteEnd());
+
+        const std::string& path(PATH"=" + req.getHeaders().find(PATH)-> second);
+        std::string root(ROOT"=" + instance.getRootDir() + req.getHeaders().find(PATH)-> second);
+
+        char *envp[] = {(char *)root.c_str(), (char *)path.c_str(), NULL};
+
+        char *argv[] = {NULL};
+
+        execve(PATH_TO_DIRECTORY_LISTING_SCRIPT, argv, envp);
+            
+        exit(1);
+    }
+
+    event.setOptions(IO::CGI_ON, SET);
+    close(res.getWriteEnd());
+
+    return IO::IO_SUCCESS;
+}
+
 int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 {
     HttpServer& instance = *(event.getServer() -> getInstance());
@@ -66,59 +127,9 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 
         if (HttpServer::makeNonBlockingFd(res.getReadEnd()) == -1) return INTERNAL_SERVER_ERROR;
 
-        if (access(PATH_TO_DIRECTORY_LISTING_SCRIPT, F_OK) != 0) return NOT_FOUND;
-        
-        if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
+        int resp = directoryCgi(event, req, res);
 
-        CgiStream* cgi = static_cast<CgiStream *>(event.getIO());
-        
-        cgi -> setPipes(res.getPipes());
-        cgi -> setFD(res.getReadEnd());
-        
-        epoll_event ev;
-
-        ev.events = EPOLLIN;
-        cgi -> setEvents(EPOLLIN);
-        ev.data.ptr = cgi;
-
-        if (epoll_ctl(event.getWs(), EPOLL_CTL_ADD, res.getReadEnd(), &ev) == -1) return IO::IO_ERROR;
-
-        makeStatusLine(event, OK);
-        appendToResponse(CONTENT_TYP, MIME_HTML);
-        appendToResponse(TRANSFERT_ENCODING, "chunked");
-        _response += CRLF;
-        
-        pid_t pid = fork();
-
-        if (pid == -1) return INTERNAL_SERVER_ERROR;
-
-        if (pid == 0)
-        {
-            close(res.getReadEnd());
-
-            if (dup2(res.getWriteEnd(), STDOUT_FILENO) == -1)
-            {
-                write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
-                close(res.getWriteEnd());
-                exit(1);
-            }
-            
-            close(res.getWriteEnd());
-
-            const std::string& path(PATH"=" + req.getHeaders().find(PATH)-> second);
-            std::string root(ROOT"=" + instance.getRootDir() + req.getHeaders().find(PATH)-> second);
-
-            char *envp[] = {(char *)root.c_str(), (char *)path.c_str(), NULL};
-
-            char *argv[] = {NULL};
-
-            execve(PATH_TO_DIRECTORY_LISTING_SCRIPT, argv, envp);
-            
-            exit(1);
-        }
-
-        event.setOptions(IO::CGI_ON, SET);
-        close(res.getWriteEnd());
+        if (resp > 0) return resp; 
     }
 
     if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);

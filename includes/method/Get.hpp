@@ -19,6 +19,7 @@ class Get: public Method
         int sendResponse(IO&, HttpRequest&, HttpResponse&);
         int firstStep(IO& event, const HttpRequest& req, HttpResponse& res);
         int handleChunkedRequest(HttpResponse& res, std::string& s_buffer);
+        int directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res);
 
     private:
         int handleDirectoryRessource(IO& event, const HttpRequest& req, HttpResponse& res);
