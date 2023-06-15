@@ -26,9 +26,13 @@ void    Parser::checkEndSemicolons(std::vector<std::string>& vec)
 
 void    Parser::setCommonDirectives(std::vector<std::string>& vec, std::map<std::string, std::string>& _map)
 {
-    checkEndSemicolons(vec);
-    if (_map.find(vec[0]) != _map.end())
-        throw ExceptionThrower("Redeclaration of the same directive");
+    if (vec[0] != CGI)
+    {
+        checkEndSemicolons(vec);
+        if (_map.find(vec[0]) != _map.end())
+            throw ExceptionThrower("Redeclaration of the same directive");
+    }
+    
     _map[vec[0]] = vec[1];
 }
 

@@ -17,6 +17,7 @@ class Get: public Method
 
         /*MEMBER FUNCTION*/
         int sendResponse(IO&, HttpRequest&, HttpResponse&);
+        int getCgiHandler(IO& event, const HttpRequest& req, HttpResponse& res);
         int firstStep(IO& event, const HttpRequest& req, HttpResponse& res);
         int handleChunkedRequest(HttpResponse& res, std::string& s_buffer);
         int directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res);

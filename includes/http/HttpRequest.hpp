@@ -33,7 +33,7 @@ class HttpRequest: public HttpMessage, public BitsManipulation
             CHUNKED_FINISHED,
             CARRIAGE_FEED,
             CGI_GET = 8,
-            POST_CGI,
+            CGI_POST,
             STARTED,
             MULTIPART_DATA,
             NO_ENCODING,

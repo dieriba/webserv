@@ -29,6 +29,13 @@ Get::~Get(){};
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
+int Get::getCgiHandler(IO& /* event */, const HttpRequest& /* req */, HttpResponse& /* res */)
+{
+    //HttpServer& instance = *(event.getServer() -> getInstance());
+
+    return IO::IO_SUCCESS;
+}
+
 int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
 {
     HttpServer& instance = *(event.getServer() -> getInstance());
@@ -127,7 +134,12 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 
         if (HttpServer::makeNonBlockingFd(res.getReadEnd()) == -1) return INTERNAL_SERVER_ERROR;
 
-        int resp = directoryCgi(event, req, res);
+        int resp = 0;
+
+        if (directory)
+            resp = directoryCgi(event, req, res);
+        else
+            resp = getCgiHandler(event, req, res);
 
         if (resp > 0) return resp; 
     }
@@ -148,6 +160,7 @@ int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
     if (!res.checkBits(HttpResponse::STARTED))
     {
         int err = firstStep(event, req, res);
+
         if (err) return err;
     }
 
