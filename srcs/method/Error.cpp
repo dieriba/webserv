@@ -117,3 +117,7 @@ int Error::sendResponse(IO& event, HttpRequest& /* req */, HttpResponse& res)
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+/*----------------------------------------VIRTUAL MEMBER FUNCTION----------------------------------------*/
+Method *Error::clone(void) const {return new Error; };
+/*----------------------------------------VIRTUAL MEMBER FUNCTION----------------------------------------*/

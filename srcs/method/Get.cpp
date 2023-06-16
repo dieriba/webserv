@@ -48,7 +48,9 @@ int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
         
     cgi -> setPipes(res.getPipes());
     cgi -> setFD(res.getReadEnd());
-        
+    std::cout << "Pipe File's descriptor: " << res.getReadEnd() << std::endl;
+    cgi -> getReponse().setMethodObj(res.getHttpMethod() -> clone());
+
     epoll_event ev;
 
     ev.events = EPOLLIN;
@@ -74,7 +76,7 @@ int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
         {
             write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
             close(res.getWriteEnd());
-            exit(1);
+            exit(EXIT_FAILURE);
         }
             
         close(res.getWriteEnd());
@@ -88,7 +90,7 @@ int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
 
         execve(PATH_TO_DIRECTORY_LISTING_SCRIPT, argv, envp);
             
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     event.setOptions(IO::CGI_ON, SET);
@@ -127,8 +129,11 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         _response += CRLF;
         
         res.setOptions(HttpResponse::FILE, SET);
+    
+        if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
+    
     }
-    else if (directory)
+    else if (directory || req.checkBits(HttpRequest::CGI_GET))
     {
         if (pipe(res.getPipes()) == -1) return INTERNAL_SERVER_ERROR;
 
@@ -143,8 +148,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 
         if (resp > 0) return resp; 
     }
-
-    if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
+    
 
     _response.clear();
     
@@ -160,7 +164,6 @@ int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
     if (!res.checkBits(HttpResponse::STARTED))
     {
         int err = firstStep(event, req, res);
-
         if (err) return err;
     }
 
@@ -169,3 +172,7 @@ int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+/*----------------------------------------VIRTUAL MEMBER FUNCTION----------------------------------------*/
+Method *Get::clone(void) const {return new Get; };
+/*----------------------------------------VIRTUAL MEMBER FUNCTION----------------------------------------*/

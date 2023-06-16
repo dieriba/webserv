@@ -22,6 +22,8 @@ class Get: public Method
         int handleChunkedRequest(HttpResponse& res, std::string& s_buffer);
         int directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res);
 
+        /*VIRTUAL FUNCTION*/
+        virtual Method* clone(void) const;
     private:
         int handleDirectoryRessource(IO& event, const HttpRequest& req, HttpResponse& res);
 };

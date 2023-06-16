@@ -11,7 +11,7 @@ class ClientSocketStream: public IO
         ClientSocketStream(const ClientSocketStream& rhs);
         ClientSocketStream& operator=(const ClientSocketStream& rhs);
         ~ClientSocketStream();
-
+        
         int handleIoOperation(const int& _ws, struct epoll_event&);
     private:
         int readFromSocket(const int& _ws, struct epoll_event& event);

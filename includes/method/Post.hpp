@@ -28,6 +28,9 @@ class Post: public Method
         int writeToFile(HttpRequest& req, const size_t& pos, const size_t& bytes);
         int writeToFileMutltipartData(HttpRequest& req, const size_t& bytes);
 
+        /*VIRTUAL MEMBER FUNCTION*/
+        virtual Method* clone(void) const;
+
     private:
         int handleMultipartData(IO& event, HttpRequest& req);
         size_t _request_body_size;

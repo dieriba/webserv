@@ -17,6 +17,9 @@ class Error: public Method
         /*MEMBER FUNCTION*/
         int firstStep(IO& event, HttpResponse& res, const int& err);
         int sendResponse(IO&, HttpRequest&, HttpResponse&);
+
+        /*VIRTUAL MEMBER FUNCTION*/
+        virtual Method* clone(void) const;
     private:
         std::string getErrorPage(const short int& err) const;
 };

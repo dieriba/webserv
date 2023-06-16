@@ -253,3 +253,7 @@ int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+/*----------------------------------------VIRTUAL MEMBER FUNCTION----------------------------------------*/
+Method *Post::clone(void) const {return new Post; };
+/*----------------------------------------VIRTUAL MEMBER FUNCTION----------------------------------------*/

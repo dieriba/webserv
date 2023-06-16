@@ -42,3 +42,7 @@ int Delete::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+/*----------------------------------------VIRTUAL MEMBER FUNCTION----------------------------------------*/
+Method *Delete::clone(void) const {return new Delete; };
+/*----------------------------------------VIRTUAL MEMBER FUNCTION----------------------------------------*/

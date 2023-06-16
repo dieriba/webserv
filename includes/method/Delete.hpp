@@ -16,6 +16,9 @@ class Delete: public Method
 
         /*MEMBER FUNCTION*/
         int sendResponse(IO&, HttpRequest&, HttpResponse&);
+
+        /*VIRTUAL MEMBER FUNCTION*/
+        virtual Method* clone(void) const;
 };
 
 

@@ -29,6 +29,7 @@ class Method
         void appendToResponse(const std::string& key, const std::string& value);
 
         /*VIRTUAL FUNCTION*/
+        virtual Method* clone(void) const = 0;
         virtual int sendResponse(IO&, HttpRequest&, HttpResponse&) = 0;
 
         /*STATIC MEMBER FUNCTION*/
