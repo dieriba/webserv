@@ -1,8 +1,5 @@
 #!/bin/bash
 
-echo "Content-Type: text/plain"
-echo ""
-
 # Check the request method
 request_method="$REQUEST_METHOD"
 
