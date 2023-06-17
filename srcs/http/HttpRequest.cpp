@@ -317,7 +317,7 @@ int HttpRequest::parseRequest(IO& object)
 
     int _req = RequestChecker::checkAll(object, (*this));
 
-    if (checkBits(HttpRequest::DIRECTORY)) object.getReponse().setOptions(HttpResponse::DIRECTORY, SET);
+    if (!checkBits(HttpRequest::CGI_POST) && checkBits(HttpRequest::DIRECTORY)) object.getReponse().setOptions(HttpResponse::DIRECTORY, SET);
 
     std::cout << "Req value: " << _req << std::endl;
     
@@ -329,7 +329,7 @@ int HttpRequest::parseRequest(IO& object)
 
         res.setMethodObj(Method::_tab[getMethod()]());
 
-        if (checkBits(HttpRequest::NO_ENCODING)) open_file(object);
+        if (!checkBits(HttpRequest::CGI_POST) && checkBits(HttpRequest::NO_ENCODING)) open_file(object);
 
     }
 

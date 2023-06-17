@@ -26,6 +26,7 @@ class Method
         int handleFileRessource(IO& event, HttpResponse& res);
         int sendRedirect(const IO& event, HttpResponse& res, const char *status_line);
         void makeStatusLine(IO& event, const int& status);
+        void addEndHeaderCRLF(void);
         void setCookieHeader(IO& event);
         void appendToResponse(const std::string& key, const std::string& value);
 

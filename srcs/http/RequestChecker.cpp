@@ -85,6 +85,8 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
 {
     if (req.getMethod() != HttpServer::POST) return IO::IO_SUCCESS;
 
+    if (instance.checkBits(HttpServer::FILE_UPLOAD_) == false) return METHOD_NOT_ALLOWED;
+
     std::map<std::string, std::string>& _map = req.getHeaders();
 
     std::map<std::string, std::string>::iterator it = _map.find(CONTENT_TYP);
@@ -96,10 +98,6 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
         return BAD_REQUEST;
 
     const std::string& full_path(req.getHeaders()[FULLPATH]);
-    
-    const std::map<std::string, std::string>& cgi_map = instance.getCgiMap();
-
-    if (cgi_map.find(UtilityMethod::getFileExtension(full_path, 1)) != cgi_map.end()) req.setOptions(HttpRequest::CGI_POST, SET);
 
     size_t i = full_path.rfind('/');
 
@@ -120,48 +118,59 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
         || it == _map.end()) 
         return BAD_REQUEST;
 
-    size_t len = UtilityMethod::myStrlen(MULTIPART_FORM_DATA"; boundary=");
     
-    if (!instance.checkBits(HttpServer::FILE_UPLOAD_)) return METHOD_NOT_ALLOWED;
-
-    if (it -> second.compare(0, len, MULTIPART_FORM_DATA"; boundary=") == 0)
+    const std::map<std::string, std::string>& cgi_map = instance.getCgiMap();
+    const std::map<std::string, std::string>::const_iterator& it_cgi = cgi_map.find(UtilityMethod::getFileExtension(full_path, 1));
+    
+    if (it_cgi != cgi_map.end())
     {
-        if (it_transfer != _map.end()) return BAD_REQUEST;
-
-        int count = 0;
-            
-        for (size_t i = len; it -> second[i]; i++)
-        {
-            if (it -> second[i] == '-')
-                count++;
-            else
-                break ;
-        }
-
-        if (count <= 2) return BAD_REQUEST; 
-
-        req.setBoundary(DOUBLE_HIPHEN + it -> second.erase(0, len));
-        req.setEndBoundary(DOUBLE_HIPHEN + it -> second + DOUBLE_HIPHEN);
-        req.setCrlfBoundary(CRLF + req.getBoundary());
-        req.setCrlfEndBoundary(CRLF + req.getEndBoundary());
-        _map[BOUNDARY] = req.getBoundary();
-        _map[END_BOUNDARY] = req.getEndBoundary();
-        _map[CRLF_BOUNDARY] = req.getCrlfBoundary();
-        _map[CRLF_END_BOUNDARY] = req.getCrlfEndBoundary();
-        req.setOptions(HttpRequest::MULTIPART_DATA, SET);       
+        req.getHeaders()[CGI_EXECUTABLE] = it_cgi -> second;
+        req.getHeaders()[CGI_ARGS] = full_path;
+        req.setOptions(HttpRequest::CGI_POST, SET);
     }
     else
     {
-        std::string& path(_map.find(PATH) -> second);
-        std::string _pathMimeType = UtilityMethod::getMimeType(path, "", "", false);
+        size_t len = UtilityMethod::myStrlen(MULTIPART_FORM_DATA"; boundary=");
 
-        if (path.size() > 2 && *(path.rbegin()) == '/') path.erase(path.size() - 1);
+        if (it -> second.compare(0, len, MULTIPART_FORM_DATA"; boundary=") == 0)
+        {
+            if (it_transfer != _map.end()) return BAD_REQUEST;
 
-        if (path != instance.getIndexPath() && _pathMimeType != it -> second) return BAD_REQUEST;
+            int count = 0;
+                
+            for (size_t i = len; it -> second[i]; i++)
+            {
+                if (it -> second[i] == '-')
+                    count++;
+                else
+                    break ;
+            }
 
-        req.setOptions(HttpRequest::NO_ENCODING, SET);       
+            if (count <= 2) return BAD_REQUEST; 
+
+            req.setBoundary(DOUBLE_HIPHEN + it -> second.erase(0, len));
+            req.setEndBoundary(DOUBLE_HIPHEN + it -> second + DOUBLE_HIPHEN);
+            req.setCrlfBoundary(CRLF + req.getBoundary());
+            req.setCrlfEndBoundary(CRLF + req.getEndBoundary());
+            _map[BOUNDARY] = req.getBoundary();
+            _map[END_BOUNDARY] = req.getEndBoundary();
+            _map[CRLF_BOUNDARY] = req.getCrlfBoundary();
+            _map[CRLF_END_BOUNDARY] = req.getCrlfEndBoundary();
+            req.setOptions(HttpRequest::MULTIPART_DATA, SET);       
+        }
+        else
+        {
+            std::string& path(_map.find(PATH) -> second);
+            std::string _pathMimeType = UtilityMethod::getMimeType(path, "", "", false);
+
+            if (path.size() > 2 && *(path.rbegin()) == '/') path.erase(path.size() - 1);
+
+            if (path != instance.getIndexPath() && _pathMimeType != it -> second) return BAD_REQUEST;
+
+            req.setOptions(HttpRequest::NO_ENCODING, SET);       
+        }
     }
-
+    
     return IO::IO_SUCCESS;
 }
 

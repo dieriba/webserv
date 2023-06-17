@@ -89,6 +89,11 @@ void Method::makeStatusLine(IO& object, const int& status)
     if (object.checkBits(IO::COOKIE) == 0) setCookieHeader(object);
 }
 
+void Method::addEndHeaderCRLF(void)
+{
+    _response += CRLF;
+}
+
 void Method::appendToResponse(const std::string& key, const std::string& value)
 {
     _response += key + ": " + value + CRLF;

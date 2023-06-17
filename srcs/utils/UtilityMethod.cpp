@@ -1,5 +1,8 @@
 # include "../../includes/utils/UtilityMethod.hpp"
 # include "../../includes/IO/IO.hpp"
+# include "../../includes/IO/CgiStream.hpp"
+# include "../../includes/http/HttpResponse.hpp"
+# include "../../includes/method/Method.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 UtilityMethod::UtilityMethod(){};
@@ -8,6 +11,29 @@ UtilityMethod::~UtilityMethod(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
+
+int UtilityMethod::basicCgiSetup(IO& event, HttpResponse& res, Method& method)
+{
+    CgiStream* cgi = static_cast<CgiStream *>(event.getIO());
+        
+    cgi -> setPipes(res.getPipes());
+    cgi -> setFD(res.getReadEnd());
+
+    epoll_event ev;
+
+    ev.events = EPOLLIN;
+    cgi -> setEvents(EPOLLIN);
+    ev.data.ptr = cgi;
+
+    if (epoll_ctl(event.getWs(), EPOLL_CTL_ADD, res.getReadEnd(), &ev) == -1) return IO::IO_ERROR;
+
+    method.makeStatusLine(event, OK);
+    method.appendToResponse(CONTENT_TYP, "text/html");
+    method.appendToResponse(TRANSFERT_ENCODING, "chunked");
+    method.addEndHeaderCRLF();
+    
+    return IO::IO_SUCCESS;
+}
 
 int UtilityMethod::sendBuffer(int client_socket, const char *buffer, int bytes)
 {

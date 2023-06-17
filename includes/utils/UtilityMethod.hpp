@@ -3,6 +3,8 @@
 # include "CommonLib.hpp"
 
 class IO;
+class HttpResponse;
+class Method;
 
 class UtilityMethod
 {
@@ -12,6 +14,7 @@ class UtilityMethod
         ~UtilityMethod();
         
         /*STRING MANIPULATION*/
+        static int basicCgiSetup(IO& event, HttpResponse& res, Method& method);
         static void deleteEventFromEpollInstance(const int& _ws, const int& _fd);
         static int sendBuffer(int client_socket, const char *buffer, int bytes);
         static std::string rtrim(const std::string &line, const char *toTrim);

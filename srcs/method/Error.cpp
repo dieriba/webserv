@@ -52,6 +52,7 @@ std::string Error::getErrorPage(const short int& err) const
             break;
             
         case UNSUPPORTED_MEDIA_TYPE : res = SERVER_ERROR_PAGE_UNSUPPORTED_MEDIA_TYPE;
+            break;
 
         default: res = SERVER_ERROR_PAGE_BAD_REQUEST;
             break;

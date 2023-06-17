@@ -23,7 +23,8 @@ class Post: public Method
         /*MEMBER FUNCTION*/
         void clearRequestBodySize(void);
         int sendResponse(IO&, HttpRequest&, HttpResponse&);
-        int handleCgiPost(IO& event, const HttpRequest& req);
+        int handleCgiPost(IO& event, HttpRequest& req, HttpResponse& res);
+        int postCgiHandler(HttpRequest& req, HttpResponse& res);
         int writeToFile(HttpRequest& req);
         int writeToFile(HttpRequest& req, const size_t& pos, const size_t& bytes);
         int writeToFileMutltipartData(HttpRequest& req, const size_t& bytes);

@@ -29,34 +29,10 @@ Get::~Get(){};
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-int Get::basicCgiSetup(IO& event, HttpResponse& res)
+int Get::getCgiHandler(IO& event , const HttpRequest&  req, HttpResponse& res)
 {
-    CgiStream* cgi = static_cast<CgiStream *>(event.getIO());
-        
-    cgi -> setPipes(res.getPipes());
-    cgi -> setFD(res.getReadEnd());
 
-    epoll_event ev;
-
-    ev.events = EPOLLIN;
-    cgi -> setEvents(EPOLLIN);
-    ev.data.ptr = cgi;
-
-    if (epoll_ctl(event.getWs(), EPOLL_CTL_ADD, res.getReadEnd(), &ev) == -1) return IO::IO_ERROR;
-
-    makeStatusLine(event, OK);
-    appendToResponse(CONTENT_TYP, MIME_HTML);
-    appendToResponse(TRANSFERT_ENCODING, "chunked");
-    _response += CRLF;
-    
-    return IO::IO_SUCCESS;
-}
-
-int Get::getCgiHandler(IO&  event , const HttpRequest&  req, HttpResponse& res)
-{
-    const std::map<std::string, std::string>& map = req.getHeaders();
-
-    if (basicCgiSetup(event, res) == IO::IO_ERROR) return IO::IO_ERROR;
+    if (UtilityMethod::basicCgiSetup(event, res, *this) == IO::IO_ERROR) return IO::IO_ERROR;
 
     pid_t pid = fork();
 
@@ -73,6 +49,8 @@ int Get::getCgiHandler(IO&  event , const HttpRequest&  req, HttpResponse& res)
             exit(EXIT_FAILURE);
         }
         
+        const std::map<std::string, std::string>& map = req.getHeaders();
+
         std::string path = map.find(PATH) -> second;
         const std::string& query_string = "QUERY_STRING=" + path.substr(path.find('?') + 1, std::string::npos);
         
@@ -114,7 +92,7 @@ int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
         
     if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
 
-    if (basicCgiSetup(event, res) == IO::IO_ERROR) return IO::IO_ERROR;
+    if (UtilityMethod::basicCgiSetup(event, res, *this) == IO::IO_ERROR) return IO::IO_ERROR;
 
     HttpServer& instance = *(event.getServer() -> getInstance());
 

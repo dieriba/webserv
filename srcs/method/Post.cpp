@@ -226,8 +226,92 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
     return IO::IO_SUCCESS;
 }
 
-int Post::handleCgiPost(IO& event, const HttpRequest& req)
+int Post::postCgiHandler(HttpRequest& req, HttpResponse& res)
 {
+    pid_t pid = fork();
+
+    if (pid == -1) return INTERNAL_SERVER_ERROR;
+    
+    if (pid == 0)
+    {
+        res.clearReadEnd();
+
+        if (dup2(res.getWriteEnd(), STDOUT_FILENO) == IO::IO_ERROR)
+        {
+            write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
+            close(res.getWriteEnd());
+            exit(EXIT_FAILURE);
+        }
+        
+        const std::map<std::string, std::string>& map = req.getHeaders();
+        
+        std::string path = map.find(PATH) -> second;
+        
+        const char *executable = map.find(CGI_EXECUTABLE) -> second.c_str();
+
+        res.clearWriteEnd();
+
+        std::string method = "REQUEST_METHOD=POST";
+
+        req.getBuffer().insert(0, "BODY=");
+
+        char *envp[] = {(char *)req.getBuffer().c_str(), (char *)method.c_str() ,NULL};
+
+        char *argv[] = {(char *)executable, (char *)map.find(CGI_ARGS)->second.c_str(),  NULL};
+
+        if (access(executable, F_OK) != 0)
+        {
+            write(res.getWriteEnd(), SERVER_ERROR_PAGE_NOT_FOUND, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_NOT_FOUND));
+            exit(EXIT_FAILURE);
+        };
+
+        if ((access(executable, X_OK) != 0))
+        {
+            write(res.getWriteEnd(), SERVER_ERROR_PAGE_FORBIDDEN, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_FORBIDDEN));
+            exit(EXIT_FAILURE);
+        }
+
+        execve(executable, argv, envp);
+        
+        write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
+
+        exit(EXIT_FAILURE);
+    }
+
+    return IO::IO_SUCCESS;
+}
+
+int Post::handleCgiPost(IO& event, HttpRequest& req, HttpResponse& res)
+{
+    const std::map<std::string, std::string>& map = req.getHeaders();
+
+    if (map.find(CONTENT_LEN) != map.end() && (req.getBuffer().size() < req.getBodySize())) return IO::IO_SUCCESS;
+
+    if (map.find(TRANSFERT_ENCODING) != map.end() && (req.getBuffer().find(END_CHUNK) == std::string::npos)) return IO::IO_SUCCESS;
+
+    if (pipe(res.getPipes()) == -1) return INTERNAL_SERVER_ERROR;
+
+    if (HttpServer::makeNonBlockingFd(res.getReadEnd()) == -1) return INTERNAL_SERVER_ERROR;
+    
+    if (UtilityMethod::basicCgiSetup(event, res, *this) == IO::IO_ERROR) return IO::IO_ERROR;
+
+    int resp = postCgiHandler(req, res);
+
+    res.clearWriteEnd();
+
+    if (resp > 0)
+    {
+        UtilityMethod::deleteEventFromEpollInstance(event.getWs(), res.getReadEnd());
+        res.clearReadEnd();
+        return resp; 
+    }
+
+    if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
+    
+    _response.clear();
+
+    event.setOptions(IO::CGI_ON, SET);
+
     return IO::IO_SUCCESS;
 }
 
@@ -238,7 +322,7 @@ int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
     if (event.getEvents() & EPOLLIN)
     {
         if (req.checkBits(HttpRequest::CGI_POST))
-            return handleCgiPost(event, req);
+            return handleCgiPost(event, req, res);
         if (req.checkBits(HttpRequest::MULTIPART_DATA))
             return handleMultipartData(event, req);
         else

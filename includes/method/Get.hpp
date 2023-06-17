@@ -16,7 +16,6 @@ class Get: public Method
         virtual ~Get();
 
         /*MEMBER FUNCTION*/
-        int basicCgiSetup(IO& event, HttpResponse& res);
         int sendResponse(IO&, HttpRequest&, HttpResponse&);
         int getCgiHandler(IO& event, const HttpRequest& req, HttpResponse& res);
         int firstStep(IO& event, const HttpRequest& req, HttpResponse& res);
