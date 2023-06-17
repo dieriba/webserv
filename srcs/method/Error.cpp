@@ -51,6 +51,8 @@ std::string Error::getErrorPage(const short int& err) const
         case VERSION_NOT_SUPPORTED : res = SERVER_ERROR_PAGE_VERSION_NOT_SUPPORTED;
             break;
             
+        case UNSUPPORTED_MEDIA_TYPE : res = SERVER_ERROR_PAGE_UNSUPPORTED_MEDIA_TYPE;
+
         default: res = SERVER_ERROR_PAGE_BAD_REQUEST;
             break;
     }

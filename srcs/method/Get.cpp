@@ -55,19 +55,16 @@ int Get::basicCgiSetup(IO& event, HttpResponse& res)
 int Get::getCgiHandler(IO&  event , const HttpRequest&  req, HttpResponse& res)
 {
     const std::map<std::string, std::string>& map = req.getHeaders();
-    const std::string& full_path(req.getHeaders().find(FULLPATH) -> second);
-
-    std::cout << "Full path: " << full_path << std::endl;
 
     if (basicCgiSetup(event, res) == IO::IO_ERROR) return IO::IO_ERROR;
 
     pid_t pid = fork();
 
     if (pid == -1) return INTERNAL_SERVER_ERROR;
-
+    
     if (pid == 0)
     {
-        close(res.getReadEnd());
+        res.clearReadEnd();
 
         if (dup2(res.getWriteEnd(), STDOUT_FILENO) == IO::IO_ERROR)
         {
@@ -76,15 +73,38 @@ int Get::getCgiHandler(IO&  event , const HttpRequest&  req, HttpResponse& res)
             exit(EXIT_FAILURE);
         }
         
-        const std::string& query_string = "QUERY_STRING=" + map.find(PATH) -> second;
-
-        std::cout << "Query_string: " << query_string << std::endl;
-         close(res.getWriteEnd());
+        std::string path = map.find(PATH) -> second;
+        const std::string& query_string = "QUERY_STRING=" + path.substr(path.find('?') + 1, std::string::npos);
         
+        const char *executable = map.find(CGI_EXECUTABLE) -> second.c_str();
+
+        res.clearWriteEnd();
+
+        std::string method = "REQUEST_METHOD=GET";
+
+        char *envp[] = {(char *)query_string.c_str(), (char *)method.c_str() ,NULL};
+
+        char *argv[] = {(char *)executable, (char *)map.find(CGI_ARGS)->second.c_str(),  NULL};
+
+        if (access(executable, F_OK) != 0)
+        {
+            write(res.getWriteEnd(), SERVER_ERROR_PAGE_NOT_FOUND, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_NOT_FOUND));
+            exit(EXIT_FAILURE);
+        };
+
+        if ((access(executable, X_OK) != 0))
+        {
+            write(res.getWriteEnd(), SERVER_ERROR_PAGE_FORBIDDEN, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_FORBIDDEN));
+            exit(EXIT_FAILURE);
+        }
+
+        execve(executable, argv, envp);
+        
+        write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
+
+        exit(EXIT_FAILURE);
     }
-
-    exit(EXIT_SUCCESS);
-
+    
     return IO::IO_SUCCESS;
 }
 
@@ -137,8 +157,6 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     
     bool directory = req.checkBits(HttpRequest::DIRECTORY);
     bool cgi_get = req.checkBits(HttpRequest::CGI_GET);
-
-    std::cout << "CGI_GET: " << cgi_get << std::endl;
 
     if (cgi_get == false && ((directory == true && instance.checkBits(HttpServer::AUTO_INDEX_) > 0) || directory == 0))
     {

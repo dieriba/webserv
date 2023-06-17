@@ -91,6 +91,10 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
     std::map<std::string, std::string>::iterator it_length = _map.find(CONTENT_LEN);
     std::map<std::string, std::string>::iterator it_transfer = _map.find(TRANSFERT_ENCODING);
 
+    if ((((it_length == _map.end()) && (it_transfer == _map.end())) || (it_length != _map.end() && it_transfer != _map.end()))
+        || it == _map.end()) 
+        return BAD_REQUEST;
+
     const std::string& full_path(req.getHeaders()[FULLPATH]);
     
     const std::map<std::string, std::string>& cgi_map = instance.getCgiMap();
@@ -176,8 +180,14 @@ int RequestChecker::checkGetMethod(const HttpServer& instance, HttpRequest& req)
     if (i != std::string::npos) full_path = full_path.substr(0, i);
 
     const std::map<std::string, std::string>& cgi_map = instance.getCgiMap();
-
-    if (cgi_map.find(UtilityMethod::getFileExtension(full_path, 1)) != cgi_map.end()) req.setOptions(HttpRequest::CGI_GET, SET);
+    const std::map<std::string, std::string>::const_iterator& it = cgi_map.find(UtilityMethod::getFileExtension(full_path, 1));
+    
+    if (it != cgi_map.end())
+    {
+        req.getHeaders()[CGI_EXECUTABLE] = it -> second;
+        req.getHeaders()[CGI_ARGS] = full_path;
+        req.setOptions(HttpRequest::CGI_GET, SET);
+    }
 
     std::string dir_path = instance.getRootDir() + req.getHeaders()[PATH];
 

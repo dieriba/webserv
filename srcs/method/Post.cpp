@@ -226,12 +226,19 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
     return IO::IO_SUCCESS;
 }
 
+int Post::handleCgiPost(IO& event, const HttpRequest& req)
+{
+    return IO::IO_SUCCESS;
+}
+
 int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 {
     if (res.checkBits(HttpResponse::REDIRECT_SET)) return sendRedirect(event, res, FOUND_REDIRECT_POST);
 
     if (event.getEvents() & EPOLLIN)
     {
+        if (req.checkBits(HttpRequest::CGI_POST))
+            return handleCgiPost(event, req);
         if (req.checkBits(HttpRequest::MULTIPART_DATA))
             return handleMultipartData(event, req);
         else
