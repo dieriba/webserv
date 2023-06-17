@@ -169,7 +169,11 @@ int RequestChecker::checkGetMethod(const HttpServer& instance, HttpRequest& req)
 
     if ((_map.find(CONTENT_LEN) != _map.end()) || (_map.find(TRANSFERT_ENCODING) != _map.end())) return BAD_REQUEST;
 
-    const std::string& full_path(req.getHeaders()[FULLPATH]);
+    std::string full_path(req.getHeaders()[FULLPATH]);
+
+    size_t i = full_path.find('?');
+
+    if (i != std::string::npos) full_path = full_path.substr(0, i);
 
     const std::map<std::string, std::string>& cgi_map = instance.getCgiMap();
 
@@ -180,7 +184,7 @@ int RequestChecker::checkGetMethod(const HttpServer& instance, HttpRequest& req)
     const char *root_c = full_path.c_str();
 
     if (access(root_c, F_OK) != 0) return NOT_FOUND;
-        
+
     if ((access(root_c, R_OK) != 0)) return FORBIDEN;
 
     return IO::IO_SUCCESS;

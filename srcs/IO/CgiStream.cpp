@@ -44,7 +44,7 @@ int CgiStream::resetCgi(IO* object, const int& _ws)
     UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
     object -> clear();
     this -> clear();
-
+    object -> getReponse().clearReadEnd();
     return IO::IO_SUCCESS;
 }
 

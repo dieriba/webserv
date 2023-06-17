@@ -22,6 +22,7 @@ class Method
 
         /*MEMBER FUNCTION*/
         int sendBuffer(int client_socket, const char *buffer, int bytes);
+        int handleCgiRessource(IO& event, HttpResponse& res);
         int handleFileRessource(IO& event, HttpResponse& res);
         int sendRedirect(const IO& event, HttpResponse& res, const char *status_line);
         void makeStatusLine(IO& event, const int& status);

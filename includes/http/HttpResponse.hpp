@@ -21,6 +21,8 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         /*ENUM OPTIONS*/
         enum options
         {
+            READ_END = -1,
+            WRITE_END = -1,
             STARTED,
             FILE,
             DIRECTORY,
@@ -46,6 +48,9 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         void setMethodObj(Method *method);
     
         /*MEMBER FUNCTION*/
+        void clearReadEnd();
+        void clearWriteEnd();
+        void clearBothEnd();
         void clear(void);
         void setDirectory(DIR* directory);
         int serveResponse(IO&, HttpRequest&);

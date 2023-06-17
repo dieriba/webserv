@@ -76,11 +76,9 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
     }
 
     char *end_header = UtilityMethod::mystrstr(_request.getBuffer().c_str(), CRLF CRLF);
-    std::cout << "Before File descriptor: " << this -> getFd() << "Size: " << size << std::endl;
     
     if (end_header != NULL || (_request.checkBits(HttpRequest::CONTENT_LENGTH) || _request.checkBits(HttpRequest::TRANSFER_ENCODING)))
     {
-        std::cout << "After File descriptor: " << this -> getFd() << "Size: " << size << std::endl;
         int _req = _request.parseRequest(*this);
 
         if (!_req && ((_request.checkBits(HttpRequest::CONTENT_LENGTH) || _request.checkBits(HttpRequest::TRANSFER_ENCODING)) && !_request.checkBits(HttpRequest::FINISH_BODY)))

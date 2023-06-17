@@ -29,27 +29,12 @@ Get::~Get(){};
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-int Get::getCgiHandler(IO& /* event */, const HttpRequest& /* req */, HttpResponse& /* res */)
+int Get::basicCgiSetup(IO& event, HttpResponse& res)
 {
-    //HttpServer& instance = *(event.getServer() -> getInstance());
-
-    return IO::IO_SUCCESS;
-}
-
-int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
-{
-    HttpServer& instance = *(event.getServer() -> getInstance());
-
-    if (access(PATH_TO_DIRECTORY_LISTING_SCRIPT, F_OK) != 0) return NOT_FOUND;
-        
-    if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
-
     CgiStream* cgi = static_cast<CgiStream *>(event.getIO());
         
     cgi -> setPipes(res.getPipes());
     cgi -> setFD(res.getReadEnd());
-    std::cout << "Pipe File's descriptor: " << res.getReadEnd() << std::endl;
-    cgi -> getReponse().setMethodObj(res.getHttpMethod() -> clone());
 
     epoll_event ev;
 
@@ -63,7 +48,19 @@ int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
     appendToResponse(CONTENT_TYP, MIME_HTML);
     appendToResponse(TRANSFERT_ENCODING, "chunked");
     _response += CRLF;
-        
+    
+    return IO::IO_SUCCESS;
+}
+
+int Get::getCgiHandler(IO&  event , const HttpRequest&  req, HttpResponse& res)
+{
+    const std::map<std::string, std::string>& map = req.getHeaders();
+    const std::string& full_path(req.getHeaders().find(FULLPATH) -> second);
+
+    std::cout << "Full path: " << full_path << std::endl;
+
+    if (basicCgiSetup(event, res) == IO::IO_ERROR) return IO::IO_ERROR;
+
     pid_t pid = fork();
 
     if (pid == -1) return INTERNAL_SERVER_ERROR;
@@ -72,7 +69,44 @@ int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
     {
         close(res.getReadEnd());
 
-        if (dup2(res.getWriteEnd(), STDOUT_FILENO) == -1)
+        if (dup2(res.getWriteEnd(), STDOUT_FILENO) == IO::IO_ERROR)
+        {
+            write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
+            close(res.getWriteEnd());
+            exit(EXIT_FAILURE);
+        }
+        
+        const std::string& query_string = "QUERY_STRING=" + map.find(PATH) -> second;
+
+        std::cout << "Query_string: " << query_string << std::endl;
+         close(res.getWriteEnd());
+        
+    }
+
+    exit(EXIT_SUCCESS);
+
+    return IO::IO_SUCCESS;
+}
+
+int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
+{
+    if (access(PATH_TO_DIRECTORY_LISTING_SCRIPT, F_OK) != 0) return NOT_FOUND;
+        
+    if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
+
+    if (basicCgiSetup(event, res) == IO::IO_ERROR) return IO::IO_ERROR;
+
+    HttpServer& instance = *(event.getServer() -> getInstance());
+
+    pid_t pid = fork();
+
+    if (pid == -1) return INTERNAL_SERVER_ERROR;
+
+    if (pid == 0)
+    {
+        close(res.getReadEnd());
+
+        if (dup2(res.getWriteEnd(), STDOUT_FILENO) == IO::IO_ERROR)
         {
             write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
             close(res.getWriteEnd());
@@ -93,9 +127,6 @@ int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
         exit(EXIT_FAILURE);
     }
 
-    event.setOptions(IO::CGI_ON, SET);
-    close(res.getWriteEnd());
-
     return IO::IO_SUCCESS;
 }
 
@@ -104,9 +135,12 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     HttpServer& instance = *(event.getServer() -> getInstance());
     std::string full_path(req.getHeaders().find(FULLPATH) -> second);
     
-    bool directory = res.checkBits(HttpResponse::DIRECTORY);
+    bool directory = req.checkBits(HttpRequest::DIRECTORY);
+    bool cgi_get = req.checkBits(HttpRequest::CGI_GET);
 
-    if ((directory && instance.checkBits(HttpServer::AUTO_INDEX_)) || directory == 0)
+    std::cout << "CGI_GET: " << cgi_get << std::endl;
+
+    if (cgi_get == false && ((directory == true && instance.checkBits(HttpServer::AUTO_INDEX_) > 0) || directory == 0))
     {
         std::ifstream& file = res.getFile();
 
@@ -130,10 +164,9 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         
         res.setOptions(HttpResponse::FILE, SET);
     
-        if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
-    
+        res.setOptions(HttpResponse::STARTED, SET);
     }
-    else if (directory || req.checkBits(HttpRequest::CGI_GET))
+    else if (directory == true || cgi_get == true)
     {
         if (pipe(res.getPipes()) == -1) return INTERNAL_SERVER_ERROR;
 
@@ -146,13 +179,21 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         else
             resp = getCgiHandler(event, req, res);
 
-        if (resp > 0) return resp; 
+        res.clearWriteEnd();
+        
+        if (resp > 0)
+        {
+            UtilityMethod::deleteEventFromEpollInstance(event.getWs(), res.getReadEnd());
+            res.clearReadEnd();
+            return resp; 
+        }
+
+        event.setOptions(IO::CGI_ON, SET);
     }
     
-
-    _response.clear();
+    if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
     
-    res.setOptions(HttpResponse::STARTED, SET);
+    _response.clear();
     
     return IO::IO_SUCCESS;
 }

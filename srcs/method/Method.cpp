@@ -33,7 +33,7 @@ int Method::handleFileRessource(IO& event, HttpResponse& res)
 {
     try
     {
-        char buffer[REQUEST_SIZE + 1] = {0};
+        char buffer[REQUEST_SIZE];
 
         std::ifstream& file = res.getFile();
         
