@@ -285,13 +285,13 @@ int Post::handleCgiPost(IO& event, HttpRequest& req, HttpResponse& res)
 {
     const std::map<std::string, std::string>& map = req.getHeaders();
 
-    if (map.find(CONTENT_LEN) != map.end())
-        std::cout << "Buffer size: " << req.getBuffer().size() << " Body size: " << req.getBodySize() << std::endl;
+    /*if (map.find(CONTENT_LEN) != map.end())
+        std::cout << "Buffer size: " << req.getBuffer().size() << " Body size: " << req.getBodySize() << std::endl;*/
 
     if (map.find(CONTENT_LEN) != map.end() && (req.getBuffer().size() < req.getBodySize())) return IO::IO_SUCCESS;
 
-    if (map.find(TRANSFERT_ENCODING) != map.end())
-        std::cout << "END_CHUNK: " << req.getBuffer().find(END_CHUNK) << std::endl;
+    /*if (map.find(TRANSFERT_ENCODING) != map.end())
+        std::cout << "END_CHUNK: " << req.getBuffer().find(END_CHUNK) << std::endl;*/
 
     if (map.find(TRANSFERT_ENCODING) != map.end() && (req.getBuffer().find(END_CHUNK) == std::string::npos)) return IO::IO_SUCCESS;
 

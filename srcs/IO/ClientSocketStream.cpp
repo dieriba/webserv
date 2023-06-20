@@ -126,9 +126,15 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
         CgiStream& cgi = static_cast<CgiStream& >(*(getIO()));
         if ((getTimestampInMillisecond(std::clock()) - cgi.getTimestampInMillisecond(cgi.getCgiTimeStamp())) >= TIMEOUT_CGI)
         {
-            cgi.updateCgiTimeStamp();
+            if (cgi.checkBits(CgiStream::STARTED) == 0)
+                _response.switchMethod((*this), HttpServer::ERROR, INTERNAL_SERVER_ERROR);
+            else
+            {
+                this -> clear();
+                UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
+            }
+            epoll_ctl(_ws, EPOLL_CTL_DEL, cgi.getFd(), NULL);
             getReponse().clearReadEnd();
-            _response.switchMethod((*this), HttpServer::ERROR, INTERNAL_SERVER_ERROR);
             setOptions(IO::CGI_ON, CLEAR);
         }
     }

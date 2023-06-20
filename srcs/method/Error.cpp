@@ -39,6 +39,9 @@ std::string Error::getErrorPage(const short int& err) const
         case METHOD_NOT_ALLOWED : res = SERVER_ERROR_PAGE_METHOD_NOT_ALLOWED;
             break;
 
+        case REQUEST_TIMEOUT : res = SERVER_ERROR_PAGE_REQUEST_TIMEOUT;
+            break;
+
         case TOO_LARGE_CONTENT : res = SERVER_ERROR_TOO_LARGE_CONTENT;
             break;
 

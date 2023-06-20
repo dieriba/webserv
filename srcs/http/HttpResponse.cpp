@@ -10,11 +10,13 @@ HttpResponse::HttpResponse():HttpMessage(),BitsManipulation(),_method(NULL),_dir
     _pipes[0] = HttpResponse::READ_END;
     _pipes[1] = HttpResponse::WRITE_END;
 };
+
 HttpResponse::HttpResponse(const HttpResponse& rhs):HttpMessage(rhs),BitsManipulation(rhs),_method(rhs._method)
 {
     _pipes[0] = rhs._pipes[0];
     _pipes[1] = rhs._pipes[1];
 };
+
 HttpResponse& HttpResponse::operator=(const HttpResponse& rhs)
 {
     if (this == &rhs) return *this;
@@ -28,6 +30,7 @@ HttpResponse& HttpResponse::operator=(const HttpResponse& rhs)
     _options = rhs._options;
     return *this;
 };
+
 HttpResponse::~HttpResponse()
 {
     delete _method;
