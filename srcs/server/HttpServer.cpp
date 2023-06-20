@@ -175,9 +175,7 @@ void HttpServer::makeServerServe(void)
 
     while (HttpServer::g_signal == 1)
     {
-        to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, 1000);
-
-        if (to_proceed == 0) std::cout << 0 << std::endl;
+        to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, EPOLL_TIMEOUT);
 
         for (int i = 0; i < to_proceed; i++)
         {

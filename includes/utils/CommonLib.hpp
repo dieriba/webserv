@@ -105,6 +105,7 @@
 # define BASE_10 "0123456789"
 # define BASE_16 "0123456789ABCDEFabcdef"
 # define REQUEST_SIZE 60000
+# define EPOLL_TIMEOUT 1000
 # define MAXEVENTS 64
 # define CRLF "\r\n"
 # define LEN_CRLF 2

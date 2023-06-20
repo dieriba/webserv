@@ -318,7 +318,7 @@ int HttpRequest::parseRequest(IO& object)
     int _req = RequestChecker::checkAll(object, (*this));
 
     std::cout << "REQ VALUE: " << _req << std::endl;
-
+    
     if (_req != 0)  return _req;
     
     if (_it_transfert != _headers.end() || _it_content != _headers.end())
