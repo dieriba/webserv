@@ -20,6 +20,9 @@ void    print_map_error_page(const HttpServer& instance)
 
 void    print_location_config(const Location& location)
 {
+    std::map<std::string, std::string> map(location.getCgiMap());
+    std::map<std::string, std::string>::iterator m_it = map.begin();
+    std::map<std::string, std::string>::iterator m_end = map.end();
     std::cout << std::endl << std::endl ;
     std::cout << "----------Location----------";
     std::cout << std::endl << std::endl
@@ -35,6 +38,9 @@ void    print_location_config(const Location& location)
         << "AUTO INDEX: " << ((location.checkBits(HttpServer::AUTO_INDEX_)) > 0 ? "Auto Index ON" : "Auto Index OFF") << std::endl
         << "FILE_UPLOAD: " << ((location.checkBits(HttpServer::FILE_UPLOAD_)) > 0? "FILE_UPLOAD ON" : "FILE_UPLOAD OFF") << std::endl
         << "Server: " << location.getServer() << std::endl;
+        std::cout << std::endl;
+        for (; m_it != m_end; m_it++)
+            std::cout << "cgi: " << m_it -> first << " " << m_it -> second << std::endl;
         const HttpServer& instance = location;
     print_map_error_page(instance);
 }

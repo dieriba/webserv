@@ -14,7 +14,7 @@ class UtilityMethod
         ~UtilityMethod();
         
         /*STRING MANIPULATION*/
-        static int basicCgiSetup(IO& event, HttpResponse& res, Method& method);
+        static int basicCgiSetup(IO& event, HttpResponse& res, Method& method, const char *content_type);
         static void deleteEventFromEpollInstance(const int& _ws, const int& _fd);
         static int sendBuffer(int client_socket, const char *buffer, int bytes);
         static std::string rtrim(const std::string &line, const char *toTrim);

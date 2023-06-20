@@ -44,6 +44,7 @@ class HttpServer: public Parser, public BitsManipulation
         const std::map<short int, std::string>& getErrorMaps() const;
         const std::map<std::string, std::string>& getCgiMap() const;
         std::map<short int, std::string>& getErrorMaps();
+        std::map<std::string, std::string>& getCgiMap();
         const int& getEpollWs(void) const ;
 
         /*SETTERS*/

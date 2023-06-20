@@ -11,7 +11,6 @@ Server::Server(const Server& rhs):HttpServer(rhs)
     _port = rhs._port;
     _server_names = rhs._server_names;
     _locations = rhs._locations;
-    _cgi = rhs._cgi;
     _tcp_server = rhs._tcp_server;
 }
 Server& Server::operator=(const Server& rhs)

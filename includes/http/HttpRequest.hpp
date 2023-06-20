@@ -32,8 +32,7 @@ class HttpRequest: public HttpMessage, public BitsManipulation
             CHUNK_SET,
             CHUNKED_FINISHED,
             CARRIAGE_FEED,
-            CGI_GET = 8,
-            CGI_POST,
+            CGI_ = 8,
             STARTED,
             MULTIPART_DATA,
             NO_ENCODING,
@@ -57,7 +56,6 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         int open_file(IO& event);
         int open_file(IO& event, std::string& filepath);
         int parseRequest(IO& object);
-        int checkValidHeader(const int& _ws, struct epoll_event event) const;
         void clearCurrentChunkSize(void);
         void setChunkSize(const size_t& chunk_size);
         void updateCurrentChunkSize(const size_t& current_chunk_size);

@@ -32,7 +32,7 @@ Get::~Get(){};
 int Get::getCgiHandler(IO& event , const HttpRequest&  req, HttpResponse& res)
 {
 
-    if (UtilityMethod::basicCgiSetup(event, res, *this) == IO::IO_ERROR) return IO::IO_ERROR;
+    if (UtilityMethod::basicCgiSetup(event, res, *this, "text/html") == IO::IO_ERROR) return IO::IO_ERROR;
 
     pid_t pid = fork();
 
@@ -92,7 +92,7 @@ int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
         
     if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
 
-    if (UtilityMethod::basicCgiSetup(event, res, *this) == IO::IO_ERROR) return IO::IO_ERROR;
+    if (UtilityMethod::basicCgiSetup(event, res, *this, "text/html") == IO::IO_ERROR) return IO::IO_ERROR;
 
     HttpServer& instance = *(event.getServer() -> getInstance());
 
@@ -134,7 +134,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
     std::string full_path(req.getHeaders().find(FULLPATH) -> second);
     
     bool directory = req.checkBits(HttpRequest::DIRECTORY);
-    bool cgi_get = req.checkBits(HttpRequest::CGI_GET);
+    bool cgi_get = req.checkBits(HttpRequest::CGI_);
 
     if (cgi_get == false && ((directory == true && instance.checkBits(HttpServer::AUTO_INDEX_) > 0) || directory == 0))
     {
@@ -201,6 +201,7 @@ int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
     if (!res.checkBits(HttpResponse::STARTED))
     {
         int err = firstStep(event, req, res);
+
         if (err) return err;
     }
 

@@ -22,6 +22,7 @@ Location& Location::operator=(const Location& rhs)
     _index = rhs._index;
     _sub_locations = rhs._sub_locations;
     _server = rhs._server;
+    _cgi = rhs._cgi;
     _redirect = rhs._redirect;
     _index_path = rhs._index_path;
     return *this;

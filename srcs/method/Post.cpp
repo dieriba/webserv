@@ -272,7 +272,7 @@ int Post::postCgiHandler(HttpRequest& req, HttpResponse& res)
         }
 
         execve(executable, argv, envp);
-        
+    
         write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
 
         exit(EXIT_FAILURE);
@@ -285,7 +285,13 @@ int Post::handleCgiPost(IO& event, HttpRequest& req, HttpResponse& res)
 {
     const std::map<std::string, std::string>& map = req.getHeaders();
 
+    if (map.find(CONTENT_LEN) != map.end())
+        std::cout << "Buffer size: " << req.getBuffer().size() << " Body size: " << req.getBodySize() << std::endl;
+
     if (map.find(CONTENT_LEN) != map.end() && (req.getBuffer().size() < req.getBodySize())) return IO::IO_SUCCESS;
+
+    if (map.find(TRANSFERT_ENCODING) != map.end())
+        std::cout << "END_CHUNK: " << req.getBuffer().find(END_CHUNK) << std::endl;
 
     if (map.find(TRANSFERT_ENCODING) != map.end() && (req.getBuffer().find(END_CHUNK) == std::string::npos)) return IO::IO_SUCCESS;
 
@@ -293,7 +299,7 @@ int Post::handleCgiPost(IO& event, HttpRequest& req, HttpResponse& res)
 
     if (HttpServer::makeNonBlockingFd(res.getReadEnd()) == -1) return INTERNAL_SERVER_ERROR;
     
-    if (UtilityMethod::basicCgiSetup(event, res, *this) == IO::IO_ERROR) return IO::IO_ERROR;
+    if (UtilityMethod::basicCgiSetup(event, res, *this, "text/plain") == IO::IO_ERROR) return IO::IO_ERROR;
 
     int resp = postCgiHandler(req, res);
 
@@ -310,6 +316,8 @@ int Post::handleCgiPost(IO& event, HttpRequest& req, HttpResponse& res)
     
     _response.clear();
 
+    req.setOptions(HttpRequest::FINISH_BODY, SET);
+
     event.setOptions(IO::CGI_ON, SET);
 
     return IO::IO_SUCCESS;
@@ -321,7 +329,7 @@ int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
 
     if (event.getEvents() & EPOLLIN)
     {
-        if (req.checkBits(HttpRequest::CGI_POST))
+        if (req.checkBits(HttpRequest::CGI_))
             return handleCgiPost(event, req, res);
         if (req.checkBits(HttpRequest::MULTIPART_DATA))
             return handleMultipartData(event, req);

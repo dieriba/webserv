@@ -52,6 +52,7 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
 {
     try
     {
+        std::cout << "eee" << std::endl;
         int bytes = read(_pipes[0], _buffer, REQUEST_SIZE);
 
         IO* object = getIO();

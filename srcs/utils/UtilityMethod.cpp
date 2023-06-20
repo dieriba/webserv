@@ -12,7 +12,7 @@ UtilityMethod::~UtilityMethod(){};
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
 
-int UtilityMethod::basicCgiSetup(IO& event, HttpResponse& res, Method& method)
+int UtilityMethod::basicCgiSetup(IO& event, HttpResponse& res, Method& method, const char *content_type)
 {
     CgiStream* cgi = static_cast<CgiStream *>(event.getIO());
         
@@ -24,14 +24,13 @@ int UtilityMethod::basicCgiSetup(IO& event, HttpResponse& res, Method& method)
     ev.events = EPOLLIN;
     cgi -> setEvents(EPOLLIN);
     ev.data.ptr = cgi;
-
+    std::cout << "WS: " << event.getWs() << std::endl;
     if (epoll_ctl(event.getWs(), EPOLL_CTL_ADD, res.getReadEnd(), &ev) == -1) return IO::IO_ERROR;
 
     method.makeStatusLine(event, OK);
-    method.appendToResponse(CONTENT_TYP, "text/html");
+    method.appendToResponse(CONTENT_TYP, content_type);
     method.appendToResponse(TRANSFERT_ENCODING, "chunked");
     method.addEndHeaderCRLF();
-    
     return IO::IO_SUCCESS;
 }
 

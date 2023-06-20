@@ -317,10 +317,8 @@ int HttpRequest::parseRequest(IO& object)
 
     int _req = RequestChecker::checkAll(object, (*this));
 
-    if (!checkBits(HttpRequest::CGI_POST) && checkBits(HttpRequest::DIRECTORY)) object.getReponse().setOptions(HttpResponse::DIRECTORY, SET);
+    std::cout << "REQ VALUE: " << _req << std::endl;
 
-    std::cout << "Req value: " << _req << std::endl;
-    
     if (_req != 0)  return _req;
     
     if (_it_transfert != _headers.end() || _it_content != _headers.end())
@@ -329,17 +327,10 @@ int HttpRequest::parseRequest(IO& object)
 
         res.setMethodObj(Method::_tab[getMethod()]());
 
-        if (!checkBits(HttpRequest::CGI_POST) && checkBits(HttpRequest::NO_ENCODING)) open_file(object);
-
+        if (!checkBits(HttpRequest::CGI_) && checkBits(HttpRequest::NO_ENCODING)) open_file(object);
     }
 
     return IO::IO_SUCCESS;
-}
-
-int HttpRequest::checkValidHeader(const int& /* _ws */ , struct epoll_event /* event */) const
-{
-    
-    return 0;
 }
 
 void HttpRequest::clear(void)

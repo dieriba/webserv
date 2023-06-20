@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>Form</title>
+    <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+    <div class="container">
+        <form action="index.sh" method="post" enctype="multipart/form-data">
+        <h1>Form</h1>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="file">File:</label>
+        <input type="file" id="file" name="file" required><br><br>
+
+        <input type="submit" value="Submit">
+        </form>
+    </div>
+    </body>
+</html>

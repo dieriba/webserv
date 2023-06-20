@@ -12,7 +12,7 @@ HttpServer::HttpServer():BitsManipulation(),_body_size(0),
 HttpServer::HttpServer(const HttpServer& rhs)
     :Parser(rhs),BitsManipulation(rhs),_body_size(rhs._body_size),_index(rhs._index),
     _root_dir(rhs._root_dir),_redirect(rhs._redirect),_index_path(rhs._index_path),_upload_file_folders(rhs._upload_file_folders)
-    ,_error_pages(rhs._error_pages),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
+    ,_error_pages(rhs._error_pages),_cgi(rhs._cgi),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
 
 HttpServer& HttpServer::operator=(const HttpServer& rhs)
 {
@@ -22,6 +22,7 @@ HttpServer& HttpServer::operator=(const HttpServer& rhs)
     _body_size = rhs._body_size;
     _options = rhs._options;
     _index = rhs._index;
+    _cgi = rhs._cgi;
     _root_dir = rhs._root_dir;
     _redirect = rhs._redirect;
     _epoll_ws = rhs._epoll_ws;
@@ -38,6 +39,7 @@ HttpServer::~HttpServer()
 /*----------------------------------------GETTER----------------------------------------*/
 std::map<short int, std::string>& HttpServer::getErrorMaps() {return _error_pages;}
 std::vector<Server> HttpServer::getServers(void) const {return _servers;};
+std::map<std::string, std::string>& HttpServer::getCgiMap() {return _cgi;}
 const int& HttpServer::getEpollWs(void) const {return _epoll_ws;}
 const std::map<std::string, std::string>& HttpServer::getCgiMap() const {return _cgi;}
 const std::map<short int, std::string>& HttpServer::getErrorMaps() const {return _error_pages;}
@@ -134,7 +136,7 @@ void HttpServer::runningUpServer(void)
 
     if ((_epoll_ws = epoll_create1(0)) == -1)
         throw ExceptionThrower("Failled to create an epoll instance");
-    
+
     for (size_t i = 0; i < _servers.size(); i++)
     {
         message = _servers[i].launchServer();
