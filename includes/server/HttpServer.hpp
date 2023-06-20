@@ -65,6 +65,7 @@ class HttpServer: public Parser, public BitsManipulation
         void makeServerServe(void);
 
         /*STATIC MEMBER FUNCTION*/
+        void setWs(const int& ws);
         static void initMimeTypes(void);
         static void initHttpResponses(void);
         static void initHttpMethods(void);

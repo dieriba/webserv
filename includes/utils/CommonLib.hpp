@@ -44,6 +44,7 @@
 # define FORBIDEN 403
 # define NOT_FOUND 404
 # define METHOD_NOT_ALLOWED 405
+# define TIMEOUT 408
 # define TOO_LARGE_CONTENT 413
 # define UNSUPPORTED_MEDIA_TYPE 415
 # define INTERNAL_SERVER_ERROR 500
@@ -96,6 +97,7 @@
 /*
 
 */
+# define TIMEOUT_CGI 3000
 # define NO_BODY "-2"
 # define BASE_VEC_ARR 10
 # define WHITESPACES " \n\t\r\f\v"
@@ -108,7 +110,6 @@
 # define LEN_CRLF 2
 # define END_CHUNK "\r\n0\r\n\r\n"
 # define LEN_END_CHUNK 7
-# define TIMEOUT 1000
 # define MAX_HEADER_SIZE 4000
 # define NO_VALUE "NO_VALUE"
 # define DOUBLE_HIPHEN "--"

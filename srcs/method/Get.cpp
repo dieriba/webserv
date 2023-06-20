@@ -32,7 +32,7 @@ Get::~Get(){};
 int Get::getCgiHandler(IO& event , const HttpRequest&  req, HttpResponse& res)
 {
 
-    if (UtilityMethod::basicCgiSetup(event, res, *this, "text/html") == IO::IO_ERROR) return IO::IO_ERROR;
+    if (UtilityMethod::basicCgiSetup(event, res) == IO::IO_ERROR) return IO::IO_ERROR;
 
     pid_t pid = fork();
 
@@ -92,7 +92,7 @@ int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
         
     if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
 
-    if (UtilityMethod::basicCgiSetup(event, res, *this, "text/html") == IO::IO_ERROR) return IO::IO_ERROR;
+    if (UtilityMethod::basicCgiSetup(event, res) == IO::IO_ERROR) return IO::IO_ERROR;
 
     HttpServer& instance = *(event.getServer() -> getInstance());
 

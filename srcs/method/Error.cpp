@@ -104,7 +104,6 @@ int Error::firstStep(IO& event, HttpResponse& res, const int& err)
 int Error::sendResponse(IO& event, HttpRequest& /* req */, HttpResponse& res)
 {    
     HttpServer& instance = *(event.getServer() -> getInstance());
-    
     int err = 0;
 
     if (instance.checkBits(HttpServer::ERROR_PAGE_SET))

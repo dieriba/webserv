@@ -30,6 +30,7 @@ class IO: public BitsManipulation
         HttpResponse& getReponse(void);
         Server* getServer(void) const;
         const int& getWs(void) const;
+        long getTimeStamp() const;
 
         /*GETTERS*/
         IO* getIO(void) const;
@@ -40,10 +41,11 @@ class IO: public BitsManipulation
         void setEvents(const uint32_t& events);
         void setFD(const int& fd);
         void setErrorStatus(const int& err);
+        void updateTimeStamp();
 
         /*MEMBER FUNCTION*/
         bool validSocketClient(int _fd, struct epoll_event event);
-
+        long getTimestampInMillisecond(long _cgi_timesamp) const;
         /*PURE VIRTUAL FUNCTION*/
         virtual int handleIoOperation(const int& _ws, struct epoll_event& event) = 0;
         /*MEMBER FUNCTION*/
@@ -55,7 +57,8 @@ class IO: public BitsManipulation
             IO_ERROR = -1,
             IO_SUCCESS,
             CGI_ON,
-            COOKIE
+            COOKIE,
+            KILL_MYSELF
         };
 
         enum type
@@ -75,7 +78,7 @@ class IO: public BitsManipulation
             HttpRequest _request;
             HttpResponse _response;
             enum type _type;
-            std::clock_t _begin;
+            std::clock_t _timestamp;
             std::clock_t _end;
 };
 

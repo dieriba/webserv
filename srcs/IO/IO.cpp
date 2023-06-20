@@ -28,6 +28,7 @@ IO::~IO()
 
 /*----------------------------------------GETTER----------------------------------------*/
 int IO::getType(void) const {return _type;}
+long IO::getTimeStamp(void) const {return _timestamp;};
 const int& IO::getFd(void) const { return _fd ;};
 const int& IO::getErrStatus(void) const {return _err;}
 const HttpResponse& IO::getReponse(void) const {return _response;};
@@ -46,6 +47,7 @@ void IO::setErrorStatus(const int& err) {_err = err;}
 void IO::setEvents(const uint32_t& event) {_event = event;};
 void IO::setIO(IO *io) {_io = io;};
 void IO::setWs(const int& ws) {_ws = ws;}
+void IO::updateTimeStamp(void) {_timestamp = std::clock();};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
@@ -54,6 +56,11 @@ int IO::deleteAndResetIO(HttpResponse& res)
     close(res.getReadEnd());
     res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     return IO::IO_SUCCESS;
+}
+
+long IO::getTimestampInMillisecond(long timestamp) const
+{
+    return static_cast<long>(static_cast<double>(timestamp) / (CLOCKS_PER_SEC / 1000));
 }
 
 bool IO::validSocketClient(int _fd, struct epoll_event event)

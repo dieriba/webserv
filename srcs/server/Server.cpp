@@ -141,7 +141,10 @@ void Server::deleteFromEventsMap(const IO *event)
     if (_events.find(event) == _events.end()) return;
     _events.erase(event);
     if (event -> getFd() > 0)
+    {
+        std::cout << "ENTEREDaaaa: " << event -> getFd()<< "Epoll ws:" << getEpollWs() << std::endl;
         epoll_ctl(getEpollWs(), EPOLL_CTL_DEL, event -> getFd(), NULL);
+    }
     delete event;
 }
 

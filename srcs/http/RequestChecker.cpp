@@ -208,6 +208,7 @@ int RequestChecker::checkHeader(const HttpServer& instance, HttpRequest& req)
 
     if (req.getMethod() != HttpServer::DELETE && it != cgi_map.end())
     {
+        std::cout << "Full path value: " << full_path << std::endl;
         if (access(it -> second.c_str() , F_OK) != 0 || access(full_path.c_str(), F_OK) != 0) return NOT_FOUND;
 
         if (access(it -> second.c_str() , X_OK) != 0 || access(full_path.c_str(), R_OK) != 0) return FORBIDEN;

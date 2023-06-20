@@ -228,10 +228,10 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
 
 int Post::postCgiHandler(HttpRequest& req, HttpResponse& res)
 {
+    std::cout << "Enteredeeeeeeee" << std::endl;
     pid_t pid = fork();
 
     if (pid == -1) return INTERNAL_SERVER_ERROR;
-    
     if (pid == 0)
     {
         res.clearReadEnd();
@@ -277,7 +277,7 @@ int Post::postCgiHandler(HttpRequest& req, HttpResponse& res)
 
         exit(EXIT_FAILURE);
     }
-
+    std::cout << "Exited" << std::endl;
     return IO::IO_SUCCESS;
 }
 
@@ -299,7 +299,7 @@ int Post::handleCgiPost(IO& event, HttpRequest& req, HttpResponse& res)
 
     if (HttpServer::makeNonBlockingFd(res.getReadEnd()) == -1) return INTERNAL_SERVER_ERROR;
     
-    if (UtilityMethod::basicCgiSetup(event, res, *this, "text/plain") == IO::IO_ERROR) return IO::IO_ERROR;
+    if (UtilityMethod::basicCgiSetup(event, res) == IO::IO_ERROR) return IO::IO_ERROR;
 
     int resp = postCgiHandler(req, res);
 

@@ -45,8 +45,10 @@ ClientSocketStream::~ClientSocketStream()
 
 int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
 {
-    int res = _response.serveResponse((*this), getRequest());
 
+    std::cout << "ERR: " << getErrStatus() << std::endl; 
+    int res = _response.serveResponse((*this), getRequest());
+    std::cout << "RES: " << res << std::endl; 
     if (res > 0)
         _response.switchMethod((*this), HttpServer::ERROR, res);
     else if (_response.checkBits(HttpResponse::FINISHED_RESPONSE))
@@ -96,7 +98,6 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         setErrorStatus(_req);
 
         _request.getBuffer().clear();
-        
         UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
     }
     
@@ -119,8 +120,20 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
             UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
         }
     }
+
+    if (checkBits(IO::CGI_ON))
+    {
+        CgiStream& cgi = static_cast<CgiStream& >(*(getIO()));
+        if ((getTimestampInMillisecond(std::clock()) - cgi.getTimestampInMillisecond(cgi.getCgiTimeStamp())) >= TIMEOUT_CGI)
+        {
+            cgi.updateCgiTimeStamp();
+            getReponse().clearReadEnd();
+            _response.switchMethod((*this), HttpServer::ERROR, INTERNAL_SERVER_ERROR);
+            setOptions(IO::CGI_ON, CLEAR);
+        }
+    }
     
-    if (checkBits(IO::CGI_ON) == 0) return writeToSocket(_ws, event);
+    if (checkBits(IO::CGI_ON) == 0 && event.events & EPOLLOUT) return writeToSocket(_ws, event);
 
     return IO::IO_SUCCESS;
 }

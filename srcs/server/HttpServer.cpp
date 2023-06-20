@@ -72,6 +72,11 @@ int HttpServer::addToErrorMap(const short int& error, std::string& file, const s
     return 0;
 }
 
+void HttpServer::setWs(const int& ws)
+{
+    _epoll_ws = ws;
+}
+
 void HttpServer::setUploadsFilesFolder(const std::string& uploads_files_foler)
 {
     _upload_file_folders = uploads_files_foler;
@@ -143,6 +148,8 @@ void HttpServer::runningUpServer(void)
 
         event.events = EPOLLIN;
         
+        _servers[i].setWs(_epoll_ws);
+
         if (message.size()) throw ExceptionThrower(message);
         
         event.data.ptr = new ServerStream(_servers[i].getServSocket(), &_servers[i]);
@@ -164,21 +171,35 @@ void HttpServer::makeServerServe(void)
 
     struct epoll_event _events[MAXEVENTS];
 
-    IO  *events;
+    IO  *client;
 
     while (HttpServer::g_signal == 1)
     {
-        to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, -1);
+        to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, 1000);
+
+        if (to_proceed == 0) std::cout << 0 << std::endl;
+
         for (int i = 0; i < to_proceed; i++)
         {
-            events = static_cast<IO *>(_events[i].data.ptr);
-            res = events -> handleIoOperation(_epoll_ws, _events[i]);
+            client = static_cast<IO *>(_events[i].data.ptr);
+
+            if (client -> checkBits(IO::KILL_MYSELF))
+            {
+                std::cout << "*---" << std::endl;
+                std::cout << "KIlling myself Remember me as fd: " << client -> getFd() << " from interests list" << std::endl;
+                Server *server = client -> getServer();
+                server -> deleteFromEventsMap(client);
+                continue;
+            }
+
+            res = client -> handleIoOperation(_epoll_ws, _events[i]);
+            
             if (res == IO::IO_ERROR)
             {
-                if (events -> getType() == IO::CGI_STREAM) events = events -> getIO();
-                std::cout << "Deletting client with fd: " << events -> getFd() << " from interests list" << std::endl;
-                Server *server = events -> getServer();
-                server -> deleteFromEventsMap(events);
+                std::cout << "ENTERED*---" << std::endl;
+                std::cout << "Deletting client with fd: " << client -> getFd() << " from interests list" << std::endl;
+                Server *server = client -> getServer();
+                server -> deleteFromEventsMap(client);
             }
         }
     }
