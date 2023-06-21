@@ -185,6 +185,10 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         }
 
         event.setOptions(IO::CGI_ON, SET);
+        
+        CgiStream& cgi = static_cast<CgiStream&>(*(event.getIO()));
+        
+        cgi.updateCgiTimeStamp();
     }
     
     if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);

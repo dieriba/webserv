@@ -3,6 +3,7 @@
 # include "../../includes/http/HttpResponse.hpp"
 # include "../../includes/utils/UtilityMethod.hpp"
 # include "../../includes/IO/IO.hpp"
+# include "../../includes/IO/CgiStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Post::Post():_request_body_size(0){};
@@ -228,7 +229,6 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
 
 int Post::postCgiHandler(HttpRequest& req, HttpResponse& res)
 {
-    std::cout << "Enteredeeeeeeee" << std::endl;
     pid_t pid = fork();
 
     if (pid == -1) return INTERNAL_SERVER_ERROR;
@@ -277,7 +277,7 @@ int Post::postCgiHandler(HttpRequest& req, HttpResponse& res)
 
         exit(EXIT_FAILURE);
     }
-    std::cout << "Exited" << std::endl;
+
     return IO::IO_SUCCESS;
 }
 
@@ -319,6 +319,10 @@ int Post::handleCgiPost(IO& event, HttpRequest& req, HttpResponse& res)
     req.setOptions(HttpRequest::FINISH_BODY, SET);
 
     event.setOptions(IO::CGI_ON, SET);
+
+    CgiStream& cgi = static_cast<CgiStream&>(*(event.getIO()));
+        
+    cgi.updateCgiTimeStamp();
 
     return IO::IO_SUCCESS;
 }
