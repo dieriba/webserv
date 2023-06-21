@@ -15,7 +15,6 @@ void    print_map_error_page(const HttpServer& instance)
     {
         std::cout << "Error: " << it -> first << ", error_page_location: " << it -> second << std::endl;
     }
-    
 }
 
 void    print_location_config(const Location& location)

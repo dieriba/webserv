@@ -109,8 +109,13 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
     char stop = root_c[i + 1];
 
     if (req.getHeaders().find(PATH) -> second != instance.getIndexPath()) alias_root[i + 1] = 0;
-        
-    if (UtilityMethod::is_a_directory(alias_root) == 0) return NOT_FOUND;
+ 
+    if (UtilityMethod::is_a_directory(alias_root) == 0)
+    {
+        if (errno == EACCES) return FORBIDEN;
+
+        return NOT_FOUND;
+    }
         
     alias_root[i + 1] = stop;
 
@@ -176,9 +181,14 @@ int RequestChecker::checkGetMethod(const HttpServer& instance, HttpRequest& req)
 
     const char *root_c = full_path.c_str();
 
-    if ((access(root_c, R_OK) != 0)) return FORBIDEN;
+    if (access(root_c, F_OK) != 0)
+    {
+        if (errno == EACCES) return FORBIDEN;
 
-    if (access(root_c, F_OK) != 0) return NOT_FOUND;
+        return NOT_FOUND;
+    };
+
+    if ((access(root_c, R_OK) != 0)) return FORBIDEN;
 
     return IO::IO_SUCCESS;
 }
