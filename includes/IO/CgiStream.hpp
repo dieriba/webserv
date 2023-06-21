@@ -14,11 +14,12 @@ class CgiStream: public IO
         
         /*GETTERS*/
         long getCgiTimeStamp(void) const;
+        const pid_t& getPid(void) const;
 
         /*SETTERS*/
+        void setPid(const pid_t& pid);
         void updateCgiTimeStamp(void);
         void setPipes(int *pipes);
-        void setBytes(const int& bytes);
 
         /*MEMBER FUNCTION*/
         int resetCgi(IO& object, const int& _ws);
@@ -33,6 +34,7 @@ class CgiStream: public IO
         int *_pipes;
         char _buffer[REQUEST_SIZE + 1];
         long _cgi_timestamp;
+        pid_t _pid;
 };
 
 # endif

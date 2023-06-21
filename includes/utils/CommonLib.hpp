@@ -101,6 +101,7 @@
 
 */
 # define TIMEOUT_CGI 3000
+# define COMMON_TIMEOUT 3000
 # define NO_BODY "-2"
 # define BASE_VEC_ARR 10
 # define WHITESPACES " \n\t\r\f\v"

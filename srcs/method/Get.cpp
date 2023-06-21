@@ -33,12 +33,13 @@ int Get::getCgiHandler(IO& event , const HttpRequest&  req, HttpResponse& res)
 {
 
     if (UtilityMethod::basicCgiSetup(event, res) == IO::IO_ERROR) return IO::IO_ERROR;
+    CgiStream& cgi = static_cast<CgiStream&>(*(event.getIO()));
 
-    pid_t pid = fork();
+    cgi.setPid(fork());
 
-    if (pid == -1) return INTERNAL_SERVER_ERROR;
+    if (cgi.getPid() == -1) return INTERNAL_SERVER_ERROR;
     
-    if (pid == 0)
+    if (cgi.getPid() == 0)
     {
         res.clearReadEnd();
 
@@ -95,12 +96,13 @@ int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
     if (UtilityMethod::basicCgiSetup(event, res) == IO::IO_ERROR) return IO::IO_ERROR;
 
     HttpServer& instance = *(event.getServer() -> getInstance());
+    CgiStream& cgi = static_cast<CgiStream&>(*(event.getIO()));
+    
+    cgi.setPid(fork());
 
-    pid_t pid = fork();
+    if (cgi.getPid() == -1) return INTERNAL_SERVER_ERROR;
 
-    if (pid == -1) return INTERNAL_SERVER_ERROR;
-
-    if (pid == 0)
+    if (cgi.getPid() == 0)
     {
         close(res.getReadEnd());
 

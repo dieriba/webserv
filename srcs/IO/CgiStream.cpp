@@ -32,10 +32,12 @@ CgiStream::~CgiStream(){};
 
 /*----------------------------------------GETTER----------------------------------------*/
 long CgiStream::getCgiTimeStamp(void) const { return _cgi_timestamp; }
+const pid_t& CgiStream::getPid(void) const { return _pid; };
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
 void CgiStream::setPipes(int *pipes) { _pipes = pipes; }
+void CgiStream::setPid(const pid_t& pid) { _pid = pid; }
 void CgiStream::updateCgiTimeStamp(void) { _cgi_timestamp = std::clock(); };
 /*----------------------------------------SETTER----------------------------------------*/
 
@@ -85,8 +87,6 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
         _response.appendToBuffer(CRLF, LEN_CRLF);
         _response.appendToBuffer(_buffer, bytes);
         _response.appendToBuffer(CRLF, LEN_CRLF);
-
-        std::cout << _response.getBuffer() << std::endl;
 
         std::string& resp = _response.getBuffer();
 
