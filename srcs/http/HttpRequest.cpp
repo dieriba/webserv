@@ -182,8 +182,12 @@ int HttpRequest::open_file(IO& event, std::string& filepath)
     std::string& path = getHeaders().find(PATH) -> second; 
     
     /*ADD THIS INTO A TRY CATCH BLOCK*/
+    std::string root_dir;
 
-    filepath = instance.getRootDir() + path + "/" + filepath;
+    if (instance.getUploadsFilesFolder().size() == 0)
+        filepath = instance.getRootDir() + path + "/" + filepath;
+    else
+        filepath = instance.getUploadsFilesFolder() + "/" + filepath;
 
     if (outfile.is_open()) outfile.close();
     
@@ -249,27 +253,36 @@ int HttpRequest::parseRequest(IO& object)
 
     Server& server = *(object.getServer());
     server.setInstance((HttpServer *)RequestChecker::serverOrLocation(server, (*this)));
-    const HttpServer *instance = server.getInstance();
+    const HttpServer& instance = *(server.getInstance());
 
-    std::string full_path = instance -> getRootDir() + _headers[PATH];
+    std::string full_path = instance.getRootDir() + _headers[PATH];
 
     int directory = UtilityMethod::is_a_directory(full_path.c_str());
 
+    std::string path(_headers[PATH]);
+    size_t i = path.find('?');
+
+    if (i != std::string::npos) path = path.substr(0, i);
+    const std::map<std::string, std::string>& cgi_map = instance.getCgiMap();
+    const std::map<std::string, std::string>::const_iterator& it = cgi_map.find(UtilityMethod::getFileExtension(full_path, 1));
+
+    if (it != cgi_map.end()) setOptions(HttpRequest::CGI_, SET);
+
     if (getMethod() == HttpServer::GET)
     {
-        if ((directory && instance -> getIndex().size()) && (_headers[PATH] == instance -> getIndexPath()))
-            full_path += '/' + instance -> getIndex();
-        else if (directory && instance -> getIndex().size() == 0)
+        if ((directory && instance.getIndex().size()) && (_headers[PATH] == instance.getIndexPath()))
+            full_path += '/' + instance.getIndex();
+        else if (directory && instance.getIndex().size() == 0)
             full_path = "";
     }
-    else if (getMethod() == HttpServer::POST)
+    else if (getMethod() == HttpServer::POST && checkBits(HttpRequest::CGI_) == 0)
     {
-        if (instance -> getUploadsFilesFolder().size())
+        if (instance.getUploadsFilesFolder().size())
         {
             if (directory)
-                full_path = instance -> getUploadsFilesFolder();
+                full_path = instance.getUploadsFilesFolder();
             else
-                full_path = instance -> getUploadsFilesFolder() + "/" + full_path.substr(full_path.rfind('/') + 1);
+                full_path = instance.getUploadsFilesFolder() + "/" + full_path.substr(full_path.rfind('/') + 1);
         }
     }
 

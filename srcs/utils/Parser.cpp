@@ -317,7 +317,9 @@ int    Parser::fillInstance(HttpServer& instance, std::vector<std::string>& vec,
     else if (vec[0] == ALLOWED_METHOD)
         return setAllowedMethods(instance, vec, _map);
     else if (vec[0] == ERROR_PAGE)
+    {
         return handleErrorPages(instance, vec);
+    }
     else if (vec[0] == AUTO_INDEX || vec[0] == FILE_UPLOAD)
     {
         checkEndSemicolons(vec);
@@ -364,8 +366,6 @@ int    Parser::handleErrorPages(HttpServer& instance, std::vector<std::string>& 
         throw ExceptionThrower("Missing root_error_page directory");
 
     std::string directory("." + vec[len--]);
-
-    
 
     for (size_t i = 1; i < len; i+=2)
     {

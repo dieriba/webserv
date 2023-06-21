@@ -46,7 +46,6 @@ ClientSocketStream::~ClientSocketStream()
 int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
 {
 
-    std::cout << "ERR: " << getErrStatus() << std::endl; 
     int res = _response.serveResponse((*this), getRequest());
     std::cout << "RES: " << res << std::endl; 
     if (res > 0)
@@ -127,7 +126,7 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
         if ((getTimestampInMillisecond(std::clock()) - cgi.getTimestampInMillisecond(cgi.getCgiTimeStamp())) >= TIMEOUT_CGI)
         {
             if (cgi.checkBits(CgiStream::STARTED) == 0)
-                _response.switchMethod((*this), HttpServer::ERROR, INTERNAL_SERVER_ERROR);
+                _response.switchMethod((*this), HttpServer::ERROR, GATEWAY_TIMEOUT);
             else
             {
                 this -> clear();

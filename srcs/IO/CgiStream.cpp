@@ -45,7 +45,6 @@ int CgiStream::resetCgi(IO& object, const int& _ws)
     epoll_event ev;
     ev.events = EPOLLIN;
     ev.data.ptr = &object;
-    std::cout << "Entered fd is: " << object.getFd() << std::endl;
     UtilityMethod::switchEvents(_ws, EPOLLIN, ev, object);
     UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
     object.clear();
@@ -100,7 +99,6 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
         }
     
         resp.clear();
-        std::cout << "Bytes: " << bytes << std::endl;
         if (bytes == 0) return resetCgi(object, _ws);
     }
     catch(const std::exception& e)

@@ -45,16 +45,19 @@ std::string Error::getErrorPage(const short int& err) const
         case TOO_LARGE_CONTENT : res = SERVER_ERROR_TOO_LARGE_CONTENT;
             break;
 
+        case UNSUPPORTED_MEDIA_TYPE : res = SERVER_ERROR_PAGE_UNSUPPORTED_MEDIA_TYPE;
+            break;
+
         case INTERNAL_SERVER_ERROR : res = SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR;
             break;
 
         case METHOD_NOT_SUPPORTED : res = SERVER_ERROR_PAGE_METHOD_NOT_SUPPORTED;
             break;
 
-        case VERSION_NOT_SUPPORTED : res = SERVER_ERROR_PAGE_VERSION_NOT_SUPPORTED;
+        case GATEWAY_TIMEOUT : res = SERVER_ERROR_PAGE_GATEWAY_TIMEOUT;
             break;
-            
-        case UNSUPPORTED_MEDIA_TYPE : res = SERVER_ERROR_PAGE_UNSUPPORTED_MEDIA_TYPE;
+
+        case VERSION_NOT_SUPPORTED : res = SERVER_ERROR_PAGE_VERSION_NOT_SUPPORTED;
             break;
 
         default: res = SERVER_ERROR_PAGE_BAD_REQUEST;
@@ -70,7 +73,7 @@ int Error::firstStep(IO& event, HttpResponse& res, const int& err)
     std::map<short int, std::string>::iterator it = _map.find(event.getErrStatus());
 
     if (it == _map.end()) it = _map.find(DEFAULT_ERROR_PAGE_VALUE);
-
+    
     if (it == _map.end()) return IO::IO_ERROR;
 
     if (access(it -> second.c_str(), F_OK) != 0) return IO::IO_ERROR;
@@ -108,6 +111,7 @@ int Error::sendResponse(IO& event, HttpRequest& /* req */, HttpResponse& res)
 {    
     HttpServer& instance = *(event.getServer() -> getInstance());
     int err = 0;
+
 
     if (instance.checkBits(HttpServer::ERROR_PAGE_SET))
     {

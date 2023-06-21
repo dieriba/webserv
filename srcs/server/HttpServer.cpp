@@ -183,7 +183,6 @@ void HttpServer::makeServerServe(void)
 
             if (client -> checkBits(IO::KILL_MYSELF))
             {
-                std::cout << "*---" << std::endl;
                 std::cout << "KIlling myself Remember me as fd: " << client -> getFd() << " from interests list" << std::endl;
                 Server *server = client -> getServer();
                 server -> deleteFromEventsMap(client);
@@ -194,7 +193,6 @@ void HttpServer::makeServerServe(void)
             
             if (res == IO::IO_ERROR)
             {
-                std::cout << "ENTERED*---" << std::endl;
                 std::cout << "Deletting client with fd: " << client -> getFd() << " from interests list" << std::endl;
                 Server *server = client -> getServer();
                 server -> deleteFromEventsMap(client);

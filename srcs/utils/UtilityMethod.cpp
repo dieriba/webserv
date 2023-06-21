@@ -24,7 +24,6 @@ int UtilityMethod::basicCgiSetup(IO& event, HttpResponse& res)
     ev.events = EPOLLIN;
     cgi -> setEvents(EPOLLIN);
     ev.data.ptr = cgi;
-    std::cout << "WS: " << event.getWs() << std::endl;
     if (epoll_ctl(event.getWs(), EPOLL_CTL_ADD, res.getReadEnd(), &ev) == -1) return IO::IO_ERROR;
 
     return IO::IO_SUCCESS;

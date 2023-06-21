@@ -176,9 +176,10 @@ int RequestChecker::checkGetMethod(const HttpServer& instance, HttpRequest& req)
 
     const char *root_c = full_path.c_str();
 
+    if ((access(root_c, R_OK) != 0)) return FORBIDEN;
+
     if (access(root_c, F_OK) != 0) return NOT_FOUND;
 
-    if ((access(root_c, R_OK) != 0)) return FORBIDEN;
     return IO::IO_SUCCESS;
 }
 
@@ -199,16 +200,17 @@ int RequestChecker::checkHeader(const HttpServer& instance, HttpRequest& req)
 
     if (UtilityMethod::is_a_directory(dir_path.c_str())) req.setOptions(HttpRequest::DIRECTORY, SET);
 
-    std::string full_path(req.getHeaders()[FULLPATH]);
-    size_t i = full_path.find('?');
-
-    if (i != std::string::npos) full_path = full_path.substr(0, i);
-    const std::map<std::string, std::string>& cgi_map = instance.getCgiMap();
-    const std::map<std::string, std::string>::const_iterator& it = cgi_map.find(UtilityMethod::getFileExtension(full_path, 1));
-
-    if (req.getMethod() != HttpServer::DELETE && it != cgi_map.end())
+    if (req.getMethod() != HttpServer::DELETE && req.checkBits(HttpRequest::CGI_))
     {
+        std::string full_path(req.getHeaders()[FULLPATH]);
+        size_t i = full_path.find('?');
+
+        if (i != std::string::npos) full_path = full_path.substr(0, i);
+        const std::map<std::string, std::string>& cgi_map = instance.getCgiMap();
+        const std::map<std::string, std::string>::const_iterator& it = cgi_map.find(UtilityMethod::getFileExtension(full_path, 1));
+
         std::cout << "Full path value: " << full_path << std::endl;
+
         if (access(it -> second.c_str() , F_OK) != 0 || access(full_path.c_str(), F_OK) != 0) return NOT_FOUND;
 
         if (access(it -> second.c_str() , X_OK) != 0 || access(full_path.c_str(), R_OK) != 0) return FORBIDEN;
