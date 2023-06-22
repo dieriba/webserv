@@ -125,19 +125,19 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
         CgiStream& cgi = static_cast<CgiStream& >(*(getIO()));
         if ((getTimestampInMillisecond(std::clock()) - cgi.getTimestampInMillisecond(cgi.getCgiTimeStamp())) >= TIMEOUT_CGI)
         {
-            if (cgi.checkBits(CgiStream::STARTED) == 0)
-                _response.switchMethod((*this), HttpServer::ERROR, GATEWAY_TIMEOUT);
-            else
+            epoll_ctl(_ws, EPOLL_CTL_DEL, cgi.getFd(), NULL);
+            getReponse().clearReadEnd();
+            if (cgi.checkBits(CgiStream::STARTED) != 0)
             {
                 this -> clear();
                 UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
+                return IO::IO_SUCCESS;
             }
-            epoll_ctl(_ws, EPOLL_CTL_DEL, cgi.getFd(), NULL);
-            getReponse().clearReadEnd();
+            _response.switchMethod((*this), HttpServer::ERROR, GATEWAY_TIMEOUT);
             setOptions(IO::CGI_ON, CLEAR);
         }
     }
-    
+
     if (checkBits(IO::CGI_ON) == 0 && event.events & EPOLLOUT) return writeToSocket(_ws, event);
 
     return IO::IO_SUCCESS;

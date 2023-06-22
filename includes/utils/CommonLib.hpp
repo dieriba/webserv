@@ -101,6 +101,7 @@
 
 */
 # define TIMEOUT_CGI 3000
+# define MAX_TIMEOUT_CGI 4000
 # define COMMON_TIMEOUT 3000
 # define NO_BODY "-2"
 # define BASE_VEC_ARR 10

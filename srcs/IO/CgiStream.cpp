@@ -32,11 +32,13 @@ CgiStream::~CgiStream(){};
 
 /*----------------------------------------GETTER----------------------------------------*/
 long CgiStream::getCgiTimeStamp(void) const { return _cgi_timestamp; }
+long CgiStream::getCgiBeginTimestamp(void) const { return _cgi_begin; }
 const pid_t& CgiStream::getPid(void) const { return _pid; };
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
 void CgiStream::setPipes(int *pipes) { _pipes = pipes; }
+void CgiStream::setBeginTimeStamp(void) { _cgi_begin = std::clock(); }
 void CgiStream::setPid(const pid_t& pid) { _pid = pid; }
 void CgiStream::updateCgiTimeStamp(void) { _cgi_timestamp = std::clock(); };
 /*----------------------------------------SETTER----------------------------------------*/
@@ -57,53 +59,62 @@ int CgiStream::resetCgi(IO& object, const int& _ws)
 
 int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */)
 {
-    try
+    IO& object = *(getIO());
+
+    if (object.checkBits(IO::CGI_ON) == 0) return IO::IO_SUCCESS;
+
+    if (checkBits(CgiStream::STARTED) == 0)
     {
-        IO& object = *(getIO());
+        Get object;
+        object.makeStatusLine((*this), OK);
+        object.appendToResponse(CONTENT_TYP, "text/html");
+        object.appendToResponse(TRANSFERT_ENCODING, "chunked");
+        object.addEndHeaderCRLF();
+        setBeginTimeStamp();
+        _response.getBuffer().append(object.getResponse());
+        setOptions(CgiStream::STARTED, SET);
+    }        
 
-        if (object.checkBits(IO::CGI_ON) == 0) return IO::IO_SUCCESS;
+    updateCgiTimeStamp();
 
-        if (checkBits(CgiStream::STARTED) == 0)
-        {
-            Get object;
-            object.makeStatusLine((*this), OK);
-            object.appendToResponse(CONTENT_TYP, "text/html");
-            object.appendToResponse(TRANSFERT_ENCODING, "chunked");
-            object.addEndHeaderCRLF();
+    int bytes = read(_pipes[0], _buffer, REQUEST_SIZE);
 
-            _response.getBuffer().append(object.getResponse());
-            setOptions(CgiStream::STARTED, SET);
-        }
-
-        updateCgiTimeStamp();
-
-        int bytes = read(_pipes[0], _buffer, REQUEST_SIZE);
-
-        if (bytes < 0) return resetCgi(object, _ws);
+    if (bytes < 0) return resetCgi(object, _ws);
         
-        std::string hex = UtilityMethod::decimalToHex(bytes);
+    std::string hex = UtilityMethod::decimalToHex(bytes);
 
-        _response.appendToBuffer(hex.c_str(), hex.size());
-        _response.appendToBuffer(CRLF, LEN_CRLF);
-        _response.appendToBuffer(_buffer, bytes);
-        _response.appendToBuffer(CRLF, LEN_CRLF);
+    _response.appendToBuffer(hex.c_str(), hex.size());
+    _response.appendToBuffer(CRLF, LEN_CRLF);
+    _response.appendToBuffer(_buffer, bytes);
+    _response.appendToBuffer(CRLF, LEN_CRLF);
 
-        std::string& resp = _response.getBuffer();
+    std::string& resp = _response.getBuffer();
 
-        if (UtilityMethod::sendBuffer(object.getFd(), resp.data(), resp.size()) == IO::IO_ERROR)
+    if (UtilityMethod::sendBuffer(object.getFd(), resp.data(), resp.size()) == IO::IO_ERROR)
+    {
+        UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
+        object.setOptions(IO::KILL_MYSELF, SET);
+        resp.clear();
+        return IO::IO_SUCCESS;
+    }
+
+    resp.clear();
+        
+    if (bytes == 0) return resetCgi(object, _ws);
+
+    if ((getTimestampInMillisecond(std::clock()) - getTimestampInMillisecond(getCgiBeginTimestamp())) >= MAX_TIMEOUT_CGI)
+    {
+        kill(_pid, SIGTERM);
+
+        if (UtilityMethod::sendBuffer(object.getFd(), "0\r\n\r\n", 5) == IO::IO_ERROR)
         {
             UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
             object.setOptions(IO::KILL_MYSELF, SET);
             resp.clear();
             return IO::IO_SUCCESS;
         }
-    
-        resp.clear();
-        if (bytes == 0) return resetCgi(object, _ws);
-    }
-    catch(const std::exception& e)
-    {
-        return IO::IO_ERROR;
+
+        return resetCgi(object, _ws);
     }
 
     return IO::IO_SUCCESS;

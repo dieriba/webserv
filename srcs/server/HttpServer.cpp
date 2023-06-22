@@ -2,6 +2,7 @@
 # include "../../includes/server/Server.hpp"
 # include "../../includes/utils/ExceptionThrower.hpp"
 # include "../../includes/IO/IO.hpp"
+# include "../../includes/IO/CgiStream.hpp"
 # include "../../includes/IO/ServerStream.hpp"
 # include "../../includes/IO/ClientSocketStream.hpp"
 
@@ -183,14 +184,16 @@ void HttpServer::makeServerServe(void)
 
             if (client -> checkBits(IO::KILL_MYSELF))
             {
-                std::cout << "KIlling myself Remember me as fd: " << client -> getFd() << " from interests list" << std::endl;
+                std::cout << "Killing myself Remember me as fd: " << client -> getFd() << " from interests list" << std::endl;
+                CgiStream& cgi = static_cast<CgiStream&>(*(client -> getIO()));
+                kill(cgi.getPid(), SIGTERM);
                 Server *server = client -> getServer();
                 server -> deleteFromEventsMap(client);
-                continue;
+                continue ;
             }
 
             res = client -> handleIoOperation(_epoll_ws, _events[i]);
-            
+
             if (res == IO::IO_ERROR)
             {
                 std::cout << "Deletting client with fd: " << client -> getFd() << " from interests list" << std::endl;
@@ -200,7 +203,6 @@ void HttpServer::makeServerServe(void)
         }
     }
 }
-
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
