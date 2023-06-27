@@ -245,9 +245,17 @@ int HttpRequest::parseRequest(IO& object)
 
     if (header.size() != 3) return BAD_REQUEST;
 
-    _headers[METHOD] =  header[0];
+    _headers[METHOD] = header[0];
+
+    if (HttpServer::getMethodIndex(header[0]) == -1) return METHOD_NOT_SUPPORTED;
+
     _headers[PATH] = UtilityMethod::remove_dup(header[1]);
+
+    if (header[1].find('/') == std::string::npos) return BAD_REQUEST;
+
     _headers[VERSION] = header[2];
+    
+    if (header[2] != HTTP_VERSION) return BAD_REQUEST;
 
     setMetod(HttpServer::getHttpMethod(header[0]));
 

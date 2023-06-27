@@ -195,18 +195,13 @@ int RequestChecker::checkGetMethod(const HttpServer& instance, HttpRequest& req)
 
 int RequestChecker::checkHeader(const HttpServer& instance, HttpRequest& req)
 {
-
     std::map<std::string, std::string> _map = req.getHeaders();
     
-    if (HttpServer::getMethodIndex(_map[METHOD]) == -1) return METHOD_NOT_SUPPORTED;
-
     if (instance.getRootDir().size() == 0) return NOT_FOUND;
 
     if (_map[VERSION] != HTTP_VERSION) return VERSION_NOT_SUPPORTED;
     
     std::string dir_path = instance.getRootDir() + req.getHeaders()[PATH];
-
-    if (dir_path.find('/') == std::string::npos) return BAD_REQUEST;
 
     if (UtilityMethod::is_a_directory(dir_path.c_str())) req.setOptions(HttpRequest::DIRECTORY, SET);
 
