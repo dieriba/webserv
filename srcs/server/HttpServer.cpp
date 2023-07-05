@@ -250,7 +250,7 @@ const vec_it HttpServer::getHttpResponse(const short int& response)
     return _httpResponses.find(response);
 }
 
-std::map<const unsigned int&, std::map<const std::string&, Server*> >& HttpServer::getHostnameServerMap(void)
+std::map<const unsigned int&, std::map<const std::string&, const Server*> >& HttpServer::getHostnameServerMap(void)
 {
     return _serverNameToServer;
 }
@@ -439,4 +439,4 @@ std::map<std::string, bool> HttpServer::_knownDirectives;
 std::map<std::string, bool> HttpServer::_knownLocationsDirectives;
 std::map<std::string, short int> HttpServer::_httpMethods;
 std::map<std::string, std::string> HttpServer::_mimeTypes;
-std::map<const unsigned int&, std::map<const std::string&, Server*> > HttpServer::_serverNameToServer;
+std::map<const unsigned int&, std::map<const std::string&, const Server*> > HttpServer::_serverNameToServer;

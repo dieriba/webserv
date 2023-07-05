@@ -115,7 +115,6 @@ std::string Server::launchServer(void)
     _serv_address.sin_family = AF_INET;
     _serv_address.sin_addr.s_addr = htonl(INADDR_ANY);
     _serv_address.sin_port = htons(_port);
-
     if (setsockopt(_serv_socket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &option, sizeof(option)) < 0)
         return "Failed to set socket options";
 
