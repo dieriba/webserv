@@ -24,7 +24,7 @@ class Server: public HttpServer
         const unsigned int& getPort(void) const;
         const std::vector<Location>& getLocations(void) const;
         std::vector<Location>& getLocations(void);
-        std::vector<std::string> getServerNames(void) const;
+        const std::vector<std::string>& getServerNames(void) const;
         HttpServer *getInstance(void) const;
 
         /*Setters*/

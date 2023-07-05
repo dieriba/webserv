@@ -61,7 +61,7 @@ const unsigned int& Server::getPort(void) const {return _port;};
 const std::vector<Location>& Server::getLocations(void) const {return _locations;};
 HttpServer *Server::getHttpServer(void) const {return _tcp_server;};
 std::vector<Location>& Server::getLocations(void) {return _locations;}
-std::vector<std::string> Server::getServerNames(void) const {return _server_names;};
+const std::vector<std::string>& Server::getServerNames(void) const {return _server_names;};
 HttpServer *Server::getInstance(void) const {return _instance;}
 /*----------------------------------------GETTER----------------------------------------*/
 

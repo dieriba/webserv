@@ -136,6 +136,23 @@ void HttpServer::settingUpServer(const char *filename)
     if (file.is_open() == false) throw ExceptionThrower("Failled to open file");
     
     _servers = Parser::getServerConfig(file, this);
+    
+    HttpServer::setUpServerNameToServerMap(_servers);
+    
+}
+
+void HttpServer::setUpServerNameToServerMap(const std::vector<Server>& servers)
+{
+    for (size_t i = 0; i < servers.size(); i++)
+    {
+        const std::vector<std::string>& server_names = servers[i].getServerNames();
+        
+        if (server_names.size() == 0) continue;
+
+        const unsigned int& port = servers[i].getPort();
+        for (size_t j = 0; j < server_names.size(); j++)
+            HttpServer::_serverNameToServer[port].insert(std::make_pair(server_names[j], &servers[i]));
+    }
 }
 
 void HttpServer::runningUpServer(void)
@@ -231,6 +248,11 @@ const std::string& HttpServer::getMimeType(const std::string& key)
 const vec_it HttpServer::getHttpResponse(const short int& response)
 {
     return _httpResponses.find(response);
+}
+
+std::map<const unsigned int&, std::map<const std::string&, Server*> >& HttpServer::getHostnameServerMap(void)
+{
+    return _serverNameToServer;
 }
 
 bool HttpServer::isKnownDirective(const std::string& directive)
@@ -417,3 +439,4 @@ std::map<std::string, bool> HttpServer::_knownDirectives;
 std::map<std::string, bool> HttpServer::_knownLocationsDirectives;
 std::map<std::string, short int> HttpServer::_httpMethods;
 std::map<std::string, std::string> HttpServer::_mimeTypes;
+std::map<const unsigned int&, std::map<const std::string&, Server*> > HttpServer::_serverNameToServer;
