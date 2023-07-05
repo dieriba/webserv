@@ -1,49 +1,45 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <stdint.h>
 
-#define FILE_SIZE_GB 2
-#define BUFFER_SIZE 1024
+int main(){
+    const char* filename = "./var/web/ups/file.bin";
+    const uint64_t targetSize = 2ULL * 1024 * 1024 * 1024; // 2GB in bytes
+    const uint64_t chunkSize = 1024 * 1024; // 1MB chunk size (adjust this if needed)
 
-void generate_text_file(const char* file_path, size_t file_size) 
-{
-    FILE* file = fopen(file_path, "w");
-    if (file == NULL) 
-    {
-        printf("Erreur lors de l'ouverture du fichier en écriture.\n");
-        return;
+    FILE* file = fopen(filename, "wb");
+    if (!file) {
+        printf("Error: Unable to create the file.\n");
+        return 1;
     }
 
-    char buffer[BUFFER_SIZE + 1];
-    buffer[BUFFER_SIZE] = '\0';  
-    srand(time(NULL));  
+    uint64_t totalSize = 0;
+    char buffer[chunkSize];
 
-    size_t total_written = 0;
-
-    while (total_written < file_size) 
-    {
-        size_t remaining = file_size - total_written;
-        size_t write_size = (remaining < BUFFER_SIZE) ? remaining : BUFFER_SIZE;
-
-        for (size_t i = 0; i < write_size; i++) 
-        {
-            buffer[i] = rand() % 128;  
+    while (totalSize < targetSize) {
+        // Calculate the remaining bytes to write in this chunk
+        uint64_t bytesToWrite = targetSize - totalSize;
+        if (bytesToWrite > chunkSize) {
+            bytesToWrite = chunkSize;
         }
 
-        fwrite(buffer, sizeof(char), write_size, file);
-        total_written += write_size;
+        // Fill the buffer with some data (you can modify this as needed)
+        for (uint64_t i = 0; i < bytesToWrite; i++) {
+            buffer[i] = (char)(i % 256);
+        }
+
+        // Write the data to the file
+        size_t bytesWritten = fwrite(buffer, 1, bytesToWrite, file);
+        if (bytesWritten != bytesToWrite) {
+            printf("Error: Failed to write to the file.\n");
+            fclose(file);
+            return 1;
+        }
+
+        // Update the total size written so far
+        totalSize += bytesToWrite;
     }
 
     fclose(file);
-    printf("Successfully generated %s with a size of %zu bits.\n", file_path, file_size);
-}
-
-int main() {
-    const char* file_path = "file.txt";
-    size_t cal = 1024 * 1024 * 1024;
-    size_t file_size = FILE_SIZE_GB * cal;
-
-    generate_text_file(file_path, file_size);
-
+    printf("Binary file created: %s\n", filename);
     return 0;
 }

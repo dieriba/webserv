@@ -507,7 +507,7 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
 }
 
 /*----------------------------------------MEMBER FUNCTION-----line.find('{') != std::string::npos-----------------------------------*/
-std::vector<Server> Parser::getServerConfig(std::ifstream& file, HttpServer *tcp_serv)
+std::vector<Server> Parser::getServerConfig(std::ifstream& file, HttpServer *http_server)
 {
     std::string line;
     Server serv;
@@ -545,7 +545,7 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, HttpServer *tcp
                 
                 serv.setIndexPath("/");
 
-                serv.setHttpServer(tcp_serv);
+                serv.setHttpServer(http_server);
                 
                 server.push_back(serv);
 
@@ -555,8 +555,11 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, HttpServer *tcp
             else
                 throw ExceptionThrower("Unknow Context: " + line + " please refer to dieriba for the known context");
         }
+
         if (file.eof()) break ;
+        
     }
+
     return server;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

@@ -57,6 +57,21 @@ size_t UtilityMethod::hexToDecimal(const std::string& hex)
     return number;
 }
 
+std::string UtilityMethod::getDateAndTime(void)
+{
+    std::time_t currentTime = std::time(NULL);
+    std::tm* currentTm = std::gmtime(&currentTime);
+    char formattedDate[50] = {0};
+
+    std::strftime(formattedDate, sizeof(formattedDate), "Date: %a, %d %b %Y %H:%M:%S GMT", currentTm);
+
+    std::string date(formattedDate);
+
+    date += CRLF;
+
+    return date;
+}
+
 std::vector<std::string> UtilityMethod::stringSpliter(const std::string& line, const std::string& delim) 
 {
     size_t pos_start = 0, pos_end;

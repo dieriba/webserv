@@ -7,6 +7,7 @@ CgiStream::CgiStream(){};
 CgiStream::CgiStream(const int& fd, IO *event, int *pipes):_io(event),_pipes(pipes)
 {
     setFD(fd);
+    _pid = 0;
     _cgi_timestamp = 0;
     _type = IO::CGI_STREAM;
 };
@@ -27,7 +28,10 @@ CgiStream& CgiStream::operator=(const CgiStream& rhs)
     _options = rhs._options;
     return (*this);
 };
-CgiStream::~CgiStream(){};
+CgiStream::~CgiStream()
+{
+    if (_pid > 0) kill(_pid, SIGTERM);
+};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
@@ -53,6 +57,7 @@ int CgiStream::resetCgi(IO& object, const int& _ws)
     UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
     object.clear();
     this -> clear();
+    _pid = 0;
     object.getReponse().clearReadEnd();
     return IO::IO_SUCCESS;
 }

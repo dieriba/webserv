@@ -17,6 +17,7 @@ class UtilityMethod
         static int basicCgiSetup(IO& event, HttpResponse& res);
         static void deleteEventFromEpollInstance(const int& _ws, const int& _fd);
         static int sendBuffer(int client_socket, const char *buffer, int bytes);
+        static std::string getDateAndTime(void);
         static std::string rtrim(const std::string &line, const char *toTrim);
         static std::string ltrim(const std::string &line, const char *toTrim);
         static std::string trimBothEnd(std::string& line, const char *toTrim);

@@ -80,11 +80,11 @@ void Method::makeStatusLine(IO& object, const int& status)
 {
     std::string version(HTTP_VERSION);
     std::ostringstream ss;
-
+    
     ss << status;
     std::string code(ss.str());
     
-    _response = version + " " + code + " " + HttpServer::getHttpResponse(status) -> second + CRLF;
+    _response = version + " " + code + " " + HttpServer::getHttpResponse(status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime();
 
     if (object.checkBits(IO::COOKIE) == 0) setCookieHeader(object);
 }

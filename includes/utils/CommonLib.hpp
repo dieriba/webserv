@@ -162,6 +162,7 @@
 
 
 */
+# define SERVER_NAME "Server: webserv\r\n"
 # define LISTEN "listen"
 # define SERVER_NAMES "server_names"
 # define ROOT "root"

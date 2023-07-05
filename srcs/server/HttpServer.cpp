@@ -130,8 +130,11 @@ void HttpServer::settingUpServer(const char *filename)
 {
     std::ifstream file;   
     _servers.reserve(BASE_VEC_ARR);
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    file.exceptions(std::ifstream::badbit);
     filename != NULL ? file.open(filename) : file.open(DEFAULT_CONF_FILE);
+    
+    if (file.is_open() == false) throw ExceptionThrower("Failled to open file");
+    
     _servers = Parser::getServerConfig(file, this);
 }
 
