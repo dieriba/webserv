@@ -102,9 +102,9 @@ void HttpResponse::clear(void)
     resetOptions();
 }
 
-int HttpResponse::serveResponse(IO& event, HttpRequest& req)
+int HttpResponse::serveResponse(ClientSocketStream& client, HttpRequest& req)
 {
-    return _method -> sendResponse(event, req, *this);
+    return _method -> sendResponse(client, req, *this);
 }
 
 int HttpResponse::switchMethod(IO& event, const short int& method, const short int& status)

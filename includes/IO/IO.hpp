@@ -12,10 +12,10 @@ class IO: public BitsManipulation
 {
     public:
         IO();
-        IO(const int& fd, Server *server);
-        IO(const int& ws, const int& fd, Server *server);
-        IO(const IO& rhs);
-        IO& operator=(const IO& rhs);
+        IO(const int&, Server *);
+        IO(const int&, const int&, Server *);
+        IO(const IO&);
+        IO& operator=(const IO&);
         virtual ~IO();
 
     
@@ -36,20 +36,19 @@ class IO: public BitsManipulation
         IO* getIO(void) const;
 
         /*SETTERS*/
-        void setWs(const int& ws);
-        void setIO(IO* io);
-        void setEvents(const uint32_t& events);
-        void setFD(const int& fd);
-        void setErrorStatus(const int& err);
+        void setWs(const int&);
+        void setIO(IO*);
+        void setEvents(const uint32_t&);
+        void setFD(const int&);
+        void setErrorStatus(const int&);
         void updateTimeStamp();
 
         /*MEMBER FUNCTION*/
-        bool validSocketClient(int _fd, struct epoll_event event);
-        long getTimestampInMillisecond(long _cgi_timesamp) const;
+        long getTimestampInMillisecond(const long& _cgi_timesamp) const;
         /*PURE VIRTUAL FUNCTION*/
-        virtual int handleIoOperation(const int& _ws, struct epoll_event& event) = 0;
+        virtual int handleIoOperation(const int&, struct epoll_event&) = 0;
         /*MEMBER FUNCTION*/
-        int deleteAndResetIO(HttpResponse& res);
+        int deleteAndResetIO(HttpResponse&);
         void clear(void);
 
         enum

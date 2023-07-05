@@ -13,8 +13,8 @@ class Server: public HttpServer
 {
     public:
         Server();
-        Server(const Server& rhs);
-        Server& operator=(const Server& rhs);
+        Server(const Server&);
+        Server& operator=(const Server&);
         ~Server();
 
         /*GETTERS*/
@@ -28,17 +28,17 @@ class Server: public HttpServer
         HttpServer *getInstance(void) const;
 
         /*Setters*/
-        void    setHttpServer(HttpServer *tcp_server);
-        void    setPort(const unsigned int& port);
-        void    pushNewServerName(const std::string& server_name);
-        void    pushNewLocation(const Location& server_name);
-        void    setIp(const std::string& ip);
-        void    setServSocket(const int& socket);
-        void    setInstance(HttpServer* instance);
+        void    setHttpServer(HttpServer *);
+        void    setPort(const unsigned int&);
+        void    pushNewServerName(const std::string&);
+        void    pushNewLocation(const Location&);
+        void    setIp(const std::string&);
+        void    setServSocket(const int&);
+        void    setInstance(HttpServer*);
 
         /*MEMBER FUNCTION*/
-        void addToEventsMap(const IO* event);
-        void deleteFromEventsMap(const IO* event);
+        void addToEventsMap(const IO*);
+        void deleteFromEventsMap(const IO*);
         std::string launchServer(void);
 
     private:

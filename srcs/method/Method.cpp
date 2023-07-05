@@ -5,6 +5,7 @@
 # include "../../includes/method/Delete.hpp"
 # include "../../includes/method/Error.hpp"
 # include "../../includes/IO/IO.hpp"
+# include "../../includes/IO/ClientSocketStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Method::Method(){};
@@ -29,7 +30,7 @@ std::string& Method::getResponse(void) {return _response;}
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-int Method::handleFileRessource(IO& event, HttpResponse& res)
+int Method::handleFileRessource(ClientSocketStream& event, HttpResponse& res)
 {
     try
     {
@@ -50,14 +51,14 @@ int Method::handleFileRessource(IO& event, HttpResponse& res)
     return IO::IO_SUCCESS;
 }
 
-int Method::sendRedirect(const IO& event, HttpResponse& res, const char *status_line)
+int Method::sendRedirect(const ClientSocketStream& client, HttpResponse& res, const char *status_line)
 {
-    if (UtilityMethod::sendBuffer(event.getFd(), status_line, UtilityMethod::myStrlen(status_line)) == IO::IO_ERROR)
+    if (UtilityMethod::sendBuffer(client.getFd(), status_line, UtilityMethod::myStrlen(status_line)) == IO::IO_ERROR)
             return IO::IO_ERROR;
     
-    const std::string& redirect_url = event.getServer() -> getInstance() -> getRedirect();
+    const std::string& redirect_url = client.getServer() -> getInstance() -> getRedirect();
 
-    if (UtilityMethod::sendBuffer(event.getFd(), redirect_url.c_str(), redirect_url.size()) || UtilityMethod::sendBuffer(event.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
+    if (UtilityMethod::sendBuffer(client.getFd(), redirect_url.c_str(), redirect_url.size()) || UtilityMethod::sendBuffer(client.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
         return IO::IO_ERROR;
             
     res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);

@@ -7,8 +7,8 @@ class HttpMessage
 {
     public:
         HttpMessage();
-        HttpMessage(const HttpMessage& rhs);
-        HttpMessage& operator=(const HttpMessage& rhs);
+        HttpMessage(const HttpMessage&);
+        HttpMessage& operator=(const HttpMessage&);
         ~HttpMessage();
 
         /*GETTER*/
@@ -20,10 +20,10 @@ class HttpMessage
         std::map<std::string, std::string>& getHeaders();
 
         /*SETTER*/
-        void setBodySize(const std::string& body);
-        void setBodySize(const size_t& size);
-        virtual void appendToBuffer(const char *toAppend, const ssize_t& size);
-        void setMetod(const int& _method);
+        void setBodySize(const std::string&);
+        void setBodySize(const size_t&);
+        virtual void appendToBuffer(const char *, const ssize_t&);
+        void setMetod(const int&);
 
         /*MEMBER FUNCTION*/
         virtual void clear(void) = 0;

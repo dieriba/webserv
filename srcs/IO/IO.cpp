@@ -58,19 +58,9 @@ int IO::deleteAndResetIO(HttpResponse& res)
     return IO::IO_SUCCESS;
 }
 
-long IO::getTimestampInMillisecond(long timestamp) const
+long IO::getTimestampInMillisecond(const long& timestamp) const
 {
     return static_cast<long>(static_cast<double>(timestamp) / (CLOCKS_PER_SEC / 1000));
-}
-
-bool IO::validSocketClient(int _fd, struct epoll_event event)
-{
-    if ((event.events & EPOLLERR) || (event.events & EPOLLHUP) || (!(event.events & EPOLLIN)))
-	{
-	    close(_fd);
-        return false;
-	}
-    return true ;
 }
 
 void IO::clear(void)

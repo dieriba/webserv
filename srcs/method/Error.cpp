@@ -1,7 +1,7 @@
 # include "../../includes/method/Error.hpp"
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/http/HttpResponse.hpp"
-# include "../../includes/IO/IO.hpp"
+# include "../../includes/IO/ClientSocketStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Error::Error(){};
@@ -67,7 +67,7 @@ std::string Error::getErrorPage(const short int& err) const
     return res;
 }
 
-int Error::firstStep(IO& event, HttpResponse& res, const int& err)
+int Error::firstStep(ClientSocketStream& event, HttpResponse& res, const int& err)
 {
     std::map<short int, std::string>& _map = event.getServer() -> getInstance() -> getErrorMaps();
     std::map<short int, std::string>::iterator it = _map.find(event.getErrStatus());
@@ -107,21 +107,21 @@ int Error::firstStep(IO& event, HttpResponse& res, const int& err)
     return IO::IO_SUCCESS;
 }
 
-int Error::sendResponse(IO& event, HttpRequest& /* req */, HttpResponse& res)
+int Error::sendResponse(ClientSocketStream& client, HttpRequest& /* req */, HttpResponse& res)
 {    
-    HttpServer& instance = *(event.getServer() -> getInstance());
+    HttpServer& instance = *(client.getServer() -> getInstance());
+    
     int err = 0;
-
 
     if (instance.checkBits(HttpServer::ERROR_PAGE_SET))
     {
-        if (!res.checkBits(HttpResponse::STARTED)) err = firstStep(event, res, event.getErrStatus());
+        if (!res.checkBits(HttpResponse::STARTED)) err = firstStep(client, res, client.getErrStatus());
 
-        if (err == IO::IO_SUCCESS && res.checkBits(HttpResponse::FILE)) return handleFileRessource(event, res);
+        if (err == IO::IO_SUCCESS && res.checkBits(HttpResponse::FILE)) return handleFileRessource(client, res);
     }
     
-    std::string error_page = getErrorPage(event.getErrStatus());
-    if (UtilityMethod::sendBuffer(event.getFd(), error_page.c_str(), error_page.size()) == IO::IO_ERROR) return IO::IO_ERROR;
+    std::string error_page = getErrorPage(client.getErrStatus());
+    if (UtilityMethod::sendBuffer(client.getFd(), error_page.c_str(), error_page.size()) == IO::IO_ERROR) return IO::IO_ERROR;
     res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
     return IO::IO_SUCCESS;
 }

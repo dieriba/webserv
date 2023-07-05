@@ -3,25 +3,25 @@
 
 # include "Method.hpp"
 
-class IO;
+class ClientSocketStream;
 class HttpRequest;
 
 class Error: public Method
 {
     public:
         Error();
-        Error(const Error& rhs);
-        Error& operator=(const Error& rhs);
+        Error(const Error&);
+        Error& operator=(const Error&);
         ~Error();
 
         /*MEMBER FUNCTION*/
-        int firstStep(IO& event, HttpResponse& res, const int& err);
-        int sendResponse(IO&, HttpRequest&, HttpResponse&);
+        int firstStep(ClientSocketStream&, HttpResponse&, const int&);
+        int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
 
         /*VIRTUAL MEMBER FUNCTION*/
         virtual Method* clone(void) const;
     private:
-        std::string getErrorPage(const short int& err) const;
+        std::string getErrorPage(const short int&) const;
 };
 
 # endif

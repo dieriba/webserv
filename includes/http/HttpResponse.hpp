@@ -14,8 +14,8 @@ class HttpResponse: public HttpMessage, public BitsManipulation
 {
     public:
         HttpResponse();
-        HttpResponse(const HttpResponse& rhs);
-        HttpResponse& operator=(const HttpResponse& rhs);
+        HttpResponse(const HttpResponse&);
+        HttpResponse& operator=(const HttpResponse&);
         ~HttpResponse();
 
         /*ENUM OPTIONS*/
@@ -44,17 +44,17 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         const std::string& getPath(void) const;
 
         /*SETTER*/
-        void setPath(const std::string& ressource);
-        void setMethodObj(Method *method);
+        void setPath(const std::string&);
+        void setMethodObj(Method *);
     
         /*MEMBER FUNCTION*/
         void clearReadEnd();
         void clearWriteEnd();
         void clearBothEnd();
         void clear(void);
-        void setDirectory(DIR* directory);
-        int serveResponse(IO&, HttpRequest&);
-        int switchMethod(IO& event, const short int& method, const short int& status);
+        void setDirectory(DIR*);
+        int serveResponse(ClientSocketStream&, HttpRequest&);
+        int switchMethod(IO&, const short int&, const short int&);
 
     private:
         int     _pipes[2];

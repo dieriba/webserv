@@ -7,15 +7,19 @@ class ClientSocketStream: public IO
 {
     public:
         ClientSocketStream();
-        ClientSocketStream(const int& ws, const int& fd, Server* server);
-        ClientSocketStream(const ClientSocketStream& rhs);
-        ClientSocketStream& operator=(const ClientSocketStream& rhs);
+        ClientSocketStream(const int&, const int&, Server*);
+        ClientSocketStream(const ClientSocketStream&);
+        ClientSocketStream& operator=(const ClientSocketStream&);
         ~ClientSocketStream();
+
+        /*GETTERS*/
+        const unsigned int& getPort(void) const;
         
-        int handleIoOperation(const int& _ws, struct epoll_event&);
+        int handleIoOperation(const int&, struct epoll_event&);
     private:
-        int readFromSocket(const int& _ws, struct epoll_event& event);
-        int writeToSocket(const int& _ws, struct epoll_event& event);
+        int readFromSocket(const int&, struct epoll_event&);
+        int writeToSocket(const int&, struct epoll_event&);
+        unsigned int _port;
 };
 
 # endif

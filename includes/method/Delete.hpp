@@ -5,17 +5,18 @@
 
 class IO;
 class HttpRequest;
+class ClientSocketStream;
 
 class Delete: public Method
 {
     public:
         Delete();
-        Delete(const Delete& rhs);
-        Delete& operator=(const Delete& rhs);
+        Delete(const Delete&);
+        Delete& operator=(const Delete&);
         ~Delete();
 
         /*MEMBER FUNCTION*/
-        int sendResponse(IO&, HttpRequest&, HttpResponse&);
+        int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
 
         /*VIRTUAL MEMBER FUNCTION*/
         virtual Method* clone(void) const;

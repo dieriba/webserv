@@ -1,7 +1,7 @@
 # include "../../includes/method/Delete.hpp"
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/http/HttpResponse.hpp"
-# include "../../includes/IO/IO.hpp"
+# include "../../includes/IO/ClientSocketStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 Delete::Delete(){};
@@ -23,7 +23,7 @@ Delete::~Delete(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-int Delete::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
+int Delete::sendResponse(ClientSocketStream& event, HttpRequest& req, HttpResponse& res)
 {
     if (res.checkBits(HttpResponse::REDIRECT_SET)) return sendRedirect(event, res, FOUND_REDIRECT_IND_METHOD);
 

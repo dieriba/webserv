@@ -2,7 +2,7 @@
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/http/HttpResponse.hpp"
 # include "../../includes/utils/UtilityMethod.hpp"
-# include "../../includes/IO/IO.hpp"
+# include "../../includes/IO/ClientSocketStream.hpp"
 # include "../../includes/IO/CgiStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
@@ -103,7 +103,7 @@ int Post::writeToFile(HttpRequest& req)
     return IO::IO_SUCCESS;
 }
 
-int Post::handleMultipartData(IO& event, HttpRequest& req)
+int Post::handleMultipartData(ClientSocketStream& client, HttpRequest& req)
 {
     while (1)
     {
@@ -159,7 +159,7 @@ int Post::handleMultipartData(IO& event, HttpRequest& req)
                 if (UtilityMethod::getFileExtension(vector_filename[1] ,1)
                     != UtilityMethod::getFileExtension(vec_content_type[1] ,0)) return BAD_REQUEST;
                 
-                if (vector_filename[1].size()) req.open_file(event, vector_filename[1]);
+                if (vector_filename[1].size()) req.open_file(client, vector_filename[1]);
 
                 pos_two = pos_three;
             }
@@ -281,7 +281,7 @@ int Post::postCgiHandler(HttpRequest& req, HttpResponse& res)
     return IO::IO_SUCCESS;
 }
 
-int Post::handleCgiPost(IO& event, HttpRequest& req, HttpResponse& res)
+int Post::handleCgiPost(ClientSocketStream& event, HttpRequest& req, HttpResponse& res)
 {
     const std::map<std::string, std::string>& map = req.getHeaders();
 
@@ -327,16 +327,16 @@ int Post::handleCgiPost(IO& event, HttpRequest& req, HttpResponse& res)
     return IO::IO_SUCCESS;
 }
 
-int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
+int Post::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpResponse& res)
 {
-    if (res.checkBits(HttpResponse::REDIRECT_SET)) return sendRedirect(event, res, FOUND_REDIRECT_POST);
+    if (res.checkBits(HttpResponse::REDIRECT_SET)) return sendRedirect(client, res, FOUND_REDIRECT_POST);
 
-    if (event.getEvents() & EPOLLIN)
+    if (client.getEvents() & EPOLLIN)
     {
         if (req.checkBits(HttpRequest::CGI_))
-            return handleCgiPost(event, req, res);
+            return handleCgiPost(client, req, res);
         if (req.checkBits(HttpRequest::MULTIPART_DATA))
-            return handleMultipartData(event, req);
+            return handleMultipartData(client, req);
         else
         {
             if (req.checkBits(HttpRequest::CONTENT_LENGTH))
@@ -346,7 +346,7 @@ int Post::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
     }
     else
     {
-        if (UtilityMethod::sendBuffer(event.getFd(), SERVER_SUCCESS_POST_RESPONSE, UtilityMethod::myStrlen(SERVER_SUCCESS_POST_RESPONSE)) == IO::IO_ERROR)
+        if (UtilityMethod::sendBuffer(client.getFd(), SERVER_SUCCESS_POST_RESPONSE, UtilityMethod::myStrlen(SERVER_SUCCESS_POST_RESPONSE)) == IO::IO_ERROR)
         {
             res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
             return IO::IO_ERROR;

@@ -4,6 +4,7 @@
 # include "../utils/CommonLib.hpp"
 
 class IO;
+class ClientSocketStream;
 class HttpRequest;
 class HttpResponse;
 
@@ -11,8 +12,8 @@ class Method
 {
     public:
         Method();
-        Method(const Method& rhs);
-        Method& operator=(const Method& rhs);
+        Method(const Method&);
+        Method& operator=(const Method&);
         virtual ~Method();
 
         typedef Method* (*Factory)();
@@ -21,18 +22,18 @@ class Method
         std::string& getResponse(void);
 
         /*MEMBER FUNCTION*/
-        int sendBuffer(int client_socket, const char *buffer, int bytes);
-        int handleCgiRessource(IO& event, HttpResponse& res);
-        int handleFileRessource(IO& event, HttpResponse& res);
-        int sendRedirect(const IO& event, HttpResponse& res, const char *status_line);
-        void makeStatusLine(IO& event, const int& status);
+        int sendBuffer(int, const char *, int);
+        int handleCgiRessource(ClientSocketStream&, HttpResponse&);
+        int handleFileRessource(ClientSocketStream&, HttpResponse&);
+        int sendRedirect(const ClientSocketStream&, HttpResponse&, const char *);
+        void makeStatusLine(IO&, const int&);
         void addEndHeaderCRLF(void);
-        void setCookieHeader(IO& event);
-        void appendToResponse(const std::string& key, const std::string& value);
+        void setCookieHeader(IO&);
+        void appendToResponse(const std::string&, const std::string&);
 
         /*VIRTUAL FUNCTION*/
         virtual Method* clone(void) const = 0;
-        virtual int sendResponse(IO&, HttpRequest&, HttpResponse&) = 0;
+        virtual int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&) = 0;
 
         /*STATIC MEMBER FUNCTION*/
         static Method* createGet();
@@ -43,7 +44,6 @@ class Method
 
     protected:
         std::string _response;
-
 };
 
 # endif

@@ -14,8 +14,8 @@ class HttpServer: public Parser, public BitsManipulation
     public:
         /*CONSTRUCTOR/DESTRUCTOR/COPY/ASSIGNEMENT*/
         HttpServer();
-        HttpServer(const HttpServer& rhs);
-        HttpServer& operator=(const HttpServer& rhs);
+        HttpServer(const HttpServer&);
+        HttpServer& operator=(const HttpServer&);
         ~HttpServer();
 
         enum
@@ -32,7 +32,7 @@ class HttpServer: public Parser, public BitsManipulation
         };
 
         /*GETTERS*/
-        bool getCgiPath(const std::string& key, std::string& path);
+        bool getCgiPath(const std::string&, std::string&);
         std::vector<Server> getServers(void) const;
         const size_t& getBodySize(void) const;
         const std::string& getIndex(void) const;
@@ -48,40 +48,40 @@ class HttpServer: public Parser, public BitsManipulation
         const int& getEpollWs(void) const ;
 
         /*SETTERS*/
-        int addToErrorMap(const short int& error, std::string& file, const std::string& directory);
-        void pushNewServer(const Server& server);
-        void setBodySize(const size_t& body);
-        void setIndex(const std::string& index);
-        void setRootDir(const std::string& root_dir);
-        void setRedirect(const std::string& redirect);
-        void setIndexPath(const std::string& path);
-        void setFullIndexPath(const std::string& full_index_path);
-        void pushNewCGI(const std::string& key, const std::string& value);
-        void setUploadsFilesFolder(const std::string& uploads_files_folders);
+        int addToErrorMap(const short int&, std::string&, const std::string&);
+        void pushNewServer(const Server&);
+        void setBodySize(const size_t&);
+        void setIndex(const std::string&);
+        void setRootDir(const std::string&);
+        void setRedirect(const std::string&);
+        void setIndexPath(const std::string&);
+        void setFullIndexPath(const std::string&);
+        void pushNewCGI(const std::string&, const std::string&);
+        void setUploadsFilesFolder(const std::string&);
 
         /*MEMBER FUNCTION*/
-        void settingUpServer(const char *filename);
+        void settingUpServer(const char *);
         void runningUpServer(void);
         void makeServerServe(void);
 
         /*STATIC MEMBER FUNCTION*/
-        void setWs(const int& ws);
+        void setWs(const int&);
         static void initMimeTypes(void);
         static void initHttpResponses(void);
         static void initHttpMethods(void);
         static void initKnownDirectives(void);
         static void initknownLocationsDirectives(void);
-        static const std::string& getMimeType(const std::string& key);
-        static bool isKnownDirective(const std::string& directive);
-        static bool isKnownLocationDirectives(const std::string& directive);
-        static const vec_it getHttpResponse(const short int& code);
-        static int getHttpMethod(const std::string& method);
-        static int makeNonBlockingFd(const int& fd);
-        static int getMethodIndex(const std::string& method);
+        static const std::string& getMimeType(const std::string&);
+        static bool isKnownDirective(const std::string&);
+        static bool isKnownLocationDirectives(const std::string&);
+        static const vec_it getHttpResponse(const short int&);
+        static int getHttpMethod(const std::string&);
+        static int makeNonBlockingFd(const int&);
+        static int getMethodIndex(const std::string&);
         static std::map<const unsigned int&, std::map<const std::string&, const Server*> >& getHostnameServerMap(void);
-        static void setUpServerNameToServerMap(const std::vector<Server>& servers);
+        static void setUpServerNameToServerMap(const std::vector<Server>&);
 
-        static void switch_off_signal(int signal);
+        static void switch_off_signal(int);
 
         /*static var*/
         static short int g_signal;

@@ -14,27 +14,27 @@ class Parser
         ~Parser();
 
         /*MEMBER FUNCTION*/
-        std::vector<Server> getServerConfig(std::ifstream& file, HttpServer *tcp_server);
+        std::vector<Server> getServerConfig(std::ifstream&, HttpServer *);
     private:
 
         /*MEMBER FUNC*/
 
-        Parser& operator=(const Parser& rhs);
-        Location fillUpLocation(Server *server, std::ifstream& file, std::string& line, bool bracket);
-        Server fillServer(std::ifstream& file, std::string& line, bool bracket);
-        bool    validIpFormat(const std::string& ip);
-        int    handleErrorPages(HttpServer& instance, std::vector<std::string>& vec);
-        int    setAllowedMethods(HttpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _serv_conf);
-        void    SemicolonCheck(std::string& line, size_t i, size_t len);
-        void    fillMap(const std::string& line, Server& server, std::map<std::string, std::string>& _serv_conf);
-        void    fillMap(const std::string& line, Location& server, std::map<std::string, std::string>& _serv_conf);
-        int     fillInstance(HttpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _map);
-        void    checkOpeningLine(std::ifstream& file, std::string& line);
-        void    checkEndSemicolons(std::vector<std::string>& vec);
-        void    feedingUpLocation(std::map<std::string, std::string>& _map, Location& location);
-        void    feedingUpServer(std::map<std::string, std::string>& _serv_conf, Server& server);
-        void    feedingUpInstance(std::map<std::string, std::string>& _map, HttpServer& instance);
-        void    setCommonDirectives(std::vector<std::string>& vec, std::map<std::string, std::string>& _map);
+        Parser& operator=(const Parser&);
+        Location fillUpLocation(Server *, std::ifstream&, std::string&, bool);
+        Server fillServer(std::ifstream&, std::string&, bool);
+        bool    validIpFormat(const std::string&);
+        int    handleErrorPages(HttpServer&, std::vector<std::string>&);
+        int    setAllowedMethods(HttpServer&, std::vector<std::string>&, std::map<std::string, std::string>&);
+        void    SemicolonCheck(std::string&, size_t, size_t);
+        void    fillMap(const std::string&, Server&, std::map<std::string, std::string>&);
+        void    fillMap(const std::string&, Location&, std::map<std::string, std::string>&);
+        int     fillInstance(HttpServer&, std::vector<std::string>&, std::map<std::string, std::string>&);
+        void    checkOpeningLine(std::ifstream&, std::string&);
+        void    checkEndSemicolons(std::vector<std::string>&);
+        void    feedingUpLocation(std::map<std::string, std::string>&, Location&);
+        void    feedingUpServer(std::map<std::string, std::string>&, Server&);
+        void    feedingUpInstance(std::map<std::string, std::string>&, HttpServer&);
+        void    setCommonDirectives(std::vector<std::string>&, std::map<std::string, std::string>&);
 };
 
 #endif

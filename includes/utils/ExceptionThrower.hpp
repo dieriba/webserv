@@ -5,9 +5,9 @@
 class ExceptionThrower : public std::exception
 {
     public:
-        ExceptionThrower(const std::string& exception);
-        ExceptionThrower(const ExceptionThrower& rhs);
-        ExceptionThrower& operator=(const ExceptionThrower& rhs);
+        ExceptionThrower(const std::string&);
+        ExceptionThrower(const ExceptionThrower&);
+        ExceptionThrower& operator=(const ExceptionThrower&);
         ~ExceptionThrower() throw();
         
         /*virutal method inhirited from std::exception*/

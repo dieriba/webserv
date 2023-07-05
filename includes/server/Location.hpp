@@ -9,8 +9,8 @@ class Location: public HttpServer
 {
     public:
         Location();
-        Location(const Location& rhs);
-        Location& operator=(const Location& rhs);
+        Location(const Location&);
+        Location& operator=(const Location&);
         ~Location();
     
         /*GETTERS*/
@@ -18,8 +18,8 @@ class Location: public HttpServer
         std::list<Location> getSubLocations(void) const;
 
         /*Setters*/
-        void    pushNewLocation(const Location& location);
-        void    setServer(Server *server);
+        void    pushNewLocation(const Location&);
+        void    setServer(Server *);
 
     private:
         std::list<Location> _sub_locations;

@@ -7,6 +7,7 @@
 ClientSocketStream::ClientSocketStream(){};
 ClientSocketStream::ClientSocketStream(const int& ws, const int& fd, Server* server):IO(ws, fd, server)
 {
+    _port = server -> getPort();
     _io = new CgiStream(-1, this, NULL);
     _io -> setIO(this);
     _type = IO::CLIENT_SOCKET;
@@ -36,6 +37,10 @@ ClientSocketStream::~ClientSocketStream()
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
+const unsigned int& ClientSocketStream::getPort(void) const
+{
+    return _port;
+}
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/

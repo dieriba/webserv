@@ -5,16 +5,16 @@ class BitsManipulation
 {
     public:
         BitsManipulation();
-        BitsManipulation(const BitsManipulation& rhs);
-        BitsManipulation& operator=(const BitsManipulation& rhs);
+        BitsManipulation(const BitsManipulation&);
+        BitsManipulation& operator=(const BitsManipulation&);
         ~BitsManipulation();
 
         /*GETTER*/
         unsigned int  getOptions(void) const ;
         /*SETTER*/
-        void    setOptions(const unsigned int& nbit, char actions);
+        void    setOptions(const unsigned int&, char);
         /*MEMBER FUNCTION*/
-        bool    checkBits(const unsigned int& nbit) const;
+        bool    checkBits(const unsigned int&) const;
         void    resetOptions(void);
 
     protected:

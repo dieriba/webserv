@@ -3,7 +3,7 @@
 # include "../../includes/utils/UtilityMethod.hpp"
 # include "../../includes/method/Post.hpp"
 # include "../../includes/server/HttpServer.hpp"
-# include "../../includes/IO/IO.hpp"
+# include "../../includes/IO/ClientSocketStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 HttpRequest::HttpRequest():HttpMessage(),_header_size(0),_chunk_size(0),_current_chunk_size(0),_start(true){};
@@ -175,7 +175,7 @@ void HttpRequest::appendToBuffer(const char *toAppend, const ssize_t& size)
         _header_size = len + 1;
 }
 
-int HttpRequest::open_file(IO& event, std::string& filepath)
+int HttpRequest::open_file(ClientSocketStream& event, std::string& filepath)
 {
     static int _nb;
     HttpServer& instance = *(event.getServer() -> getInstance());
@@ -202,7 +202,7 @@ int HttpRequest::open_file(IO& event, std::string& filepath)
     return IO::IO_SUCCESS;
 }
 
-int HttpRequest::open_file(IO& event)
+int HttpRequest::open_file(ClientSocketStream& event)
 {
     static int _nb;
     HttpServer& instance = *(event.getServer() -> getInstance());
@@ -228,7 +228,7 @@ int HttpRequest::open_file(IO& event)
     return IO::IO_SUCCESS;
 }
 
-int HttpRequest::parseRequest(IO& object)
+int HttpRequest::parseRequest(ClientSocketStream& object)
 {
     if (checkBits(HttpRequest::CONTENT_LENGTH) || checkBits(HttpRequest::TRANSFER_ENCODING))
         return 0;

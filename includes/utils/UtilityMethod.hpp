@@ -10,32 +10,32 @@ class UtilityMethod
 {
     public:
         UtilityMethod();
-        UtilityMethod(const UtilityMethod& rhs);
+        UtilityMethod(const UtilityMethod&);
         ~UtilityMethod();
         
         /*STRING MANIPULATION*/
-        static int basicCgiSetup(IO& event, HttpResponse& res);
-        static void deleteEventFromEpollInstance(const int& _ws, const int& _fd);
-        static int sendBuffer(int client_socket, const char *buffer, int bytes);
+        static int basicCgiSetup(IO&, HttpResponse&);
+        static void deleteEventFromEpollInstance(const int&, const int&);
+        static int sendBuffer(int, const char *, int);
         static std::string getDateAndTime(void);
-        static std::string rtrim(const std::string &line, const char *toTrim);
-        static std::string ltrim(const std::string &line, const char *toTrim);
-        static std::string trimBothEnd(std::string& line, const char *toTrim);
-        static std::vector<std::string> stringSpliter(const std::string& line, const std::string& delim);
-        static size_t  count(const std::string& line, char to_count);
-        static int switchEvents(const int& _ws, uint32_t mode, struct epoll_event& event, IO& ev);
-        static std::string numberToString(const size_t& number);
-        static const std::string& getMimeType(std::string& path, const std::string& index_path, const std::string& index, const bool& to_check);
-        static std::string getFileExtension(const std::string& content_type, const short int& opt);
-        static std::string decimalToHex(const int& number);
-        static size_t hexToDecimal(const std::string& hex);
-        static char *mystrstr(const char *big, const char *needle);
-        static int is_a_directory(const char *path);
-        static size_t myStrlen(const char *buffer);
-        static std::string remove_dup(std::string& ressource);
+        static std::string rtrim(const std::string& ,const char *);
+        static std::string ltrim(const std::string& ,const char *);
+        static std::string trimBothEnd(std::string& ,const char *);
+        static std::vector<std::string> stringSpliter(const std::string& , const std::string&);
+        static size_t  count(const std::string& , char);
+        static int switchEvents(const int&, uint32_t, struct epoll_event&, IO&);
+        static std::string numberToString(const size_t&);
+        static const std::string& getMimeType(std::string&, const std::string&, const std::string&, const bool&);
+        static std::string getFileExtension(const std::string&, const short int&);
+        static std::string decimalToHex(const int&);
+        static size_t hexToDecimal(const std::string&);
+        static char *mystrstr(const char *, const char *);
+        static int is_a_directory(const char *);
+        static size_t myStrlen(const char *);
+        static std::string remove_dup(std::string&);
     
     private:
-        UtilityMethod& operator=(const UtilityMethod& rhs);        
+        UtilityMethod& operator=(const UtilityMethod&);        
 };
 
 #endif

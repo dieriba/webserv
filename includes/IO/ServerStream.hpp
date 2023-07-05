@@ -7,12 +7,12 @@ class ServerStream: public IO
 {
     public:
         ServerStream();
-        ServerStream(const int& fd, Server *server);
-        ServerStream(const ServerStream& rhs);
-        ServerStream& operator=(const ServerStream& rhs);
+        ServerStream(const int&, Server *);
+        ServerStream(const ServerStream&);
+        ServerStream& operator=(const ServerStream&);
         ~ServerStream();
 
-        int handleIoOperation(const int& _ws, struct epoll_event&);
+        int handleIoOperation(const int&, struct epoll_event&);
 };
 
 # endif

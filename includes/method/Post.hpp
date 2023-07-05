@@ -3,37 +3,37 @@
 
 # include "Method.hpp"
 
-class IO;
+class ClientSocketStream;
 class HttpRequest;
 
 class Post: public Method
 {
     public:
         Post();
-        Post(const Post& rhs);
-        Post& operator=(const Post& rhs);
+        Post(const Post&);
+        Post& operator=(const Post&);
         virtual ~Post();
 
         /*GETTERS*/
         const size_t& getRequestBodySize(void) const;
 
         /*SETTERS*/
-        void updateSize(const size_t& size);
+        void updateSize(const size_t&);
 
         /*MEMBER FUNCTION*/
         void clearRequestBodySize(void);
-        int sendResponse(IO&, HttpRequest&, HttpResponse&);
-        int handleCgiPost(IO& event, HttpRequest& req, HttpResponse& res);
-        int postCgiHandler(HttpRequest& req, HttpResponse& res);
-        int writeToFile(HttpRequest& req);
-        int writeToFile(HttpRequest& req, const size_t& pos, const size_t& bytes);
-        int writeToFileMutltipartData(HttpRequest& req, const size_t& bytes);
+        int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
+        int handleCgiPost(ClientSocketStream&, HttpRequest&, HttpResponse&);
+        int postCgiHandler(HttpRequest&, HttpResponse&);
+        int writeToFile(HttpRequest&);
+        int writeToFile(HttpRequest&, const size_t&, const size_t&);
+        int writeToFileMutltipartData(HttpRequest&, const size_t&);
 
         /*VIRTUAL MEMBER FUNCTION*/
         virtual Method* clone(void) const;
 
     private:
-        int handleMultipartData(IO& event, HttpRequest& req);
+        int handleMultipartData(ClientSocketStream&, HttpRequest&);
         size_t _request_body_size;
 };
 

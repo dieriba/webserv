@@ -3,6 +3,7 @@
 # include "../../includes/server/Server.hpp"
 # include "../../includes/server/Location.hpp"
 # include "../../includes/IO/IO.hpp"
+# include "../../includes/IO/ClientSocketStream.hpp"
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/http/HttpResponse.hpp"
 
@@ -36,9 +37,9 @@ const HttpServer *RequestChecker::serverOrLocation(const Server& server, const H
     return &server;
 }
 
-int RequestChecker::checkAll(IO& object, HttpRequest& req)
+int RequestChecker::checkAll(ClientSocketStream& client, HttpRequest& req)
 {
-    Server& server = *(object.getServer());
+    Server& server = *(client.getServer());
     
     const HttpServer *instance = server.getInstance();
     

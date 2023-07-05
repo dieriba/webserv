@@ -3,7 +3,7 @@
 
 # include "Method.hpp"
 
-class IO;
+class ClientSocketStream;
 class HttpRequest;
 class HttpServer;
 
@@ -11,21 +11,19 @@ class Get: public Method
 {
     public:
         Get();
-        Get(const Get& rhs);
-        Get& operator=(const Get& rhs);
+        Get(const Get&);
+        Get& operator=(const Get&);
         virtual ~Get();
 
         /*MEMBER FUNCTION*/
-        int sendResponse(IO&, HttpRequest&, HttpResponse&);
-        int getCgiHandler(IO& event, const HttpRequest& req, HttpResponse& res);
-        int firstStep(IO& event, const HttpRequest& req, HttpResponse& res);
-        int handleChunkedRequest(HttpResponse& res, std::string& s_buffer);
-        int directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res);
+        int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
+        int getCgiHandler(ClientSocketStream&, const HttpRequest&, HttpResponse&);
+        int firstStep(ClientSocketStream&, const HttpRequest&, HttpResponse&);
+        int handleChunkedRequest(HttpResponse&, std::string&);
+        int directoryCgi(ClientSocketStream&, const HttpRequest&, HttpResponse&);
 
         /*VIRTUAL FUNCTION*/
         virtual Method* clone(void) const;
-    private:
-        int handleDirectoryRessource(IO& event, const HttpRequest& req, HttpResponse& res);
 };
 
 

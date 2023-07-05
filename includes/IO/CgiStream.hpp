@@ -7,9 +7,9 @@ class CgiStream: public IO
 {
     public:
         CgiStream();
-        CgiStream(const int& fd, IO *event, int *pipes);
-        CgiStream(const CgiStream& rhs);
-        CgiStream& operator=(const CgiStream& rhs);
+        CgiStream(const int&, IO *, int *);
+        CgiStream(const CgiStream&);
+        CgiStream& operator=(const CgiStream&);
         ~CgiStream();
         
         /*GETTERS*/
@@ -19,18 +19,18 @@ class CgiStream: public IO
 
         /*SETTERS*/
         void setBeginTimeStamp(void);
-        void setPid(const pid_t& pid);
+        void setPid(const pid_t&);
         void updateCgiTimeStamp(void);
-        void setPipes(int *pipes);
+        void setPipes(int *);
 
         /*MEMBER FUNCTION*/
-        int resetCgi(IO& object, const int& _ws);
+        int resetCgi(IO&, const int&);
         enum
         {
             STARTED,
         };
 
-        int handleIoOperation(const int& _ws, struct epoll_event&);
+        int handleIoOperation(const int&, struct epoll_event&);
     private:
         IO *_io;
         int *_pipes;

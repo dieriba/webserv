@@ -4,7 +4,7 @@
 # include "HttpMessage.hpp"
 # include "../utils/BitsManipulation.hpp"
 
-class IO;
+class ClientSocketStream;
 class Post;
 
 typedef struct multipart
@@ -19,8 +19,8 @@ class HttpRequest: public HttpMessage, public BitsManipulation
 {
     public:
         HttpRequest();
-        HttpRequest(const HttpRequest& rhs);
-        HttpRequest& operator=(const HttpRequest& rhs);
+        HttpRequest(const HttpRequest&);
+        HttpRequest& operator=(const HttpRequest&);
         ~HttpRequest();
 
         enum
@@ -52,20 +52,20 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         const std::string& getCrlfEndBoundary(void) const;
 
         /*MEMBER FUNCTION*/
-        int fillChunkBody(Post& post);
-        int open_file(IO& event);
-        int open_file(IO& event, std::string& filepath);
-        int parseRequest(IO& object);
+        int fillChunkBody(Post&);
+        int open_file(ClientSocketStream&);
+        int open_file(ClientSocketStream&, std::string&);
+        int parseRequest(ClientSocketStream&);
         void clearCurrentChunkSize(void);
-        void setChunkSize(const size_t& chunk_size);
-        void updateCurrentChunkSize(const size_t& current_chunk_size);
-        void appendToChunkBody(const std::string& chunk, const ssize_t& size);
+        void setChunkSize(const size_t&);
+        void updateCurrentChunkSize(const size_t&);
+        void appendToChunkBody(const std::string&, const ssize_t&);
         void clear(void);
-        void appendToBuffer(const char *toAppend, const ssize_t& size);
-        void setBoundary(const std::string& boundary);
-        void setCrlfBoundary(const std::string& CrlfBoundary);
-        void setEndBoundary(const std::string& Endboundary);
-        void setCrlfEndBoundary(const std::string& CrlfEndboundary);
+        void appendToBuffer(const char *, const ssize_t&);
+        void setBoundary(const std::string&);
+        void setCrlfBoundary(const std::string&);
+        void setEndBoundary(const std::string&);
+        void setCrlfEndBoundary(const std::string&);
 
     private:
         std::string _chunk_body;

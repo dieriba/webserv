@@ -1,7 +1,7 @@
 # include "../../includes/method/Get.hpp"
 # include "../../includes/http/HttpRequest.hpp"
 # include "../../includes/http/HttpResponse.hpp"
-# include "../../includes/IO/IO.hpp"
+# include "../../includes/IO/ClientSocketStream.hpp"
 # include "../../includes/IO/CgiStream.hpp"
 # include "../../includes/utils/UtilityMethod.hpp"
 # include "../../includes/server/HttpServer.hpp"
@@ -29,11 +29,11 @@ Get::~Get(){};
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-int Get::getCgiHandler(IO& event , const HttpRequest&  req, HttpResponse& res)
+int Get::getCgiHandler(ClientSocketStream& client , const HttpRequest&  req, HttpResponse& res)
 {
 
-    if (UtilityMethod::basicCgiSetup(event, res) == IO::IO_ERROR) return IO::IO_ERROR;
-    CgiStream& cgi = static_cast<CgiStream&>(*(event.getIO()));
+    if (UtilityMethod::basicCgiSetup(client, res) == IO::IO_ERROR) return IO::IO_ERROR;
+    CgiStream& cgi = static_cast<CgiStream&>(*(client.getIO()));
 
     cgi.setPid(fork());
 
@@ -87,16 +87,16 @@ int Get::getCgiHandler(IO& event , const HttpRequest&  req, HttpResponse& res)
     return IO::IO_SUCCESS;
 }
 
-int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
+int Get::directoryCgi(ClientSocketStream& client, const HttpRequest& req, HttpResponse& res)
 {
     if (access(PATH_TO_DIRECTORY_LISTING_SCRIPT, F_OK) != 0) return NOT_FOUND;
         
     if ((access(PATH_TO_DIRECTORY_LISTING_SCRIPT, X_OK | R_OK) != 0)) return FORBIDEN;
 
-    if (UtilityMethod::basicCgiSetup(event, res) == IO::IO_ERROR) return IO::IO_ERROR;
+    if (UtilityMethod::basicCgiSetup(client, res) == IO::IO_ERROR) return IO::IO_ERROR;
 
-    HttpServer& instance = *(event.getServer() -> getInstance());
-    CgiStream& cgi = static_cast<CgiStream&>(*(event.getIO()));
+    HttpServer& instance = *(client.getServer() -> getInstance());
+    CgiStream& cgi = static_cast<CgiStream&>(*(client.getIO()));
     
     cgi.setPid(fork());
 
@@ -130,9 +130,9 @@ int Get::directoryCgi(IO& event, const HttpRequest& req, HttpResponse& res)
     return IO::IO_SUCCESS;
 }
 
-int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
+int Get::firstStep(ClientSocketStream& client, const HttpRequest& req, HttpResponse& res)
 {
-    HttpServer& instance = *(event.getServer() -> getInstance());
+    HttpServer& instance = *(client.getServer() -> getInstance());
     std::string full_path(req.getHeaders().find(FULLPATH) -> second);
     
     bool directory = req.checkBits(HttpRequest::DIRECTORY);
@@ -152,7 +152,7 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
 
         if (file.fail()) return INTERNAL_SERVER_ERROR;
 
-        makeStatusLine(event, OK);
+        makeStatusLine(client, OK);
 
         std::string ressource(full_path);
         
@@ -173,45 +173,45 @@ int Get::firstStep(IO& event, const HttpRequest& req, HttpResponse& res)
         int resp = 0;
 
         if (directory)
-            resp = directoryCgi(event, req, res);
+            resp = directoryCgi(client, req, res);
         else
-            resp = getCgiHandler(event, req, res);
+            resp = getCgiHandler(client, req, res);
 
         res.clearWriteEnd();
         
         if (resp > 0)
         {
-            UtilityMethod::deleteEventFromEpollInstance(event.getWs(), res.getReadEnd());
+            UtilityMethod::deleteEventFromEpollInstance(client.getWs(), res.getReadEnd());
             res.clearReadEnd();
             return resp; 
         }
 
-        event.setOptions(IO::CGI_ON, SET);
+        client.setOptions(IO::CGI_ON, SET);
         
-        CgiStream& cgi = static_cast<CgiStream&>(*(event.getIO()));
+        CgiStream& cgi = static_cast<CgiStream&>(*(client.getIO()));
         
         cgi.updateCgiTimeStamp();
     }
     
-    if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
+    if (UtilityMethod::sendBuffer(client.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
     
     _response.clear();
     
     return IO::IO_SUCCESS;
 }
 
-int Get::sendResponse(IO& event, HttpRequest& req, HttpResponse& res)
+int Get::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpResponse& res)
 {
-    if (res.checkBits(HttpResponse::REDIRECT_SET)) return sendRedirect(event, res, FOUND_REDIRECT);
+    if (res.checkBits(HttpResponse::REDIRECT_SET)) return sendRedirect(client, res, FOUND_REDIRECT);
 
     if (!res.checkBits(HttpResponse::STARTED))
     {
-        int err = firstStep(event, req, res);
+        int err = firstStep(client, req, res);
 
         if (err) return err;
     }
 
-    if (res.checkBits(HttpResponse::FILE)) return handleFileRessource(event, res);
+    if (res.checkBits(HttpResponse::FILE)) return handleFileRessource(client, res);
     
     return IO::IO_SUCCESS;
 }
