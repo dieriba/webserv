@@ -45,7 +45,7 @@ class HttpResponse: public HttpMessage, public BitsManipulation
 
         /*SETTER*/
         void setPath(const std::string&);
-        void setMethodObj(Method *);
+        void setMethodObj(Method*);
     
         /*MEMBER FUNCTION*/
         void clearReadEnd();

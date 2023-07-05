@@ -78,7 +78,7 @@ class HttpServer: public Parser, public BitsManipulation
         static int getHttpMethod(const std::string&);
         static int makeNonBlockingFd(const int&);
         static int getMethodIndex(const std::string&);
-        static std::map<const unsigned int&, std::map<const std::string&, const Server*> >& getHostnameServerMap(void);
+        static const Server* getHostnameServerMap(const unsigned int&, const std::string&);
         static void setUpServerNameToServerMap(const std::vector<Server>&);
 
         static void switch_off_signal(int);

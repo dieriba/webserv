@@ -61,7 +61,7 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         void updateCurrentChunkSize(const size_t&);
         void appendToChunkBody(const std::string&, const ssize_t&);
         void clear(void);
-        void appendToBuffer(const char *, const ssize_t&);
+        void appendToBuffer(const char*, const ssize_t&);
         void setBoundary(const std::string&);
         void setCrlfBoundary(const std::string&);
         void setEndBoundary(const std::string&);

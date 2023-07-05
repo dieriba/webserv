@@ -7,7 +7,7 @@ class ServerStream: public IO
 {
     public:
         ServerStream();
-        ServerStream(const int&, Server *);
+        ServerStream(const int&, Server*);
         ServerStream(const ServerStream&);
         ServerStream& operator=(const ServerStream&);
         ~ServerStream();

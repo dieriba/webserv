@@ -250,9 +250,17 @@ const vec_it HttpServer::getHttpResponse(const short int& response)
     return _httpResponses.find(response);
 }
 
-std::map<const unsigned int&, std::map<const std::string&, const Server*> >& HttpServer::getHostnameServerMap(void)
+const Server* HttpServer::getHostnameServerMap(const unsigned int& port, const std::string& server_name)
 {
-    return _serverNameToServer;
+    std::map<const unsigned int&, std::map<const std::string&, const Server*> >::iterator it = _serverNameToServer.find(port); 
+
+    if (it == _serverNameToServer.end()) return NULL;
+
+    std::map<const std::string&, const Server*>::iterator server = it -> second.find(server_name);
+
+    if (server != it -> second.end()) return server -> second;
+    
+    return NULL;
 }
 
 bool HttpServer::isKnownDirective(const std::string& directive)

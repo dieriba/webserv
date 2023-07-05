@@ -7,7 +7,7 @@ class CgiStream: public IO
 {
     public:
         CgiStream();
-        CgiStream(const int&, IO *, int *);
+        CgiStream(const int&, IO*, int*);
         CgiStream(const CgiStream&);
         CgiStream& operator=(const CgiStream&);
         ~CgiStream();

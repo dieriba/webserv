@@ -19,7 +19,7 @@ class Location: public HttpServer
 
         /*Setters*/
         void    pushNewLocation(const Location&);
-        void    setServer(Server *);
+        void    setServer(Server*);
 
     private:
         std::list<Location> _sub_locations;

@@ -22,7 +22,7 @@ class HttpMessage
         /*SETTER*/
         void setBodySize(const std::string&);
         void setBodySize(const size_t&);
-        virtual void appendToBuffer(const char *, const ssize_t&);
+        virtual void appendToBuffer(const char*, const ssize_t&);
         void setMetod(const int&);
 
         /*MEMBER FUNCTION*/
