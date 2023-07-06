@@ -141,7 +141,7 @@ void HttpServer::settingUpServer(const char *filename)
     
 }
 
-void HttpServer::setUpServerNameToServerMap(const std::vector<Server>& servers)
+void HttpServer::setUpServerNameToServerMap(std::vector<Server>& servers)
 {
     for (size_t i = 0; i < servers.size(); i++)
     {
@@ -250,17 +250,18 @@ const vec_it HttpServer::getHttpResponse(const short int& response)
     return _httpResponses.find(response);
 }
 
-const Server* HttpServer::getHostnameServerMap(const unsigned int& port, const std::string& server_name)
+Server* HttpServer::getHostnameServerMap(const unsigned int& port, const std::string& server_name)
 {
-    std::map<unsigned int, std::map<std::string, const Server*> >::iterator it = _serverNameToServer.find(port); 
+    std::cout << "Server_name: " << server_name << std::endl;
+    std::map<unsigned int, std::map<std::string, Server*> >::iterator it = _serverNameToServer.find(port); 
 
     if (it == _serverNameToServer.end()) return NULL;
 
-    std::map<std::string, const Server*>::iterator server = it -> second.find(server_name);
+    std::map<std::string, Server*>::iterator server = it -> second.find(server_name);
+        
+    if (server != it -> second.end()) std::cout << "FOUND" << std::endl;
 
-    if (server != it -> second.end()) return server -> second;
-    
-    return NULL;
+    return server == it -> second.end() ? NULL : server -> second;
 }
 
 bool HttpServer::isKnownDirective(const std::string& directive)
@@ -447,4 +448,4 @@ std::map<std::string, bool> HttpServer::_knownDirectives;
 std::map<std::string, bool> HttpServer::_knownLocationsDirectives;
 std::map<std::string, short int> HttpServer::_httpMethods;
 std::map<std::string, std::string> HttpServer::_mimeTypes;
-std::map<unsigned int, std::map<std::string, const Server*> > HttpServer::_serverNameToServer;
+std::map<unsigned int, std::map<std::string, Server*> > HttpServer::_serverNameToServer;

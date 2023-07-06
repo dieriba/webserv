@@ -45,7 +45,7 @@ int ServerStream::handleIoOperation(const int& _ws, struct epoll_event& /* event
 
         _ev.data.ptr = new ClientSocketStream(_ws, client_fd, getServer());
         _ev.events = EPOLLIN;
-
+        std::cout << getServer()->getServerNames()[0] << std::endl;
         this -> getServer() -> addToEventsMap((const IO*)_ev.data.ptr);
             
         if (HttpServer::makeNonBlockingFd(client_fd) || epoll_ctl(_ws, EPOLL_CTL_ADD, client_fd, &_ev))

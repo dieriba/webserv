@@ -39,9 +39,15 @@ const HttpServer *RequestChecker::serverOrLocation(const Server& server, const H
 
 int RequestChecker::checkAll(ClientSocketStream& client, HttpRequest& req)
 {
-    Server& server = *(client.getServer());
+    Server* server = (HttpServer::getHostnameServerMap(client.getPort(), req.getHeaders()["Host"]));
     
-    const HttpServer *instance = server.getInstance();
+    if (server == NULL) 
+    {
+        std::cout << "NULLLL" << std::endl;
+        server = client.getServer();
+    }
+    
+    const HttpServer *instance = server -> getInstance();
     
     int _res = 0;
     
