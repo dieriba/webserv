@@ -48,6 +48,7 @@ void IO::setEvents(const uint32_t& event) {_event = event;};
 void IO::setIO(IO *io) {_io = io;};
 void IO::setWs(const int& ws) {_ws = ws;}
 void IO::updateTimeStamp(void) {_timestamp = std::clock();};
+void IO::setServer(Server *server) { _server = server;};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

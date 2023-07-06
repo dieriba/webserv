@@ -41,14 +41,12 @@ int RequestChecker::checkAll(ClientSocketStream& client, HttpRequest& req)
 {
     Server* server = (HttpServer::getHostnameServerMap(client.getPort(), req.getHeaders()["Host"]));
     
-    if (server == NULL) 
-    {
-        std::cout << "NULLLL" << std::endl;
-        server = client.getServer();
-    }
-    
-    const HttpServer *instance = server -> getInstance();
-    
+    if (server == NULL) server = client.getServer();
+
+    client.setServer(server);
+
+    const HttpServer *instance = server;
+
     int _res = 0;
     
     for (size_t i = 0; tab[i] != 0; i++)

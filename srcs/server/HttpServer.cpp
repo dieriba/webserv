@@ -259,7 +259,7 @@ Server* HttpServer::getHostnameServerMap(const unsigned int& port, const std::st
 
     std::map<std::string, Server*>::iterator server = it -> second.find(server_name);
         
-    if (server != it -> second.end()) std::cout << "FOUND" << std::endl;
+    if (server != it -> second.end()) std::cout << "FOUND root dir is: " << server -> second->getRootDir() << std::endl;
 
     return server == it -> second.end() ? NULL : server -> second;
 }

@@ -36,6 +36,7 @@ class IO: public BitsManipulation
         IO* getIO(void) const;
 
         /*SETTERS*/
+        void setServer(Server *);
         void setWs(const int&);
         void setIO(IO*);
         void setEvents(const uint32_t&);

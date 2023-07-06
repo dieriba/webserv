@@ -309,6 +309,11 @@ int HttpRequest::parseRequest(ClientSocketStream& object)
         _headers[header[0]] = header[1].erase(0, 1);
     }
     
+    if (_headers.find("Host") != _headers.end())
+    {
+        _headers["Host"] =_headers["Host"].substr(0, _headers["Host"].find(':'));
+    }
+
     size_t lenq;
 
     if (server.getInstance() -> getRedirect().size() > 0)
