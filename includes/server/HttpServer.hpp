@@ -105,6 +105,6 @@ class HttpServer: public Parser, public BitsManipulation
         static std::map<std::string, bool> _knownLocationsDirectives;
         static std::map<std::string, short int> _httpMethods;
         static std::map<std::string, std::string> _mimeTypes;
-        static std::map<const unsigned int&, std::map<const std::string&, const Server*> > _serverNameToServer;
+        static std::map<unsigned int, std::map<std::string, const Server*> > _serverNameToServer;
 };
 # endif

@@ -252,11 +252,11 @@ const vec_it HttpServer::getHttpResponse(const short int& response)
 
 const Server* HttpServer::getHostnameServerMap(const unsigned int& port, const std::string& server_name)
 {
-    std::map<const unsigned int&, std::map<const std::string&, const Server*> >::iterator it = _serverNameToServer.find(port); 
+    std::map<unsigned int, std::map<std::string, const Server*> >::iterator it = _serverNameToServer.find(port); 
 
     if (it == _serverNameToServer.end()) return NULL;
 
-    std::map<const std::string&, const Server*>::iterator server = it -> second.find(server_name);
+    std::map<std::string, const Server*>::iterator server = it -> second.find(server_name);
 
     if (server != it -> second.end()) return server -> second;
     
@@ -447,4 +447,4 @@ std::map<std::string, bool> HttpServer::_knownDirectives;
 std::map<std::string, bool> HttpServer::_knownLocationsDirectives;
 std::map<std::string, short int> HttpServer::_httpMethods;
 std::map<std::string, std::string> HttpServer::_mimeTypes;
-std::map<const unsigned int&, std::map<const std::string&, const Server*> > HttpServer::_serverNameToServer;
+std::map<unsigned int, std::map<std::string, const Server*> > HttpServer::_serverNameToServer;
