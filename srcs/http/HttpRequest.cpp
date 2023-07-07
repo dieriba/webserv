@@ -239,26 +239,6 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
     std::map<std::string, std::string>::const_iterator _it_transfert;
     size_t len = headers.size();
 
-    if (headers.size() == 0) return BAD_REQUEST;
-
-    header = UtilityMethod::stringSpliter(headers[0], " ");
-
-    if (header.size() != 3) return BAD_REQUEST;
-
-    _headers[METHOD] = header[0];
-
-    if (HttpServer::getMethodIndex(header[0]) == -1) return METHOD_NOT_SUPPORTED;
-
-    _headers[PATH] = UtilityMethod::remove_dup(header[1]);
-
-    if (header[1].find('/') == std::string::npos) return BAD_REQUEST;
-
-    _headers[VERSION] = header[2];
-    
-    if (header[2] != HTTP_VERSION) return BAD_REQUEST;
-
-    setMetod(HttpServer::getHttpMethod(header[0]));
-
     for (size_t i = 1; i < len; i++)
     {
         header = UtilityMethod::stringSpliter(headers[i], ":");
@@ -279,6 +259,28 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
     if (server == NULL) server = client.getServer();
 
     client.setServer(server);
+
+    server -> setInstance(server);
+
+    if (headers.size() == 0) return BAD_REQUEST;
+
+    header = UtilityMethod::stringSpliter(headers[0], " ");
+
+    if (header.size() != 3) return BAD_REQUEST;
+
+    _headers[METHOD] = header[0];
+
+    if (HttpServer::getMethodIndex(header[0]) == -1) return METHOD_NOT_SUPPORTED;
+
+    _headers[PATH] = UtilityMethod::remove_dup(header[1]);
+
+    if (header[1].find('/') == std::string::npos) return BAD_REQUEST;
+
+    _headers[VERSION] = header[2];
+    
+    if (header[2] != HTTP_VERSION) return BAD_REQUEST;
+
+    setMetod(HttpServer::getHttpMethod(header[0]));
 
     server -> setInstance((HttpServer *)RequestChecker::serverOrLocation(*server, (*this)));
 
