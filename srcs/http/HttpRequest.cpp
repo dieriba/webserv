@@ -211,7 +211,6 @@ int HttpRequest::open_file(ClientSocketStream& event)
     std::string filepath(getHeaders().find(FULLPATH) -> second);
     
     /*ADD THIS INTO A TRY CATCH BLOCK*/
-
     if (path == instance.getIndexPath())
         filepath += DEFAULT_FILE_NAME + UtilityMethod::numberToString(_nb) + fileExtenstion;
 
@@ -219,10 +218,14 @@ int HttpRequest::open_file(ClientSocketStream& event)
     
     outfile.clear();
     
+    std::cout << filepath << std::endl;
+
     outfile.open(filepath.c_str(), std::ios::out);
     
-    if (outfile.fail()) return FORBIDEN;
-    
+    if (outfile.fail())
+    {
+        return FORBIDEN;
+    }
     _nb++;
 
     return IO::IO_SUCCESS;

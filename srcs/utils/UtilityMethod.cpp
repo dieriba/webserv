@@ -173,14 +173,19 @@ const std::string& UtilityMethod::getMimeType(std::string& path, const std::stri
 
 std::string UtilityMethod::getFileExtension(const std::string& content_type, const short int& opt)
 {
-    if (opt == 0) return HttpServer::getMimeType(content_type);
+    if (opt == 0) 
+    {
+        std::string res = HttpServer::getMimeType(content_type);
+
+        if (res.size() == 0 && content_type != MIME_PLAIN) return ".bin";
+
+        return res;
+    }
     
     int i = content_type.size() - 1;
 
     for (; i >= 0; i--)
-    {
         if (content_type[i] == '.') break ;
-    }
 
     if (content_type.size() == 0) return ".bin";
     

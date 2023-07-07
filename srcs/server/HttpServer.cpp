@@ -270,7 +270,7 @@ const std::string& HttpServer::getMimeType(const std::string& key)
     std::map<std::string, std::string>::iterator it = _mimeTypes.find(key);
 
     if (it == _mimeTypes.end())
-        return _mimeTypes.find(DEFAULT) -> second;
+        return _mimeTypes.find(MIME_PLAIN) -> second;
     return it -> second;
 }
 
@@ -400,22 +400,6 @@ void HttpServer::initHttpResponses(void)
 
 void HttpServer::initMimeTypes(void)
 {
-    _mimeTypes[DEFAULT] = MIME_PLAIN;
-    _mimeTypes[HTM] = MIME_HTM;
-    _mimeTypes[HTML] = MIME_HTML;
-    _mimeTypes[SLASH] = MIME_HTML;
-    _mimeTypes[CSS] = MIME_CSS;
-    _mimeTypes[CSV] = MIME_CSV;
-    _mimeTypes[JPEG] = MIME_JPEG;
-    _mimeTypes[JPG] = MIME_JPG;
-    _mimeTypes[JS] = MIME_JS;
-    _mimeTypes[JSON] = MIME_JSON;
-    _mimeTypes[PNG] = MIME_PNG;
-    _mimeTypes[PDF] = MIME_PDF;
-    _mimeTypes[PHP] = MIME_PHP;
-    _mimeTypes[SH] = MIME_SH;
-    _mimeTypes[MP4] = MIME_MP4;
-
     std::ifstream file(MIME_FILENAME);
 
     if (!file)
@@ -437,6 +421,25 @@ void HttpServer::initMimeTypes(void)
 
         if (file.eof()) break;
     }
+
+    _mimeTypes[BIN] = MIME_BIN;
+    _mimeTypes[MIME_BIN] = BIN; 
+    _mimeTypes[DEFAULT] = MIME_PLAIN;
+    _mimeTypes[HTM] = MIME_HTM;
+    _mimeTypes[HTML] = MIME_HTML;
+    _mimeTypes[SLASH] = MIME_HTML;
+    _mimeTypes[CSS] = MIME_CSS;
+    _mimeTypes[CSV] = MIME_CSV;
+    _mimeTypes[JPEG] = MIME_JPEG;
+    _mimeTypes[JPG] = MIME_JPG;
+    _mimeTypes[JS] = MIME_JS;
+    _mimeTypes[JSON] = MIME_JSON;
+    _mimeTypes[PNG] = MIME_PNG;
+    _mimeTypes[PDF] = MIME_PDF;
+    _mimeTypes[PHP] = MIME_PHP;
+    _mimeTypes[SH] = MIME_SH;
+    _mimeTypes[MP4] = MIME_MP4;
+    _mimeTypes[MIME_PLAIN] = "";
 }
 
 void HttpServer::initHttpMethods(void)

@@ -157,8 +157,7 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
 
         if (path != instance.getIndexPath() && _pathMimeType != it -> second) return BAD_REQUEST;
 
-        req.setOptions(HttpRequest::HTTP_REQUEST_NO_ENCODING, SET);       
-        
+        req.setOptions(HttpRequest::HTTP_REQUEST_NO_ENCODING, SET);
     }
     
     return IO::IO_SUCCESS;
