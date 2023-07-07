@@ -90,7 +90,7 @@ void    print_server_config(const Server& server)
 void    init_static_data(void)
 {
     RequestChecker::tab[0] = RequestChecker::checkHeader;
-    RequestChecker::tab[1] = RequestChecker::checkGetMethod;
+    RequestChecker::tab[1] = RequestChecker::checkGetHeadMethod;
     RequestChecker::tab[2] = RequestChecker::checkPostMethod;
     RequestChecker::tab[3] = RequestChecker::checkDeleteMethod;
     RequestChecker::tab[4] = RequestChecker::checkAllowedMethod;
@@ -99,10 +99,10 @@ void    init_static_data(void)
     HttpServer::initHttpResponses();
     HttpServer::initHttpMethods();
     HttpServer::initKnownDirectives();
-    Method::_tab[0] = Method::createGet;
-    Method::_tab[1] = Method::createPost;
-    Method::_tab[2] = Method::createDelete;
-    Method::_tab[3] = Method::createError;
+    Method::_tab[HttpServer::HTTP_SERVER_HEAD] = Method::createHead;
+    Method::_tab[HttpServer::HTTP_SERVER_GET] = Method::createGet;
+    Method::_tab[HttpServer::HTTP_SERVER_POST] = Method::createPost;
+    Method::_tab[HttpServer::HTTP_SERVER_DELETE] = Method::createDelete;
 }
 
 int main (int argc, char **argv)

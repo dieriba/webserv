@@ -22,8 +22,6 @@ class Method
         std::string& getResponse(void);
 
         /*MEMBER FUNCTION*/
-        int sendBuffer(int, const char *, int);
-        int handleCgiRessource(ClientSocketStream&, HttpResponse&);
         int handleFileRessource(ClientSocketStream&, HttpResponse&);
         int sendRedirect(const ClientSocketStream&, HttpResponse&, const char *);
         void makeStatusLine(IO&, const int&);
@@ -39,8 +37,8 @@ class Method
         static Method* createGet();
         static Method* createPost();
         static Method* createDelete();
-        static Method* createError();
-        static Factory _tab[4];
+        static Method* createHead();
+        static Factory _tab[NUMBER_SUPPORTED_METHOD];
 
     protected:
         std::string _response;

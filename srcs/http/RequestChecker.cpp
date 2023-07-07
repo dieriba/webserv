@@ -8,8 +8,6 @@
 # include "../../includes/http/HttpResponse.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-RequestChecker::RequestChecker(){};
-RequestChecker::~RequestChecker(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
@@ -166,9 +164,9 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkGetMethod(const HttpServer& instance, HttpRequest& req)
+int RequestChecker::checkGetHeadMethod(const HttpServer& instance, HttpRequest& req)
 {
-    if (req.getMethod() != HttpServer::HTTP_SERVER_GET) return IO::IO_SUCCESS;
+    if (req.getMethod() != HttpServer::HTTP_SERVER_GET && req.getMethod() != HttpServer::HTTP_SERVER_HEAD) return IO::IO_SUCCESS;
 
     std::map<std::string, std::string>& _map = req.getHeaders();
 
@@ -231,6 +229,7 @@ int RequestChecker::checkHeader(const HttpServer& instance, HttpRequest& req)
 
 int RequestChecker::checkAllowedMethod(const HttpServer& instance, HttpRequest& req)
 {
+    std::cout << "Option value: " <<  instance.getOption() << std::endl;
     if (instance.checkBits(req.getMethod()) == 0) return METHOD_NOT_ALLOWED;
     
     return IO::IO_SUCCESS;

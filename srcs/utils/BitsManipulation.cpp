@@ -1,4 +1,4 @@
-#include "../../includes/utils/BitsManipulation.hpp"
+# include "../../includes/utils/BitsManipulation.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 BitsManipulation::BitsManipulation():_options(0){};
@@ -13,15 +13,14 @@ BitsManipulation::~BitsManipulation(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
-unsigned int BitsManipulation::getOptions(void) const {return _options;};
+unsigned int& BitsManipulation::getOption(void) {return _options;};
+const unsigned int& BitsManipulation::getOption(void) const { return _options ;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
 void    BitsManipulation::setOptions(const unsigned int& nbit, char actions)
 {
-    if (actions == SET && nbit == ALL_METHODS)
-        _options |= ALL_METHODS;
-    else if (actions == SET)
+    if (actions == SET)
         bitset(_options, nbit);
     else if (actions == CLEAR)
         bitclear(_options, nbit);

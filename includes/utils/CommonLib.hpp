@@ -28,7 +28,7 @@
 /*
 
 */
-# define DEFAULT_ERROR_PAGE_VALUE -1
+# define DEFAULT_ERROR_PAGE_VALUE 0
 # define DEFAULT_FILE_NAME "/ressource_"
 # define WELCOME_COOKIES "Welcome_Cookie="
 # define SET_COOKIE "Set-Cookie"
@@ -52,6 +52,8 @@
 # define METHOD_NOT_SUPPORTED 501
 # define GATEWAY_TIMEOUT 504
 # define VERSION_NOT_SUPPORTED 505
+
+# define NUMBER_SUPPORTED_METHOD 4
 /*
 
 
@@ -204,7 +206,7 @@
 */
 # define SET -1
 # define CLEAR -2
-# define ALL_METHODS 7
+# define ALL_METHODS -3
 
 /*
 

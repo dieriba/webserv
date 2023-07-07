@@ -54,7 +54,7 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         void clear(void);
         void setDirectory(DIR*);
         int serveResponse(ClientSocketStream&, HttpRequest&);
-        int switchMethod(IO&, const short int&, const short int&);
+        int setErrorObjectResponse(IO& client, const short int& status);
 
     private:
         int     _pipes[2];

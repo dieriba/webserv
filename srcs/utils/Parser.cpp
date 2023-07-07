@@ -91,7 +91,7 @@ void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, Http
 
     it = _map.find(ALLOWED_METHOD);
 
-    if (it == end) instance.setOptions(ALL_METHODS, SET);
+    if (it == end) instance.getOption() |= HttpServer::_all_methods;
 
     it = _map.find(CLIENT_BODY);
 
@@ -170,9 +170,6 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
 
 int    Parser::setAllowedMethods(HttpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _serv_conf)
 {
-    if (vec.size() > 4)
-        throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
-    
     size_t  len = vec.size() - 1;
         
     for (size_t i = 1; i < vec.size(); i++)

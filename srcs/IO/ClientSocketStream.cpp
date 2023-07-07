@@ -52,9 +52,10 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
 {
 
     int res = _response.serveResponse((*this), getRequest());
-    std::cout << "RES: " << res << std::endl; 
+    std::cout << "RES: " << res << std::endl;
+
     if (res > 0)
-        _response.switchMethod((*this), HttpServer::HTTP_SERVER_ERROR, res);
+        _response.setErrorObjectResponse((*this), res);
     else if (_response.checkBits(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE))
     {
         UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
@@ -91,13 +92,13 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         {
             _req = _response.serveResponse((*this), _request);
             if (_req)
-                _response.switchMethod((*this), HttpServer::HTTP_SERVER_ERROR, _req);
+                _response.setErrorObjectResponse((*this), _req);
             else if (!_request.checkBits(HttpRequest::HTTP_REQUEST_FINISH_BODY))
                 return IO::IO_SUCCESS;
         }
 
         if (_response.getHttpMethod() == NULL)
-            _response.setMethodObj((_req < 10 ? Method::_tab[_request.getMethod()]() : Method::_tab[HttpServer::HTTP_SERVER_ERROR]()));
+            _response.setMethodObj((_req < 10 ? Method::_tab[_request.getMethod()]() : new Error));
 
         setErrorStatus(_req);
 
@@ -118,7 +119,7 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
         }
         catch(const std::exception& e)
         {
-            _response.switchMethod((*this), HttpServer::HTTP_SERVER_ERROR, INTERNAL_SERVER_ERROR);
+            _response.setErrorObjectResponse((*this), INTERNAL_SERVER_ERROR);
             resetOptions();
             _request.getBuffer().clear();
             UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
@@ -138,7 +139,7 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
                 UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
                 return IO::IO_SUCCESS;
             }
-            _response.switchMethod((*this), HttpServer::HTTP_SERVER_ERROR, GATEWAY_TIMEOUT);
+            _response.setErrorObjectResponse((*this), GATEWAY_TIMEOUT);
             setOptions(IO::CGI_ON, CLEAR);
         }
     }

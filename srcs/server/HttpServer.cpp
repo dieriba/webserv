@@ -431,9 +431,17 @@ void HttpServer::initMimeTypes(void)
 
 void HttpServer::initHttpMethods(void)
 {
+    _httpMethods["HEAD"] = HTTP_SERVER_HEAD;
+    bitset(HttpServer::_all_methods, HTTP_SERVER_HEAD);
+
     _httpMethods["GET"] = HTTP_SERVER_GET;
+    bitset(HttpServer::_all_methods, HTTP_SERVER_GET);
+
     _httpMethods["POST"] = HTTP_SERVER_POST;
+    bitset(HttpServer::_all_methods, HTTP_SERVER_POST);
+
     _httpMethods["DELETE"] = HTTP_SERVER_DELETE;
+    bitset(HttpServer::_all_methods, HTTP_SERVER_DELETE);
 }
 
 int HttpServer::getMethodIndex(const std::string& method)
@@ -461,6 +469,7 @@ void HttpServer::switch_off_signal(int)
 
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 short int HttpServer::g_signal = 1;
+unsigned int HttpServer::_all_methods = 0;
 std::map<short int, std::string> HttpServer::_httpResponses;
 std::map<std::string, bool> HttpServer::_knownDirectives;
 std::map<std::string, bool> HttpServer::_knownLocationsDirectives;

@@ -3,7 +3,7 @@
 # include "../../includes/method/Get.hpp"
 # include "../../includes/method/Post.hpp"
 # include "../../includes/method/Delete.hpp"
-# include "../../includes/method/Error.hpp"
+# include "../../includes/method/Head.hpp"
 # include "../../includes/IO/IO.hpp"
 # include "../../includes/IO/ClientSocketStream.hpp"
 
@@ -104,6 +104,6 @@ void Method::appendToResponse(const std::string& key, const std::string& value)
 Method* Method::createGet() {return new Get; }
 Method* Method::createPost() {return new Post; }
 Method* Method::createDelete() {return new Delete; }
-Method* Method::createError() {return new Error; }
+Method* Method::createHead() {return new Head; }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-Method::Factory Method::_tab[4] = {0};
+Method::Factory Method::_tab[NUMBER_SUPPORTED_METHOD] = {0};

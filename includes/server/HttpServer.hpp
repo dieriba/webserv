@@ -20,10 +20,10 @@ class HttpServer: public Parser, public BitsManipulation
 
         enum
         {
+            HTTP_SERVER_HEAD,
             HTTP_SERVER_GET,
             HTTP_SERVER_POST,
             HTTP_SERVER_DELETE,
-            HTTP_SERVER_ERROR,
             HTTP_SERVER_HEADER,
             HTTP_SERVER_LOCATION_BLOCK,
             HTTP_SERVER_ERROR_PAGE_SET,
@@ -84,6 +84,7 @@ class HttpServer: public Parser, public BitsManipulation
         static void switch_off_signal(int);
 
         /*static var*/
+        static unsigned int _all_methods;
         static short int g_signal;
     
     protected:

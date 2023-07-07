@@ -270,7 +270,9 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
 
     _headers[METHOD] = header[0];
 
-    if (HttpServer::getMethodIndex(header[0]) == -1) return METHOD_NOT_SUPPORTED;
+    setMetod(HttpServer::getMethodIndex(header[0]));
+    
+    if (_method == -1) return METHOD_NOT_SUPPORTED;
 
     _headers[PATH] = UtilityMethod::remove_dup(header[1]);
 
@@ -279,8 +281,6 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
     _headers[VERSION] = header[2];
     
     if (header[2] != HTTP_VERSION) return BAD_REQUEST;
-
-    setMetod(HttpServer::getHttpMethod(header[0]));
 
     server -> setInstance((HttpServer *)RequestChecker::serverOrLocation(*server, (*this)));
 

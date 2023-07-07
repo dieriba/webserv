@@ -3,8 +3,6 @@
 
 # include "Method.hpp"
 
-class ClientSocketStream;
-class HttpRequest;
 class HttpServer;
 
 class Get: public Method
@@ -19,7 +17,6 @@ class Get: public Method
         int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
         int getCgiHandler(ClientSocketStream&, const HttpRequest&, HttpResponse&);
         int firstStep(ClientSocketStream&, const HttpRequest&, HttpResponse&);
-        int handleChunkedRequest(HttpResponse&, std::string&);
         int directoryCgi(ClientSocketStream&, const HttpRequest&, HttpResponse&);
 
         /*VIRTUAL FUNCTION*/

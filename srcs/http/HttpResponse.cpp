@@ -107,11 +107,11 @@ int HttpResponse::serveResponse(ClientSocketStream& client, HttpRequest& req)
     return _method -> sendResponse(client, req, *this);
 }
 
-int HttpResponse::switchMethod(IO& event, const short int& method, const short int& status)
+int HttpResponse::setErrorObjectResponse(IO& client, const short int& status)
 {
     delete _method;
-    event.setErrorStatus(status);
-    _method = Method::_tab[method]();
-    return (1);
+    client.setErrorStatus(status);
+    _method = new Error;
+    return IO::IO_ERROR;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

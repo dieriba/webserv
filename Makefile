@@ -23,6 +23,7 @@ SRCS_METHOD	= ./srcs/method/Method.cpp \
 			  ./srcs/method/Get.cpp \
 			  ./srcs/method/Post.cpp \
 			  ./srcs/method/Delete.cpp \
+              ./srcs/method/Head.cpp \
 			  ./srcs/method/Error.cpp \
 
 OBJ_DIR     = ./obj

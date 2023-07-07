@@ -10,7 +10,8 @@ class BitsManipulation
         ~BitsManipulation();
 
         /*GETTER*/
-        unsigned int  getOptions(void) const ;
+        unsigned int&  getOption(void);
+        const unsigned int&  getOption(void) const;
         /*SETTER*/
         void    setOptions(const unsigned int&, char);
         /*MEMBER FUNCTION*/

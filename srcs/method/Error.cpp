@@ -98,32 +98,56 @@ int Error::firstStep(ClientSocketStream& event, HttpResponse& res, const int& er
     _response += CRLF;
 
     if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
-
+    
     _response.clear();
-
     res.setOptions(HttpResponse::HTTP_RESPONSE_STARTED, SET);
     res.setOptions(HttpResponse::HTTP_RESPONSE_FILE, SET);
 
     return IO::IO_SUCCESS;
 }
 
-int Error::sendResponse(ClientSocketStream& client, HttpRequest& /* req */, HttpResponse& res)
+int Error::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpResponse& res)
 {    
     HttpServer& instance = *(client.getServer() -> getInstance());
-    
-    int err = 0;
+    int err = IO::IO_SUCCESS;
 
     if (instance.checkBits(HttpServer::HTTP_SERVER_ERROR_PAGE_SET))
     {
-        if (!res.checkBits(HttpResponse::HTTP_RESPONSE_STARTED)) err = firstStep(client, res, client.getErrStatus());
+        if (!res.checkBits(HttpResponse::HTTP_RESPONSE_STARTED))
+            err = firstStep(client, res, client.getErrStatus());
 
-        if (err == IO::IO_SUCCESS && res.checkBits(HttpResponse::HTTP_RESPONSE_FILE)) return handleFileRessource(client, res);
+        if (err == IO::IO_SUCCESS)
+        {
+            if (req.getMethod() == HttpServer::HTTP_SERVER_HEAD)
+            {
+                res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
+                return IO::IO_ERROR;
+            }
+
+            if (res.checkBits(HttpResponse::HTTP_RESPONSE_FILE))
+                return handleFileRessource(client, res);
+        }
+
     }
     
     std::string error_page = getErrorPage(client.getErrStatus());
-    if (UtilityMethod::sendBuffer(client.getFd(), error_page.c_str(), error_page.size()) == IO::IO_ERROR) return IO::IO_ERROR;
+    size_t len = error_page.size();
+
+   // err = IO::IO_SUCCESS;
+    
+    if (req.getMethod() == HttpServer::HTTP_SERVER_HEAD)
+    {
+        len = error_page.find(CRLF CRLF) + 4;
+        error_page[len] = 0;
+        err = IO::IO_ERROR;
+    }
+
+    if (UtilityMethod::sendBuffer(client.getFd(), error_page.c_str(), len) == IO::IO_ERROR)
+        return (IO::IO_ERROR);
+        
     res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
-    return IO::IO_SUCCESS;
+
+    return err;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
