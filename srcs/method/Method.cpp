@@ -99,6 +99,11 @@ void Method::appendToResponse(const std::string& key, const std::string& value)
 {
     _response += key + ": " + value + CRLF;
 }
+
+void Method::addSpecificHeader(ClientSocketStream&)
+{
+    
+}
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 Method* Method::createGet() {return new Get; }

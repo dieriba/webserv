@@ -43,6 +43,7 @@ class HttpServer: public Parser, public BitsManipulation
         const std::string& getUploadsFilesFolder(void) const;
         const std::map<short int, std::string>& getErrorMaps() const;
         const std::map<std::string, std::string>& getCgiMap() const;
+        const std::map<std::string, std::string>& getHeadersMap() const;
         std::map<short int, std::string>& getErrorMaps();
         std::map<std::string, std::string>& getCgiMap();
         const int& getEpollWs(void) const ;
@@ -84,8 +85,10 @@ class HttpServer: public Parser, public BitsManipulation
         static void switch_off_signal(int);
 
         /*static var*/
+        static short int number_of_methods;
         static unsigned int _all_methods;
         static short int g_signal;
+        static std::map<std::string, short int> _httpMethods;
     
     protected:
         size_t _body_size;
@@ -97,6 +100,7 @@ class HttpServer: public Parser, public BitsManipulation
         std::string _upload_file_folders;
         std::map<short int, std::string> _error_pages;
         std::map<std::string, std::string> _cgi;
+        std::map<std::string, std::string> _headers;
 
     private:
         int _epoll_ws;
@@ -104,7 +108,6 @@ class HttpServer: public Parser, public BitsManipulation
         static std::map<short int, std::string> _httpResponses;
         static std::map<std::string, bool> _knownDirectives;
         static std::map<std::string, bool> _knownLocationsDirectives;
-        static std::map<std::string, short int> _httpMethods;
         static std::map<std::string, std::string> _mimeTypes;
         static std::map<unsigned int, std::map<std::string, Server*> > _serverNameToServer;
 };

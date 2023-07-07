@@ -31,6 +31,7 @@ class Method
 
         /*VIRTUAL FUNCTION*/
         virtual Method* clone(void) const = 0;
+        virtual void addSpecificHeader(ClientSocketStream&);
         virtual int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&) = 0;
 
         /*STATIC MEMBER FUNCTION*/

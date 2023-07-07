@@ -43,6 +43,7 @@ std::vector<Server> HttpServer::getServers(void) const {return _servers;};
 std::map<std::string, std::string>& HttpServer::getCgiMap() {return _cgi;}
 const int& HttpServer::getEpollWs(void) const {return _epoll_ws;}
 const std::map<std::string, std::string>& HttpServer::getCgiMap() const {return _cgi;}
+const std::map<std::string, std::string>& HttpServer::getHeadersMap() const {return _headers;}
 const std::map<short int, std::string>& HttpServer::getErrorMaps() const {return _error_pages;}
 const size_t& HttpServer::getBodySize(void) const {return _body_size;};
 const std::string& HttpServer::getRootDir(void) const {return _root_dir;};
@@ -295,6 +296,7 @@ bool HttpServer::isKnownLocationDirectives(const std::string& directive)
 void HttpServer::initknownLocationsDirectives(void)
 {
     _knownLocationsDirectives[AUTO_INDEX] = true;
+    _knownLocationsDirectives[ADD_HEADER]= true;
     _knownLocationsDirectives[ROOT] = true;
     _knownLocationsDirectives[ALLOWED_METHOD] = true;
     _knownLocationsDirectives[INDEX] = true;
@@ -310,6 +312,7 @@ void HttpServer::initknownLocationsDirectives(void)
 void HttpServer::initKnownDirectives(void)
 {
     _knownDirectives[AUTO_INDEX] = true;
+    _knownDirectives[ADD_HEADER] = true;
     _knownDirectives[ROOT_ERROR_PAGE] = true;
     _knownDirectives[LISTEN] = true;
     _knownDirectives[SERVER_NAMES] = true;
@@ -433,15 +436,20 @@ void HttpServer::initHttpMethods(void)
 {
     _httpMethods["HEAD"] = HTTP_SERVER_HEAD;
     bitset(HttpServer::_all_methods, HTTP_SERVER_HEAD);
+    HttpServer::number_of_methods++;
 
     _httpMethods["GET"] = HTTP_SERVER_GET;
     bitset(HttpServer::_all_methods, HTTP_SERVER_GET);
+    HttpServer::number_of_methods++;
 
     _httpMethods["POST"] = HTTP_SERVER_POST;
     bitset(HttpServer::_all_methods, HTTP_SERVER_POST);
+    HttpServer::number_of_methods++;
 
     _httpMethods["DELETE"] = HTTP_SERVER_DELETE;
     bitset(HttpServer::_all_methods, HTTP_SERVER_DELETE);
+    HttpServer::number_of_methods++;
+
 }
 
 int HttpServer::getMethodIndex(const std::string& method)
@@ -469,6 +477,7 @@ void HttpServer::switch_off_signal(int)
 
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 short int HttpServer::g_signal = 1;
+short int HttpServer::number_of_methods = 0;
 unsigned int HttpServer::_all_methods = 0;
 std::map<short int, std::string> HttpServer::_httpResponses;
 std::map<std::string, bool> HttpServer::_knownDirectives;
