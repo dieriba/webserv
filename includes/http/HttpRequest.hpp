@@ -25,18 +25,18 @@ class HttpRequest: public HttpMessage, public BitsManipulation
 
         enum
         {
-            CONTENT_LENGTH,
-            TRANSFER_ENCODING,
-            FINISH_BODY,
-            RESPONSE_HEADER_FINISHED,
-            CHUNK_SET,
-            CHUNKED_FINISHED,
-            CARRIAGE_FEED,
-            CGI_ = 8,
-            STARTED,
-            MULTIPART_DATA,
-            NO_ENCODING,
-            DIRECTORY
+            HTTP_REQUEST_CONTENT_LENGTH,
+            HTTP_REQUEST_TRANSFER_ENCODING,
+            HTTP_REQUEST_FINISH_BODY,
+            HTTP_REQUEST_RESPONSE_HEADER_FINISHED,
+            HTTP_REQUEST_CHUNK_SET,
+            HTTP_REQUEST_CHUNKED_FINISHED,
+            HTTP_REQUEST_CARRIAGE_FEED,
+            HTTP_REQUEST_CGI_ = 8,
+            HTTP_REQUEST_STARTED,
+            HTTP_REQUEST_MULTIPART_DATA,
+            HTTP_REQUEST_NO_ENCODING,
+            HTTP_REQUEST_DIRECTORY
         };
 
         /*GETTERS*/

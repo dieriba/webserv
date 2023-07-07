@@ -20,15 +20,15 @@ class HttpServer: public Parser, public BitsManipulation
 
         enum
         {
-            GET,
-            POST,
-            DELETE,
-            ERROR,
-            HEADER,
-            LOCATION_BLOCK,
-            ERROR_PAGE_SET,
-            AUTO_INDEX_ = 8,
-            FILE_UPLOAD_
+            HTTP_SERVER_GET,
+            HTTP_SERVER_POST,
+            HTTP_SERVER_DELETE,
+            HTTP_SERVER_ERROR,
+            HTTP_SERVER_HEADER,
+            HTTP_SERVER_LOCATION_BLOCK,
+            HTTP_SERVER_ERROR_PAGE_SET,
+            HTTP_SERVER_AUTO_INDEX_ = 8,
+            HTTP_SERVER_FILE_UPLOAD_,
         };
 
         /*GETTERS*/

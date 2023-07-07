@@ -114,13 +114,13 @@ void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, Http
 
     it = _map.find(AUTO_INDEX);
 
-    if (it != end && it -> second ==  "on") instance.setOptions(HttpServer::AUTO_INDEX_, SET);
+    if (it != end && it -> second ==  "on") instance.setOptions(HttpServer::HTTP_SERVER_AUTO_INDEX_, SET);
 
     it = _map.find(FILE_UPLOAD);
 
-    instance.setOptions(HttpServer::FILE_UPLOAD_, SET);
+    instance.setOptions(HttpServer::HTTP_SERVER_FILE_UPLOAD_, SET);
 
-    if (it != end && it -> second ==  "off") instance.setOptions(HttpServer::FILE_UPLOAD_, CLEAR);
+    if (it != end && it -> second ==  "off") instance.setOptions(HttpServer::HTTP_SERVER_FILE_UPLOAD_, CLEAR);
 
     it = _map.find(UPLOAD_FILE_FOLDERS);
 
@@ -385,7 +385,7 @@ int    Parser::handleErrorPages(HttpServer& instance, std::vector<std::string>& 
             throw ExceptionThrower("Cannot rewrite the same status code");
     }
 
-    instance.setOptions(HttpServer::ERROR_PAGE_SET, SET);
+    instance.setOptions(HttpServer::HTTP_SERVER_ERROR_PAGE_SET, SET);
     
     return 1;
 }

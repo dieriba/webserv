@@ -25,11 +25,11 @@ Delete::~Delete(){};
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 int Delete::sendResponse(ClientSocketStream& event, HttpRequest& req, HttpResponse& res)
 {
-    if (res.checkBits(HttpResponse::REDIRECT_SET)) return sendRedirect(event, res, FOUND_REDIRECT_IND_METHOD);
+    if (res.checkBits(HttpResponse::HTTP_RESPONSE_REDIRECT_SET)) return sendRedirect(event, res, FOUND_REDIRECT_IND_METHOD);
 
     const std::string& full_path(req.getHeaders().find(FULLPATH) -> second);
 
-    res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+    res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
 
     if (std::remove(full_path.c_str()) != 0)
     {

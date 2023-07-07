@@ -39,13 +39,9 @@ const HttpServer *RequestChecker::serverOrLocation(const Server& server, const H
 
 int RequestChecker::checkAll(ClientSocketStream& client, HttpRequest& req)
 {
-    Server* server = (HttpServer::getHostnameServerMap(client.getPort(), req.getHeaders()["Host"]));
+    Server& server = *(client.getServer());
     
-    if (server == NULL) server = client.getServer();
-
-    client.setServer(server);
-
-    const HttpServer *instance = server;
+    const HttpServer *instance = server.getInstance();
 
     int _res = 0;
     
@@ -61,7 +57,7 @@ int RequestChecker::checkAll(ClientSocketStream& client, HttpRequest& req)
 
 int RequestChecker::checkDeleteMethod(const HttpServer& instance, HttpRequest& req)
 {
-    if (req.getMethod() != HttpServer::DELETE) return IO::IO_SUCCESS;
+    if (req.getMethod() != HttpServer::HTTP_SERVER_DELETE) return IO::IO_SUCCESS;
 
     const std::string& full_path(req.getHeaders()[FULLPATH]);
     const std::map<std::string, std::string>& _map = req.getHeaders();
@@ -78,7 +74,7 @@ int RequestChecker::checkDeleteMethod(const HttpServer& instance, HttpRequest& r
 
     alias_root[i + 1] = 0;
 
-    if (req.checkBits(HttpRequest::DIRECTORY) || access(alias_root, W_OK | X_OK) != 0) return FORBIDEN;
+    if (req.checkBits(HttpRequest::HTTP_REQUEST_DIRECTORY) || access(alias_root, W_OK | X_OK) != 0) return FORBIDEN;
 
     alias_root[i + 1] = stop;
 
@@ -89,9 +85,9 @@ int RequestChecker::checkDeleteMethod(const HttpServer& instance, HttpRequest& r
 
 int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req)
 {
-    if (req.getMethod() != HttpServer::POST) return IO::IO_SUCCESS;
+    if (req.getMethod() != HttpServer::HTTP_SERVER_POST) return IO::IO_SUCCESS;
 
-    if (instance.checkBits(HttpServer::FILE_UPLOAD_) == false) return METHOD_NOT_ALLOWED;
+    if (instance.checkBits(HttpServer::HTTP_SERVER_FILE_UPLOAD_) == false) return METHOD_NOT_ALLOWED;
 
     std::map<std::string, std::string>& _map = req.getHeaders();
 
@@ -103,7 +99,7 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
         || it == _map.end()) 
         return BAD_REQUEST;
         
-    if (req.checkBits(HttpRequest::CGI_)) return IO::IO_SUCCESS;
+    if (req.checkBits(HttpRequest::HTTP_REQUEST_CGI_)) return IO::IO_SUCCESS;
 
     const std::string& full_path(req.getHeaders()[FULLPATH]);
 
@@ -152,7 +148,7 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
         _map[END_BOUNDARY] = req.getEndBoundary();
         _map[CRLF_BOUNDARY] = req.getCrlfBoundary();
         _map[CRLF_END_BOUNDARY] = req.getCrlfEndBoundary();
-        req.setOptions(HttpRequest::MULTIPART_DATA, SET);       
+        req.setOptions(HttpRequest::HTTP_REQUEST_MULTIPART_DATA, SET);       
     }
     else
     {
@@ -163,7 +159,7 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
 
         if (path != instance.getIndexPath() && _pathMimeType != it -> second) return BAD_REQUEST;
 
-        req.setOptions(HttpRequest::NO_ENCODING, SET);       
+        req.setOptions(HttpRequest::HTTP_REQUEST_NO_ENCODING, SET);       
         
     }
     
@@ -172,13 +168,13 @@ int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req
 
 int RequestChecker::checkGetMethod(const HttpServer& instance, HttpRequest& req)
 {
-    if (req.getMethod() != HttpServer::GET) return IO::IO_SUCCESS;
+    if (req.getMethod() != HttpServer::HTTP_SERVER_GET) return IO::IO_SUCCESS;
 
     std::map<std::string, std::string>& _map = req.getHeaders();
 
     if ((_map.find(CONTENT_LEN) != _map.end()) || (_map.find(TRANSFERT_ENCODING) != _map.end())) return BAD_REQUEST;
 
-    if (req.checkBits(HttpRequest::CGI_)) return IO::IO_SUCCESS;
+    if (req.checkBits(HttpRequest::HTTP_REQUEST_CGI_)) return IO::IO_SUCCESS;
 
     std::string full_path(req.getHeaders()[FULLPATH]);
 
@@ -208,9 +204,9 @@ int RequestChecker::checkHeader(const HttpServer& instance, HttpRequest& req)
     
     std::string dir_path = instance.getRootDir() + req.getHeaders()[PATH];
 
-    if (UtilityMethod::is_a_directory(dir_path.c_str())) req.setOptions(HttpRequest::DIRECTORY, SET);
+    if (UtilityMethod::is_a_directory(dir_path.c_str())) req.setOptions(HttpRequest::HTTP_REQUEST_DIRECTORY, SET);
 
-    if (req.getMethod() != HttpServer::DELETE && req.checkBits(HttpRequest::CGI_))
+    if (req.getMethod() != HttpServer::HTTP_SERVER_DELETE && req.checkBits(HttpRequest::HTTP_REQUEST_CGI_))
     {
         std::string full_path(req.getHeaders()[FULLPATH]);
         size_t i = full_path.find('?');
@@ -227,7 +223,7 @@ int RequestChecker::checkHeader(const HttpServer& instance, HttpRequest& req)
 
         req.getHeaders()[CGI_EXECUTABLE] = it -> second;
         req.getHeaders()[CGI_ARGS] = full_path;
-        req.setOptions(HttpRequest::CGI_, SET);
+        req.setOptions(HttpRequest::HTTP_REQUEST_CGI_, SET);
     }
 
     return IO::IO_SUCCESS;

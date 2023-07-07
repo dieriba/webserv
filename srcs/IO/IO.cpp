@@ -55,7 +55,7 @@ void IO::setServer(Server *server) { _server = server;};
 int IO::deleteAndResetIO(HttpResponse& res)
 {
     close(res.getReadEnd());
-    res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+    res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
     return IO::IO_SUCCESS;
 }
 

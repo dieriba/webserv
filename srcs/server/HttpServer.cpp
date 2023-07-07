@@ -150,8 +150,41 @@ void HttpServer::setUpServerNameToServerMap(std::vector<Server>& servers)
         if (server_names.size() == 0) continue;
 
         const unsigned int& port = servers[i].getPort();
+        
         for (size_t j = 0; j < server_names.size(); j++)
             HttpServer::_serverNameToServer[port].insert(std::make_pair(server_names[j], &servers[i]));
+    }
+    
+    std::map<unsigned int, std::map<std::string, Server*> >::iterator it = HttpServer::_serverNameToServer.begin();
+    
+    /*for (; it != HttpServer::_serverNameToServer.end(); it++)
+    {
+        std::map<std::string, Server*>::iterator server_it = it -> second.begin();
+
+        std::cout << "Port is: " << it -> first << std::endl;
+        for (; server_it != it -> second.end(); server_it++)
+        {
+            std::cout << "Hostname is: " << server_it -> first << "Server adress is: " << server_it -> second << std::endl;
+        }
+
+    }
+    exit(1);*/
+    for (; it != HttpServer::_serverNameToServer.end(); it++)
+    {
+        std::map<std::string, Server*>::iterator server_it = it -> second.begin();
+
+        Server *server = server_it -> second;
+
+        for (; server_it != it -> second.end(); server_it++)
+        {
+            if (server_it -> first == DEFAULT_SERVER || server_it -> first.size() == 0)
+            {
+                server = server_it -> second;
+                break ;
+            }
+        }
+
+        HttpServer::_serverNameToServer[it -> first].insert(std::make_pair(DEFAULT_SERVER, server));
     }
 }
 
@@ -259,9 +292,14 @@ Server* HttpServer::getHostnameServerMap(const unsigned int& port, const std::st
 
     std::map<std::string, Server*>::iterator server = it -> second.find(server_name);
         
-    if (server != it -> second.end()) std::cout << "FOUND root dir is: " << server -> second->getRootDir() << std::endl;
-
-    return server == it -> second.end() ? NULL : server -> second;
+    if (server != it -> second.end())
+        std::cout << "FOUND root dir is: " << server -> second->getRootDir() << std::endl;
+    else if (server == it -> second.end())
+    {
+        std::cout << "NOT FOUND" << std::endl;
+        std::cout << "HOSTNAME IS: " << it -> second.find(DEFAULT_SERVER) ->second->getServerNames()[0] << std::endl; 
+    }
+    return server == it -> second.end() ? it -> second.find(DEFAULT_SERVER) -> second : server -> second;
 }
 
 bool HttpServer::isKnownDirective(const std::string& directive)
@@ -413,9 +451,9 @@ void HttpServer::initMimeTypes(void)
 
 void HttpServer::initHttpMethods(void)
 {
-    _httpMethods["GET"] = GET;
-    _httpMethods["POST"] = POST;
-    _httpMethods["DELETE"] = DELETE;
+    _httpMethods["GET"] = HTTP_SERVER_GET;
+    _httpMethods["POST"] = HTTP_SERVER_POST;
+    _httpMethods["DELETE"] = HTTP_SERVER_DELETE;
 }
 
 int HttpServer::getMethodIndex(const std::string& method)

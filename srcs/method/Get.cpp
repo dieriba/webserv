@@ -135,10 +135,10 @@ int Get::firstStep(ClientSocketStream& client, const HttpRequest& req, HttpRespo
     HttpServer& instance = *(client.getServer() -> getInstance());
     std::string full_path(req.getHeaders().find(FULLPATH) -> second);
     
-    bool directory = req.checkBits(HttpRequest::DIRECTORY);
-    bool cgi_get = req.checkBits(HttpRequest::CGI_);
+    bool directory = req.checkBits(HttpRequest::HTTP_REQUEST_DIRECTORY);
+    bool cgi_get = req.checkBits(HttpRequest::HTTP_REQUEST_CGI_);
 
-    if (cgi_get == false && ((directory == true && instance.checkBits(HttpServer::AUTO_INDEX_) > 0) || directory == 0))
+    if (cgi_get == false && ((directory == true && instance.checkBits(HttpServer::HTTP_SERVER_AUTO_INDEX_) > 0) || directory == 0))
     {
         std::ifstream& file = res.getFile();
 
@@ -160,9 +160,9 @@ int Get::firstStep(ClientSocketStream& client, const HttpRequest& req, HttpRespo
         appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()));
         _response += CRLF;
         
-        res.setOptions(HttpResponse::FILE, SET);
+        res.setOptions(HttpResponse::HTTP_RESPONSE_FILE, SET);
     
-        res.setOptions(HttpResponse::STARTED, SET);
+        res.setOptions(HttpResponse::HTTP_RESPONSE_STARTED, SET);
     }
     else if (directory == true || cgi_get == true)
     {
@@ -202,16 +202,16 @@ int Get::firstStep(ClientSocketStream& client, const HttpRequest& req, HttpRespo
 
 int Get::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpResponse& res)
 {
-    if (res.checkBits(HttpResponse::REDIRECT_SET)) return sendRedirect(client, res, FOUND_REDIRECT);
+    if (res.checkBits(HttpResponse::HTTP_RESPONSE_REDIRECT_SET)) return sendRedirect(client, res, FOUND_REDIRECT);
 
-    if (!res.checkBits(HttpResponse::STARTED))
+    if (!res.checkBits(HttpResponse::HTTP_RESPONSE_STARTED))
     {
         int err = firstStep(client, req, res);
 
         if (err) return err;
     }
 
-    if (res.checkBits(HttpResponse::FILE)) return handleFileRessource(client, res);
+    if (res.checkBits(HttpResponse::HTTP_RESPONSE_FILE)) return handleFileRessource(client, res);
     
     return IO::IO_SUCCESS;
 }

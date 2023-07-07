@@ -101,8 +101,8 @@ int Error::firstStep(ClientSocketStream& event, HttpResponse& res, const int& er
 
     _response.clear();
 
-    res.setOptions(HttpResponse::STARTED, SET);
-    res.setOptions(HttpResponse::FILE, SET);
+    res.setOptions(HttpResponse::HTTP_RESPONSE_STARTED, SET);
+    res.setOptions(HttpResponse::HTTP_RESPONSE_FILE, SET);
 
     return IO::IO_SUCCESS;
 }
@@ -113,16 +113,16 @@ int Error::sendResponse(ClientSocketStream& client, HttpRequest& /* req */, Http
     
     int err = 0;
 
-    if (instance.checkBits(HttpServer::ERROR_PAGE_SET))
+    if (instance.checkBits(HttpServer::HTTP_SERVER_ERROR_PAGE_SET))
     {
-        if (!res.checkBits(HttpResponse::STARTED)) err = firstStep(client, res, client.getErrStatus());
+        if (!res.checkBits(HttpResponse::HTTP_RESPONSE_STARTED)) err = firstStep(client, res, client.getErrStatus());
 
-        if (err == IO::IO_SUCCESS && res.checkBits(HttpResponse::FILE)) return handleFileRessource(client, res);
+        if (err == IO::IO_SUCCESS && res.checkBits(HttpResponse::HTTP_RESPONSE_FILE)) return handleFileRessource(client, res);
     }
     
     std::string error_page = getErrorPage(client.getErrStatus());
     if (UtilityMethod::sendBuffer(client.getFd(), error_page.c_str(), error_page.size()) == IO::IO_ERROR) return IO::IO_ERROR;
-    res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+    res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

@@ -34,6 +34,7 @@
 # define SET_COOKIE "Set-Cookie"
 # define CGI_EXECUTABLE "CGI-EXECUTABLE"
 # define CGI_ARGS "CGI-ARGS"
+# define HOST "Host"
 /*
 
 
@@ -177,6 +178,7 @@
 # define AUTO_INDEX "auto_index"
 # define UPLOAD_FILE_FOLDERS "uploads_folder"
 # define FILE_UPLOAD "file_upload"
+# define DEFAULT_SERVER "default_server"
 /*
 
 */
@@ -207,8 +209,8 @@
 /*
 
 */
-# define bitset(byte,nbit)   (byte |= (1 << nbit))
-# define bitclear(byte,nbit) (byte &= ~(1 << nbit))
-# define bitcheck(byte,nbit) (byte & (1 << nbit))
+# define bitset(byte,nbit)   (byte |= ((unsigned int)1 << nbit))
+# define bitclear(byte,nbit) (byte &= ~((unsigned int)1 << nbit))
+# define bitcheck(byte,nbit) (byte & ((unsigned int)1 << nbit))
 
 #endif

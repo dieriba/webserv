@@ -42,11 +42,11 @@ int Method::handleFileRessource(ClientSocketStream& event, HttpResponse& res)
 
         if (UtilityMethod::sendBuffer(event.getFd(), buffer, file.gcount()) == IO::IO_ERROR) return (IO::IO_ERROR);
 
-        if (file.fail() || file.eof()) res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+        if (file.fail() || file.eof()) res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
     }
     catch(const std::exception& e)
     {
-        res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+        res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
     }
     return IO::IO_SUCCESS;
 }
@@ -61,7 +61,7 @@ int Method::sendRedirect(const ClientSocketStream& client, HttpResponse& res, co
     if (UtilityMethod::sendBuffer(client.getFd(), redirect_url.c_str(), redirect_url.size()) || UtilityMethod::sendBuffer(client.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
         return IO::IO_ERROR;
             
-    res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+    res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
     return IO::IO_SUCCESS;
 }
 

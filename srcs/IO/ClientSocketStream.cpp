@@ -54,8 +54,8 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
     int res = _response.serveResponse((*this), getRequest());
     std::cout << "RES: " << res << std::endl; 
     if (res > 0)
-        _response.switchMethod((*this), HttpServer::ERROR, res);
-    else if (_response.checkBits(HttpResponse::FINISHED_RESPONSE))
+        _response.switchMethod((*this), HttpServer::HTTP_SERVER_ERROR, res);
+    else if (_response.checkBits(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE))
     {
         UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
         clear();
@@ -83,21 +83,21 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
 
     char *end_header = UtilityMethod::mystrstr(_request.getBuffer().c_str(), CRLF CRLF);
     
-    if (end_header != NULL || (_request.checkBits(HttpRequest::CONTENT_LENGTH) || _request.checkBits(HttpRequest::TRANSFER_ENCODING)))
+    if (end_header != NULL || (_request.checkBits(HttpRequest::HTTP_REQUEST_CONTENT_LENGTH) || _request.checkBits(HttpRequest::HTTP_REQUEST_TRANSFER_ENCODING)))
     {
         int _req = _request.parseRequest(*this);
 
-        if (!_req && ((_request.checkBits(HttpRequest::CONTENT_LENGTH) || _request.checkBits(HttpRequest::TRANSFER_ENCODING)) && !_request.checkBits(HttpRequest::FINISH_BODY)))
+        if (!_req && ((_request.checkBits(HttpRequest::HTTP_REQUEST_CONTENT_LENGTH) || _request.checkBits(HttpRequest::HTTP_REQUEST_TRANSFER_ENCODING)) && !_request.checkBits(HttpRequest::HTTP_REQUEST_FINISH_BODY)))
         {
             _req = _response.serveResponse((*this), _request);
             if (_req)
-                _response.switchMethod((*this), HttpServer::ERROR, _req);
-            else if (!_request.checkBits(HttpRequest::FINISH_BODY))
+                _response.switchMethod((*this), HttpServer::HTTP_SERVER_ERROR, _req);
+            else if (!_request.checkBits(HttpRequest::HTTP_REQUEST_FINISH_BODY))
                 return IO::IO_SUCCESS;
         }
 
         if (_response.getHttpMethod() == NULL)
-            _response.setMethodObj((_req < 10 ? Method::_tab[_request.getMethod()]() : Method::_tab[HttpServer::ERROR]()));
+            _response.setMethodObj((_req < 10 ? Method::_tab[_request.getMethod()]() : Method::_tab[HttpServer::HTTP_SERVER_ERROR]()));
 
         setErrorStatus(_req);
 
@@ -118,7 +118,7 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
         }
         catch(const std::exception& e)
         {
-            _response.switchMethod((*this), HttpServer::ERROR, INTERNAL_SERVER_ERROR);
+            _response.switchMethod((*this), HttpServer::HTTP_SERVER_ERROR, INTERNAL_SERVER_ERROR);
             resetOptions();
             _request.getBuffer().clear();
             UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
@@ -138,7 +138,7 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
                 UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
                 return IO::IO_SUCCESS;
             }
-            _response.switchMethod((*this), HttpServer::ERROR, GATEWAY_TIMEOUT);
+            _response.switchMethod((*this), HttpServer::HTTP_SERVER_ERROR, GATEWAY_TIMEOUT);
             setOptions(IO::CGI_ON, CLEAR);
         }
     }

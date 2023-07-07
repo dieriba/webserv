@@ -7,8 +7,8 @@
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 HttpResponse::HttpResponse():HttpMessage(),BitsManipulation(),_method(NULL),_directory(NULL)
 {
-    _pipes[0] = HttpResponse::READ_END;
-    _pipes[1] = HttpResponse::WRITE_END;
+    _pipes[0] = HttpResponse::HTTP_RESPONSE_READ_END;
+    _pipes[1] = HttpResponse::HTTP_RESPONSE_WRITE_END;
 };
 
 HttpResponse::HttpResponse(const HttpResponse& rhs):HttpMessage(rhs),BitsManipulation(rhs),_method(rhs._method)
@@ -71,18 +71,18 @@ void HttpResponse::setDirectory(DIR *directory)
 
 void HttpResponse::clearReadEnd(void)
 {
-    if (_pipes[0] == HttpResponse::READ_END) return ;
+    if (_pipes[0] == HttpResponse::HTTP_RESPONSE_READ_END) return ;
 
     close(_pipes[0]);
-    _pipes[0] = HttpResponse::READ_END;
+    _pipes[0] = HttpResponse::HTTP_RESPONSE_READ_END;
 }
 
 void HttpResponse::clearWriteEnd(void)
 {
-    if (_pipes[1] == HttpResponse::WRITE_END) return ;
+    if (_pipes[1] == HttpResponse::HTTP_RESPONSE_WRITE_END) return ;
 
     close(_pipes[1]);
-    _pipes[1] = HttpResponse::WRITE_END;
+    _pipes[1] = HttpResponse::HTTP_RESPONSE_WRITE_END;
 }
 
 void HttpResponse::clearBothEnd(void)

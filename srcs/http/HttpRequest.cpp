@@ -95,11 +95,11 @@ int HttpRequest::fillChunkBody(Post& post)
     {
         size_t pos = 0;
         
-        if (checkBits(HttpRequest::CHUNK_SET) == 0)
+        if (checkBits(HttpRequest::HTTP_REQUEST_CHUNK_SET) == 0)
         {
             size_t start = 0;
 
-            if (checkBits(HttpRequest::CARRIAGE_FEED))
+            if (checkBits(HttpRequest::HTTP_REQUEST_CARRIAGE_FEED))
             {
                 size_t pos = s_buffer.find(CRLF);
 
@@ -107,14 +107,14 @@ int HttpRequest::fillChunkBody(Post& post)
 
                 start = LEN_CRLF;
 
-                setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
+                setOptions(HttpRequest::HTTP_REQUEST_CARRIAGE_FEED, CLEAR);
             }
 
             if (getCurrentChunkSize() > 0) clearCurrentChunkSize();
 
             pos = s_buffer.find(CRLF, start);
 
-            if (pos == std::string::npos)  return (setOptions(HttpRequest::CARRIAGE_FEED, SET), IO::IO_SUCCESS);
+            if (pos == std::string::npos)  return (setOptions(HttpRequest::HTTP_REQUEST_CARRIAGE_FEED, SET), IO::IO_SUCCESS);
             
             pos += LEN_CRLF;
 
@@ -128,7 +128,7 @@ int HttpRequest::fillChunkBody(Post& post)
             
             if (getChunkSize() == std::string::npos) return BAD_REQUEST;
 
-            setOptions(HttpRequest::CHUNK_SET, SET);
+            setOptions(HttpRequest::HTTP_REQUEST_CHUNK_SET, SET);
         }
 
         size_t size = getChunkSize() - getCurrentChunkSize();
@@ -146,8 +146,8 @@ int HttpRequest::fillChunkBody(Post& post)
 
         if (getCurrentChunkSize() == getChunkSize())
         {
-            setOptions(HttpRequest::CHUNK_SET, CLEAR);
-            setOptions(HttpRequest::CARRIAGE_FEED, SET);
+            setOptions(HttpRequest::HTTP_REQUEST_CHUNK_SET, CLEAR);
+            setOptions(HttpRequest::HTTP_REQUEST_CARRIAGE_FEED, SET);
         };
 
         if (s_buffer.find(END_CHUNK) == 0)
@@ -157,7 +157,7 @@ int HttpRequest::fillChunkBody(Post& post)
             std::cout << "Total body size: " << post.getRequestBodySize() << std::endl;
             post.clearRequestBodySize();
             outfile.close();
-            setOptions(HttpRequest::FINISH_BODY, SET);
+            setOptions(HttpRequest::HTTP_REQUEST_FINISH_BODY, SET);
             return IO::IO_SUCCESS;
         }
 
@@ -228,9 +228,9 @@ int HttpRequest::open_file(ClientSocketStream& event)
     return IO::IO_SUCCESS;
 }
 
-int HttpRequest::parseRequest(ClientSocketStream& object)
+int HttpRequest::parseRequest(ClientSocketStream& client)
 {
-    if (checkBits(HttpRequest::CONTENT_LENGTH) || checkBits(HttpRequest::TRANSFER_ENCODING))
+    if (checkBits(HttpRequest::HTTP_REQUEST_CONTENT_LENGTH) || checkBits(HttpRequest::HTTP_REQUEST_TRANSFER_ENCODING))
         return 0;
     
     std::vector<std::string> headers = UtilityMethod::stringSpliter(s_buffer.substr(0, s_buffer.find(CRLF CRLF)), CRLF);
@@ -259,43 +259,6 @@ int HttpRequest::parseRequest(ClientSocketStream& object)
 
     setMetod(HttpServer::getHttpMethod(header[0]));
 
-    Server& server = *(object.getServer());
-    server.setInstance((HttpServer *)RequestChecker::serverOrLocation(server, (*this)));
-    const HttpServer& instance = *(server.getInstance());
-
-    std::string full_path = instance.getRootDir() + _headers[PATH];
-
-    int directory = UtilityMethod::is_a_directory(full_path.c_str());
-
-    std::string path(_headers[PATH]);
-    size_t i = path.find('?');
-
-    if (i != std::string::npos) path = path.substr(0, i);
-    const std::map<std::string, std::string>& cgi_map = instance.getCgiMap();
-    const std::map<std::string, std::string>::const_iterator& it = cgi_map.find(UtilityMethod::getFileExtension(full_path, 1));
-
-    if (it != cgi_map.end()) setOptions(HttpRequest::CGI_, SET);
-
-    if (getMethod() == HttpServer::GET)
-    {
-        if ((directory && instance.getIndex().size()) && (_headers[PATH] == instance.getIndexPath()))
-            full_path += '/' + instance.getIndex();
-        else if (directory && instance.getIndex().size() == 0)
-            full_path = "";
-    }
-    else if (getMethod() == HttpServer::POST && checkBits(HttpRequest::CGI_) == 0)
-    {
-        if (instance.getUploadsFilesFolder().size())
-        {
-            if (directory)
-                full_path = instance.getUploadsFilesFolder();
-            else
-                full_path = instance.getUploadsFilesFolder() + "/" + full_path.substr(full_path.rfind('/') + 1);
-        }
-    }
-
-    _headers[FULLPATH] = full_path.size() > 0 ? UtilityMethod::remove_dup(full_path) : "";
-    
     for (size_t i = 1; i < len; i++)
     {
         header = UtilityMethod::stringSpliter(headers[i], ":");
@@ -309,16 +272,56 @@ int HttpRequest::parseRequest(ClientSocketStream& object)
         _headers[header[0]] = header[1].erase(0, 1);
     }
     
-    if (_headers.find("Host") != _headers.end())
+    if (_headers.find(HOST) != _headers.end()) _headers[HOST] =_headers[HOST].substr(0, _headers[HOST].find(':'));
+
+    Server* server = (HttpServer::getHostnameServerMap(client.getPort(), _headers[HOST]));
+    
+    if (server == NULL) server = client.getServer();
+
+    client.setServer(server);
+
+    server -> setInstance((HttpServer *)RequestChecker::serverOrLocation(*server, (*this)));
+
+    const HttpServer& instance = *(server -> getInstance());
+
+    std::string full_path = instance.getRootDir() + _headers[PATH];
+
+    int directory = UtilityMethod::is_a_directory(full_path.c_str());
+
+    std::string path(_headers[PATH]);
+    size_t i = path.find('?');
+
+    if (i != std::string::npos) path = path.substr(0, i);
+    const std::map<std::string, std::string>& cgi_map = instance.getCgiMap();
+    const std::map<std::string, std::string>::const_iterator& it = cgi_map.find(UtilityMethod::getFileExtension(full_path, 1));
+
+    if (it != cgi_map.end()) setOptions(HttpRequest::HTTP_REQUEST_CGI_, SET);
+
+    if (getMethod() == HttpServer::HTTP_SERVER_GET)
     {
-        _headers["Host"] =_headers["Host"].substr(0, _headers["Host"].find(':'));
+        if ((directory && instance.getIndex().size()) && (_headers[PATH] == instance.getIndexPath()))
+            full_path += '/' + instance.getIndex();
+        else if (directory && instance.getIndex().size() == 0)
+            full_path = "";
     }
+    else if (getMethod() == HttpServer::HTTP_SERVER_POST && checkBits(HttpRequest::HTTP_REQUEST_CGI_) == 0)
+    {
+        if (instance.getUploadsFilesFolder().size())
+        {
+            if (directory)
+                full_path = instance.getUploadsFilesFolder();
+            else
+                full_path = instance.getUploadsFilesFolder() + "/" + full_path.substr(full_path.rfind('/') + 1);
+        }
+    }
+
+    _headers[FULLPATH] = full_path.size() > 0 ? UtilityMethod::remove_dup(full_path) : "";
 
     size_t lenq;
 
-    if (server.getInstance() -> getRedirect().size() > 0)
+    if (server -> getInstance() -> getRedirect().size() > 0)
     {
-        object.getReponse().setOptions(HttpResponse::REDIRECT_SET, SET);
+        client.getReponse().setOptions(HttpResponse::HTTP_RESPONSE_REDIRECT_SET, SET);
         return getMethod();
     }
     
@@ -333,15 +336,15 @@ int HttpRequest::parseRequest(ClientSocketStream& object)
     _it_transfert = _headers.find(TRANSFERT_ENCODING);
 
     if (_it_transfert != _headers.end())
-        setOptions(HttpRequest::TRANSFER_ENCODING, SET);
+        setOptions(HttpRequest::HTTP_REQUEST_TRANSFER_ENCODING, SET);
 
     if (_it_content != _headers.end())
     {
-        setOptions(HttpRequest::CONTENT_LENGTH, SET);
+        setOptions(HttpRequest::HTTP_REQUEST_CONTENT_LENGTH, SET);
         setBodySize(_it_content -> second);
     }
 
-    int _req = RequestChecker::checkAll(object, (*this));
+    int _req = RequestChecker::checkAll(client, (*this));
 
     std::cout << "REQ VALUE: " << _req << std::endl;
     
@@ -349,11 +352,11 @@ int HttpRequest::parseRequest(ClientSocketStream& object)
     
     if (_it_transfert != _headers.end() || _it_content != _headers.end())
     {
-        HttpResponse& res = object.getReponse();
+        HttpResponse& res = client.getReponse();
 
         res.setMethodObj(Method::_tab[getMethod()]());
 
-        if (!checkBits(HttpRequest::CGI_) && checkBits(HttpRequest::NO_ENCODING)) open_file(object);
+        if (!checkBits(HttpRequest::HTTP_REQUEST_CGI_) && checkBits(HttpRequest::HTTP_REQUEST_NO_ENCODING)) open_file(client);
     }
 
     return IO::IO_SUCCESS;

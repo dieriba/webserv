@@ -87,7 +87,7 @@ int Post::writeToFile(HttpRequest& req)
         if (getRequestBodySize() >= req.getBodySize())
         {
             std::cout << _request_body_size << std::endl;
-            req.setOptions(HttpRequest::FINISH_BODY, SET);
+            req.setOptions(HttpRequest::HTTP_REQUEST_FINISH_BODY, SET);
             clearRequestBodySize();
             req.getOutfile().close();
         }
@@ -107,20 +107,20 @@ int Post::handleMultipartData(ClientSocketStream& client, HttpRequest& req)
 {
     while (1)
     {
-        if (req.checkBits(HttpRequest::STARTED) == 0)
+        if (req.checkBits(HttpRequest::HTTP_REQUEST_STARTED) == 0)
         {
             size_t start = 0;
             std::string& s_buffer = req.getBuffer();
             const std::string& boundary = req.getBoundary();
             
-            if (req.checkBits(HttpRequest::CARRIAGE_FEED))
+            if (req.checkBits(HttpRequest::HTTP_REQUEST_CARRIAGE_FEED))
             {
                 size_t pos = s_buffer.find_first_not_of(CRLF);
 
                 if (pos == std::string::npos || pos != LEN_CRLF) return BAD_REQUEST;
 
                 start = pos;
-                req.setOptions(HttpRequest::CARRIAGE_FEED, CLEAR);
+                req.setOptions(HttpRequest::HTTP_REQUEST_CARRIAGE_FEED, CLEAR);
             }
 
             size_t pos_one = s_buffer.find(CRLF, start);
@@ -168,10 +168,10 @@ int Post::handleMultipartData(ClientSocketStream& client, HttpRequest& req)
 
             s_buffer.erase(0, pos_two + LEN_CRLF + LEN_CRLF);
             
-            req.setOptions(HttpRequest::STARTED, SET);
+            req.setOptions(HttpRequest::HTTP_REQUEST_STARTED, SET);
         }
   
-        if (req.checkBits(HttpRequest::STARTED))
+        if (req.checkBits(HttpRequest::HTTP_REQUEST_STARTED))
         {
             size_t boundary_br = req.getBuffer().find(req.getCrlfBoundary());
             size_t size = boundary_br;
@@ -186,7 +186,7 @@ int Post::handleMultipartData(ClientSocketStream& client, HttpRequest& req)
                     size = pos_crlf;
             }
             else
-                req.setOptions(HttpRequest::CARRIAGE_FEED, SET);
+                req.setOptions(HttpRequest::HTTP_REQUEST_CARRIAGE_FEED, SET);
             
             if (req.getOutfile().is_open() && size > 0)
             {
@@ -217,11 +217,11 @@ int Post::handleMultipartData(ClientSocketStream& client, HttpRequest& req)
             {
                 updateSize(req.getEndBoundary().size() + LEN_CRLF + LEN_CRLF);
                 std::cout << "request body: " << _request_body_size << std::endl;
-                req.setOptions(HttpRequest::FINISH_BODY, SET);
+                req.setOptions(HttpRequest::HTTP_REQUEST_FINISH_BODY, SET);
                 break;
             }
 
-            req.setOptions(HttpRequest::STARTED, CLEAR);
+            req.setOptions(HttpRequest::HTTP_REQUEST_STARTED, CLEAR);
         }
     }
     return IO::IO_SUCCESS;
@@ -316,7 +316,7 @@ int Post::handleCgiPost(ClientSocketStream& event, HttpRequest& req, HttpRespons
     
     _response.clear();
 
-    req.setOptions(HttpRequest::FINISH_BODY, SET);
+    req.setOptions(HttpRequest::HTTP_REQUEST_FINISH_BODY, SET);
 
     event.setOptions(IO::CGI_ON, SET);
 
@@ -329,17 +329,17 @@ int Post::handleCgiPost(ClientSocketStream& event, HttpRequest& req, HttpRespons
 
 int Post::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpResponse& res)
 {
-    if (res.checkBits(HttpResponse::REDIRECT_SET)) return sendRedirect(client, res, FOUND_REDIRECT_POST);
+    if (res.checkBits(HttpResponse::HTTP_RESPONSE_REDIRECT_SET)) return sendRedirect(client, res, FOUND_REDIRECT_POST);
 
     if (client.getEvents() & EPOLLIN)
     {
-        if (req.checkBits(HttpRequest::CGI_))
+        if (req.checkBits(HttpRequest::HTTP_REQUEST_CGI_))
             return handleCgiPost(client, req, res);
-        if (req.checkBits(HttpRequest::MULTIPART_DATA))
+        if (req.checkBits(HttpRequest::HTTP_REQUEST_MULTIPART_DATA))
             return handleMultipartData(client, req);
         else
         {
-            if (req.checkBits(HttpRequest::CONTENT_LENGTH))
+            if (req.checkBits(HttpRequest::HTTP_REQUEST_CONTENT_LENGTH))
                 return writeToFile(req);
             return req.fillChunkBody(*this);
         }
@@ -348,10 +348,10 @@ int Post::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespons
     {
         if (UtilityMethod::sendBuffer(client.getFd(), SERVER_SUCCESS_POST_RESPONSE, UtilityMethod::myStrlen(SERVER_SUCCESS_POST_RESPONSE)) == IO::IO_ERROR)
         {
-            res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+            res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
             return IO::IO_ERROR;
         }
-        res.setOptions(HttpResponse::FINISHED_RESPONSE, SET);
+        res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
     }
     return IO::IO_SUCCESS;
 }

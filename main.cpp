@@ -25,17 +25,17 @@ void    print_location_config(const Location& location)
     std::cout << std::endl << std::endl ;
     std::cout << "----------Location----------";
     std::cout << std::endl << std::endl
-        << "METHOD GET: " << (location.checkBits(HttpServer::GET) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD POST: " << (location.checkBits(HttpServer::POST) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD DELETE: " << (location.checkBits(HttpServer::DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
+        << "METHOD GET: " << (location.checkBits(HttpServer::HTTP_SERVER_GET) > 0 ? "Enabled" : "Disabled") << std::endl
+        << "METHOD POST: " << (location.checkBits(HttpServer::HTTP_SERVER_POST) > 0 ? "Enabled" : "Disabled") << std::endl
+        << "METHOD DELETE: " << (location.checkBits(HttpServer::HTTP_SERVER_DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
         << "Client Max Body Size: " << location.getBodySize() << std::endl
         << "Index HTML: " << (location.getIndex().size() > 0 ? location.getIndex() : "No root index") << std::endl
         << "Sub Path: " << location.getIndexPath() << std::endl
         << "Root Directory: " << (location.getRootDir().size() > 0 ? location.getRootDir() : "No root directory") << std::endl
         << "Redirect: "  << (location.getRedirect().size() > 0 ? location.getRedirect() : "No redirect") << std::endl
         << "Upload Folder: " << ((location.getUploadsFilesFolder().size()) ? location.getUploadsFilesFolder() : "No uploads folder set") << std::endl
-        << "AUTO INDEX: " << ((location.checkBits(HttpServer::AUTO_INDEX_)) > 0 ? "Auto Index ON" : "Auto Index OFF") << std::endl
-        << "FILE_UPLOAD: " << ((location.checkBits(HttpServer::FILE_UPLOAD_)) > 0? "FILE_UPLOAD ON" : "FILE_UPLOAD OFF") << std::endl
+        << "AUTO INDEX: " << ((location.checkBits(HttpServer::HTTP_SERVER_AUTO_INDEX_)) > 0 ? "Auto Index ON" : "Auto Index OFF") << std::endl
+        << "FILE_UPLOAD: " << ((location.checkBits(HttpServer::HTTP_SERVER_FILE_UPLOAD_)) > 0? "FILE_UPLOAD ON" : "FILE_UPLOAD OFF") << std::endl
         << "Server: " << location.getServer() << std::endl;
         std::cout << std::endl;
         for (; m_it != m_end; m_it++)
@@ -56,9 +56,9 @@ void    print_server_config(const Server& server)
     std::map<std::string, std::string>::iterator m_it = map.begin();
     std::map<std::string, std::string>::iterator m_end = map.end();
     std::cout
-        << "METHOD GET: " << (server.checkBits(HttpServer::GET) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD POST: " << (server.checkBits(HttpServer::POST) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD DELETE: " << (server.checkBits(HttpServer::DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
+        << "METHOD GET: " << (server.checkBits(HttpServer::HTTP_SERVER_GET) > 0 ? "Enabled" : "Disabled") << std::endl
+        << "METHOD POST: " << (server.checkBits(HttpServer::HTTP_SERVER_POST) > 0 ? "Enabled" : "Disabled") << std::endl
+        << "METHOD DELETE: " << (server.checkBits(HttpServer::HTTP_SERVER_DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
         << "IP: " << (server.getIp().size() > 0 ? server.getIp() : "NO IP SET") << std::endl
         << "Redirect: " << (server.getRedirect().size() > 0 ? server.getRedirect(): "No redirection") << std::endl
         << "PORT: " << server.getPort() << std::endl
@@ -66,8 +66,8 @@ void    print_server_config(const Server& server)
         << "Root Directory: " << ((server.getRootDir().size()) > 0 ? server.getRootDir() : "No root directory") << std::endl
         << "Index HTML: " << ((server.getIndex().size()) > 0 ? server.getIndex() : "No index html") << std::endl
         << "Upload Folder: " << ((server.getUploadsFilesFolder().size()) ? server.getUploadsFilesFolder() : "No uploads folder set") << std::endl
-        << "AUTO INDEX: " << ((server.checkBits(HttpServer::AUTO_INDEX_)) > 0 ? "Auto Index ON" : "Auto Index OFF") << std::endl
-        << "FILE_UPLOAD: " << ((server.checkBits(HttpServer::FILE_UPLOAD_)) > 0? "FILE_UPLOAD ON" : "FILE_UPLOAD OFF") << std::endl;
+        << "AUTO INDEX: " << ((server.checkBits(HttpServer::HTTP_SERVER_AUTO_INDEX_)) > 0 ? "Auto Index ON" : "Auto Index OFF") << std::endl
+        << "FILE_UPLOAD: " << ((server.checkBits(HttpServer::HTTP_SERVER_FILE_UPLOAD_)) > 0? "FILE_UPLOAD ON" : "FILE_UPLOAD OFF") << std::endl;
         const HttpServer& instance = server;
         print_map_error_page(instance);
         if (serv_it_ != serv_it_end)

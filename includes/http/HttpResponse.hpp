@@ -21,15 +21,15 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         /*ENUM OPTIONS*/
         enum options
         {
-            READ_END = -1,
-            WRITE_END = -1,
-            STARTED,
-            FILE,
-            DIRECTORY,
-            FINISHED_RESPONSE,
-            APPLICATION_FORM_URLENCODED,
-            NO_ENCODING,
-            REDIRECT_SET
+            HTTP_RESPONSE_READ_END = -1,
+            HTTP_RESPONSE_WRITE_END = -1,
+            HTTP_RESPONSE_STARTED,
+            HTTP_RESPONSE_FILE,
+            HTTP_RESPONSE_DIRECTORY,
+            HTTP_RESPONSE_FINISHED_RESPONSE,
+            HTTP_RESPONSE_APPLICATION_FORM_URLENCODED,
+            HTTP_RESPONSE_NO_ENCODING,
+            HTTP_RESPONSE_REDIRECT_SET
         };
         
         /*GETTER*/
