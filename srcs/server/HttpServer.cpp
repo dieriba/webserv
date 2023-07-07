@@ -157,18 +157,6 @@ void HttpServer::setUpServerNameToServerMap(std::vector<Server>& servers)
     
     std::map<unsigned int, std::map<std::string, Server*> >::iterator it = HttpServer::_serverNameToServer.begin();
     
-    /*for (; it != HttpServer::_serverNameToServer.end(); it++)
-    {
-        std::map<std::string, Server*>::iterator server_it = it -> second.begin();
-
-        std::cout << "Port is: " << it -> first << std::endl;
-        for (; server_it != it -> second.end(); server_it++)
-        {
-            std::cout << "Hostname is: " << server_it -> first << "Server adress is: " << server_it -> second << std::endl;
-        }
-
-    }
-    exit(1);*/
     for (; it != HttpServer::_serverNameToServer.end(); it++)
     {
         std::map<std::string, Server*>::iterator server_it = it -> second.begin();
@@ -285,20 +273,12 @@ const vec_it HttpServer::getHttpResponse(const short int& response)
 
 Server* HttpServer::getHostnameServerMap(const unsigned int& port, const std::string& server_name)
 {
-    std::cout << "Server_name: " << server_name << std::endl;
     std::map<unsigned int, std::map<std::string, Server*> >::iterator it = _serverNameToServer.find(port); 
 
     if (it == _serverNameToServer.end()) return NULL;
 
     std::map<std::string, Server*>::iterator server = it -> second.find(server_name);
         
-    if (server != it -> second.end())
-        std::cout << "FOUND root dir is: " << server -> second->getRootDir() << std::endl;
-    else if (server == it -> second.end())
-    {
-        std::cout << "NOT FOUND" << std::endl;
-        std::cout << "HOSTNAME IS: " << it -> second.find(DEFAULT_SERVER) ->second->getServerNames()[0] << std::endl; 
-    }
     return server == it -> second.end() ? it -> second.find(DEFAULT_SERVER) -> second : server -> second;
 }
 
