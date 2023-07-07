@@ -10,16 +10,16 @@ class BitsManipulation
         ~BitsManipulation();
 
         /*GETTER*/
-        unsigned int&  getOption(void);
-        const unsigned int&  getOption(void) const;
+        uint64_t&  getOption(void);
+        const uint64_t&  getOption(void) const;
         /*SETTER*/
-        void    setOptions(const unsigned int&, char);
+        void    setOptions(const uint64_t&, char);
         /*MEMBER FUNCTION*/
-        bool    checkBits(const unsigned int&) const;
+        bool    checkBits(const uint64_t&) const;
         void    resetOptions(void);
 
     protected:
-        unsigned int _options;
+        uint64_t _options;
 
 };
 #endif

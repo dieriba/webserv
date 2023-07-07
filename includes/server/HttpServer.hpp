@@ -7,6 +7,7 @@
 
 class Server;
 class IO;
+
 typedef std::map<short int, std::string>::iterator vec_it;
 typedef std::map<std::string, short int>::iterator rev_it;
 class HttpServer: public Parser, public BitsManipulation
@@ -29,6 +30,7 @@ class HttpServer: public Parser, public BitsManipulation
             HTTP_SERVER_ERROR_PAGE_SET,
             HTTP_SERVER_AUTO_INDEX_ = 8,
             HTTP_SERVER_FILE_UPLOAD_,
+            HTTP_SERVER_CUSTOM_HEADER
         };
 
         /*GETTERS*/
@@ -44,6 +46,7 @@ class HttpServer: public Parser, public BitsManipulation
         const std::map<short int, std::string>& getErrorMaps() const;
         const std::map<std::string, std::string>& getCgiMap() const;
         const std::map<std::string, std::string>& getHeadersMap() const;
+        std::map<std::string, std::string>& getHeadersMap();
         std::map<short int, std::string>& getErrorMaps();
         std::map<std::string, std::string>& getCgiMap();
         const int& getEpollWs(void) const ;
@@ -57,6 +60,7 @@ class HttpServer: public Parser, public BitsManipulation
         void setRedirect(const std::string&);
         void setIndexPath(const std::string&);
         void setFullIndexPath(const std::string&);
+        void pushNewHeaderDirective(const std::string&, const std::string&);
         void pushNewCGI(const std::string&, const std::string&);
         void setUploadsFilesFolder(const std::string&);
 

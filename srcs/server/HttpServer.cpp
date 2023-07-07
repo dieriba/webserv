@@ -13,7 +13,7 @@ HttpServer::HttpServer():BitsManipulation(),_body_size(0),
 HttpServer::HttpServer(const HttpServer& rhs)
     :Parser(rhs),BitsManipulation(rhs),_body_size(rhs._body_size),_index(rhs._index),
     _root_dir(rhs._root_dir),_redirect(rhs._redirect),_index_path(rhs._index_path),_upload_file_folders(rhs._upload_file_folders)
-    ,_error_pages(rhs._error_pages),_cgi(rhs._cgi),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
+    ,_error_pages(rhs._error_pages),_cgi(rhs._cgi),_headers(rhs._headers),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
 
 HttpServer& HttpServer::operator=(const HttpServer& rhs)
 {
@@ -23,6 +23,7 @@ HttpServer& HttpServer::operator=(const HttpServer& rhs)
     _body_size = rhs._body_size;
     _options = rhs._options;
     _index = rhs._index;
+    _headers = rhs._headers;
     _cgi = rhs._cgi;
     _root_dir = rhs._root_dir;
     _redirect = rhs._redirect;
@@ -44,6 +45,7 @@ std::map<std::string, std::string>& HttpServer::getCgiMap() {return _cgi;}
 const int& HttpServer::getEpollWs(void) const {return _epoll_ws;}
 const std::map<std::string, std::string>& HttpServer::getCgiMap() const {return _cgi;}
 const std::map<std::string, std::string>& HttpServer::getHeadersMap() const {return _headers;}
+std::map<std::string, std::string>& HttpServer::getHeadersMap() {return _headers;}
 const std::map<short int, std::string>& HttpServer::getErrorMaps() const {return _error_pages;}
 const size_t& HttpServer::getBodySize(void) const {return _body_size;};
 const std::string& HttpServer::getRootDir(void) const {return _root_dir;};
@@ -77,6 +79,11 @@ int HttpServer::addToErrorMap(const short int& error, std::string& file, const s
 void HttpServer::setWs(const int& ws)
 {
     _epoll_ws = ws;
+}
+
+void HttpServer::pushNewHeaderDirective(const std::string& key, const std::string& value)
+{
+    _headers[key] = value;
 }
 
 void HttpServer::setUploadsFilesFolder(const std::string& uploads_files_foler)

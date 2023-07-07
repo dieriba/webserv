@@ -26,13 +26,10 @@ void    Parser::checkEndSemicolons(std::vector<std::string>& vec)
 
 void    Parser::setCommonDirectives(std::vector<std::string>& vec, std::map<std::string, std::string>& _map)
 {
-    if (vec[0] != CGI)
-    {
-        checkEndSemicolons(vec);
-        if (_map.find(vec[0]) != _map.end())
-            throw ExceptionThrower("Redeclaration of the same directive");
-    }
-    
+    checkEndSemicolons(vec);
+    if (_map.find(vec[0]) != _map.end())
+        throw ExceptionThrower("Redeclaration of the same directive");
+
     _map[vec[0]] = vec[1];
 }
 
@@ -62,11 +59,6 @@ bool    Parser::validIpFormat(const std::string& ip)
     if (count != 4) return false ;
 
     return true;
-}
-
-void    Parser::feedingUpLocation(std::map<std::string,std::string>& _map, Location& location)
-{
-    feedingUpInstance(_map, static_cast<HttpServer&>(location));
 }
 
 void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, HttpServer& instance)
@@ -288,35 +280,66 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
         if (file.eof()) break ;
     }
 
-    feedingUpLocation(_map, _location);
+    feedingUpInstance(_map, static_cast<HttpServer&>(_location));
 
     _location.setServer(server);
     return _location;
 }
 
+int Parser::setHeaderMap(HttpServer& instance, std::vector<std::string>& vec)
+{
+    if (vec.size() < 3) throw ExceptionThrower("Missing Key And/Or value");
+
+    const std::map<std::string, std::string>& headers = instance.getHeadersMap();
+    
+    if (headers.find(vec[1]) != headers.end())
+        throw ExceptionThrower("Redeclaration of same header");
+
+    std::string& last = *(vec.rbegin());
+
+    if (*(last.rbegin()) != ';')
+        throw ExceptionThrower("Missing Semicolon At the End");
+    
+    last.erase(last.size() - 1);
+
+    if (vec[2].size() == 0) throw ExceptionThrower("Missing Key Value");
+
+    instance.pushNewHeaderDirective(vec[1], vec[2]);
+
+    if (instance.checkBits(HttpServer::HTTP_SERVER_CUSTOM_HEADER) == 0)
+        instance.setOptions(HttpServer::HTTP_SERVER_CUSTOM_HEADER, SET);
+    
+    return 1;
+}
+
+int Parser::setCgiMap(HttpServer& instance, std::vector<std::string>& vec)
+{
+    std::string path;
+        
+    if (instance.getCgiPath(vec[1], path))
+        throw ExceptionThrower("CGI " + vec[1] + " already exists with path: " + vec[2]);
+
+    if (vec[1].find(';') != std::string::npos || (UtilityMethod::count(vec[2], ';') > 1))
+        throw ExceptionThrower("Bad Syntax");
+        
+    if (*(vec.rbegin() -> rbegin()) != ';')
+        throw ExceptionThrower("Missing Semicolon At the End");
+    vec[2].erase(vec[2].size() - 1);
+    instance.pushNewCGI(vec[1], vec[2]);
+
+    return 1;
+}
+
 int    Parser::fillInstance(HttpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _map)
 {
     if (vec[0] == CGI)
-    {
-        std::string path;
-        
-        if (instance.getCgiPath(vec[1], path))
-            throw ExceptionThrower("CGI " + vec[1] + " already exists with path: " + vec[2]);
-
-        if (vec[1].find(';') != std::string::npos || (UtilityMethod::count(vec[2], ';') > 1))
-            throw ExceptionThrower("Bad Syntax");
-        
-        if (*(vec.rbegin() -> rbegin()) != ';')
-            throw ExceptionThrower("Missing Semicolon At the End");
-        vec[2].erase(vec[2].size() - 1);
-        instance.pushNewCGI(vec[1], vec[2]);
-    }
+        return setCgiMap(instance, vec);
     else if (vec[0] == ALLOWED_METHOD)
         return setAllowedMethods(instance, vec, _map);
+    else if (vec[0] == ADD_HEADER)
+        return setHeaderMap(instance, vec);
     else if (vec[0] == ERROR_PAGE)
-    {
         return handleErrorPages(instance, vec);
-    }
     else if (vec[0] == AUTO_INDEX || vec[0] == FILE_UPLOAD)
     {
         checkEndSemicolons(vec);
@@ -341,9 +364,8 @@ void    Parser::fillMap(const std::string& line, Location& location, std::map<st
     if (vec.size() == 1)
         throw ExceptionThrower(MISSING_TOO_MANY_KEY_VALUE);
 
-    if (vec.size() > 3 && (vec[0] != ALLOWED_METHOD && vec[0] != ERROR_PAGE))
+    if (vec.size() > 3 && (vec[0] != ALLOWED_METHOD && vec[0] != ERROR_PAGE && vec[0] != ADD_HEADER))
         throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
-
     if (fillInstance(static_cast<HttpServer&>(location), vec, _map))
         return ;
     else
@@ -355,9 +377,7 @@ int    Parser::handleErrorPages(HttpServer& instance, std::vector<std::string>& 
     size_t len = vec.size() - 1;
 
     for (size_t i = 0; i <= len; i++)
-    {
         SemicolonCheck(vec[i], i, len);
-    }
     
     if ((vec.size() % 2 != 0) || vec.size() < 4)
         throw ExceptionThrower("Missing root_error_page directory");
@@ -405,7 +425,7 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
     if (vec.size() == 1)
         throw ExceptionThrower(MISSING_TOO_MANY_KEY_VALUE);
 
-    if (vec.size() > 3 && (vec[0] != SERVER_NAMES && vec[0] != ALLOWED_METHOD && vec[0] != ERROR_PAGE))
+    if (vec.size() > 3 && (vec[0] != SERVER_NAMES && vec[0] != ALLOWED_METHOD && vec[0] != ADD_HEADER && vec[0] != ERROR_PAGE))
         throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
         
     if (vec.size() != 3 && vec[0] == CGI)
@@ -467,8 +487,7 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
             
             if ((pos = line.find(LOCATION)) != std::string::npos)
             {
-                if (pos != 0)
-                    throw ExceptionThrower("Unkown Context");
+                if (pos != 0) throw ExceptionThrower("Unkown Context");
                     
                 pos = line.find('{');
                 
@@ -494,10 +513,24 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
     
     std::vector<Location>& serv_locations(server.getLocations());
 
+    bool header = server.checkBits(HttpServer::HTTP_SERVER_CUSTOM_HEADER);
+    std::map<std::string, std::string>& _map = server.getHeadersMap();
     for (size_t i = 0; i < serv_locations.size(); i++)
     {
         if (serv_locations[i].getRootDir().size() == 0)
             serv_locations[i].setRootDir(server.getRootDir());
+        
+        if (header == true && serv_locations[i].checkBits(HttpServer::HTTP_SERVER_CUSTOM_HEADER) == 0)
+        {
+            serv_locations[i].setOptions(HttpServer::HTTP_SERVER_CUSTOM_HEADER, SET);
+            std::map<std::string, std::string>::const_iterator it = _map.begin();
+            std::map<std::string, std::string>& _location_map = serv_locations[i].getHeadersMap();
+            for (; it != _map.end(); it++)
+            {
+                if (_location_map.find(it -> first) == _location_map.end())
+                    _location_map[it -> first] = it -> second;
+            }
+        }
     }
     
     return server;

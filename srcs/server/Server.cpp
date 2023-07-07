@@ -13,6 +13,7 @@ Server::Server(const Server& rhs):HttpServer(rhs)
     _locations = rhs._locations;
     _tcp_server = rhs._tcp_server;
 }
+
 Server& Server::operator=(const Server& rhs)
 {
     if (this == &rhs) return *(this);
@@ -25,6 +26,7 @@ Server& Server::operator=(const Server& rhs)
     _options = rhs._options;
     _body_size = rhs._body_size;
     _port = rhs._port;
+    _headers = rhs._headers;
     _root_dir = rhs._root_dir;
     _index = rhs._index;
     _server_names = rhs._server_names;

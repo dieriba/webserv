@@ -17,6 +17,14 @@ void    print_map_error_page(const HttpServer& instance)
     }
 }
 
+void    print_header_map(const HttpServer& instance)
+{
+    std::map<std::string, std::string>::const_iterator it = instance.getHeadersMap().begin();
+    std::map<std::string, std::string>::const_iterator end = instance.getHeadersMap().end();
+    for (; it != end; it++)
+        std::cout << "Custom_header:  Key: " << it -> first << ", Value: " << it -> second << std::endl;
+}
+
 void    print_location_config(const Location& location)
 {
     std::map<std::string, std::string> map(location.getCgiMap());
@@ -41,8 +49,11 @@ void    print_location_config(const Location& location)
         for (; m_it != m_end; m_it++)
             std::cout << "cgi: " << m_it -> first << " " << m_it -> second << std::endl;
         const HttpServer& instance = location;
-    print_map_error_page(instance);
+        print_map_error_page(instance);
+        print_header_map(instance);
 }
+
+
 
 void    print_server_config(const Server& server)
 {
@@ -70,6 +81,7 @@ void    print_server_config(const Server& server)
         << "FILE_UPLOAD: " << ((server.checkBits(HttpServer::HTTP_SERVER_FILE_UPLOAD_)) > 0? "FILE_UPLOAD ON" : "FILE_UPLOAD OFF") << std::endl;
         const HttpServer& instance = server;
         print_map_error_page(instance);
+        print_header_map(instance);
         if (serv_it_ != serv_it_end)
         {
             std::cout << "Server_name: ";

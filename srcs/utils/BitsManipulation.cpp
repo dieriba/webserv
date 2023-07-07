@@ -13,12 +13,12 @@ BitsManipulation::~BitsManipulation(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
-unsigned int& BitsManipulation::getOption(void) {return _options;};
-const unsigned int& BitsManipulation::getOption(void) const { return _options ;};
+uint64_t& BitsManipulation::getOption(void) {return _options;};
+const uint64_t& BitsManipulation::getOption(void) const { return _options ;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
-void    BitsManipulation::setOptions(const unsigned int& nbit, char actions)
+void    BitsManipulation::setOptions(const uint64_t& nbit, char actions)
 {
     if (actions == SET)
         bitset(_options, nbit);
@@ -31,7 +31,7 @@ void    BitsManipulation::setOptions(const unsigned int& nbit, char actions)
 /*
 
 */
-bool    BitsManipulation::checkBits(const unsigned int& nbit) const
+bool    BitsManipulation::checkBits(const uint64_t& nbit) const
 {
     return (bitcheck(_options, nbit) > 0);
 }

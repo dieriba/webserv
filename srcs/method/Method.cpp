@@ -85,7 +85,7 @@ void Method::makeStatusLine(IO& object, const int& status)
     ss << status;
     std::string code(ss.str());
     
-    _response = version + " " + code + " " + HttpServer::getHttpResponse(status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime();
+    _response = version + " " + code + " " + HttpServer::getHttpResponse(status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime() + CRLF;
 
     if (object.checkBits(IO::COOKIE) == 0) setCookieHeader(object);
 }
@@ -100,10 +100,17 @@ void Method::appendToResponse(const std::string& key, const std::string& value)
     _response += key + ": " + value + CRLF;
 }
 
-void Method::addSpecificHeader(ClientSocketStream&)
+void Method::addCustomHeader(const HttpServer& instance)
 {
-    
+    if (instance.checkBits(HttpServer::HTTP_SERVER_CUSTOM_HEADER) == 0)
+        return ;
+
+    const std::map<std::string, std::string>& map = instance.getHeadersMap();
+    std::map<std::string, std::string>::const_iterator it = map.begin();
+    for (; it != map.end(); it++)
+        appendToResponse(it -> first, it -> second);
 }
+
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 Method* Method::createGet() {return new Get; }

@@ -7,6 +7,7 @@ class IO;
 class ClientSocketStream;
 class HttpRequest;
 class HttpResponse;
+class HttpServer;
 
 class Method
 {
@@ -28,10 +29,10 @@ class Method
         void addEndHeaderCRLF(void);
         void setCookieHeader(IO&);
         void appendToResponse(const std::string&, const std::string&);
+        void addCustomHeader(const HttpServer&);
 
         /*VIRTUAL FUNCTION*/
         virtual Method* clone(void) const = 0;
-        virtual void addSpecificHeader(ClientSocketStream&);
         virtual int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&) = 0;
 
         /*STATIC MEMBER FUNCTION*/

@@ -18,6 +18,7 @@ Location& Location::operator=(const Location& rhs)
     _options = rhs._options;
     _error_pages = rhs._error_pages;
     _body_size = rhs._body_size;
+    _headers = rhs._headers;
     _root_dir = rhs._root_dir;
     _index = rhs._index;
     _sub_locations = rhs._sub_locations;

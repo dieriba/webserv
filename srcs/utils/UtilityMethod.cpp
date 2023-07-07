@@ -67,8 +67,6 @@ std::string UtilityMethod::getDateAndTime(void)
 
     std::string date(formattedDate);
 
-    date += CRLF;
-
     return date;
 }
 
