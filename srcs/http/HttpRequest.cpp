@@ -224,6 +224,7 @@ int HttpRequest::open_file(ClientSocketStream& event)
     
     if (outfile.fail())
     {
+        std::cout << "Failled" << std::endl;
         return FORBIDEN;
     }
     _nb++;
