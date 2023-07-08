@@ -218,17 +218,10 @@ int HttpRequest::open_file(ClientSocketStream& event)
     
     outfile.clear();
     
-    std::cout << filepath << std::endl;
-
     outfile.open(filepath.c_str(), std::ios::out);
     
-    if (outfile.fail())
-    {
-        std::cout << "Failled" << std::endl;
-        return FORBIDEN;
-    }
+    if (outfile.fail()) return FORBIDEN;
     _nb++;
-
     return IO::IO_SUCCESS;
 }
 
@@ -348,6 +341,7 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
     {
         setOptions(HttpRequest::HTTP_REQUEST_CONTENT_LENGTH, SET);
         setBodySize(_it_content -> second);
+        client.setPrevContentLength(getBodySize());
     }
 
     int _req = RequestChecker::checkAll(client, (*this));

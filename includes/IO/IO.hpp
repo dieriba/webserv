@@ -34,6 +34,7 @@ class IO: public BitsManipulation
 
         /*GETTERS*/
         IO* getIO(void) const;
+        Server *getBaseServer(void);
 
         /*SETTERS*/
         void setServer(Server *);
@@ -56,16 +57,17 @@ class IO: public BitsManipulation
         {
             IO_ERROR = -1,
             IO_SUCCESS,
-            CGI_ON,
-            COOKIE,
-            KILL_MYSELF
+            IO_CGI_ON,
+            IO_COOKIE,
+            IO_KILL_MYSELF,
+            IO_SOCKET_NOT_FINISH
         };
 
         enum type
         {
-            VIRTUAL_SERV,
-            CLIENT_SOCKET,
-            CGI_STREAM,
+            IO_VIRTUAL_SERV,
+            IO_CLIENT_SOCKET,
+            IO_CGI_STREAM,
         };
         
         protected:
@@ -80,6 +82,7 @@ class IO: public BitsManipulation
             enum type _type;
             std::clock_t _timestamp;
             std::clock_t _end;
+            Server *_base_server;
 };
 
 # endif

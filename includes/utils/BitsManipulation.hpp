@@ -15,8 +15,9 @@ class BitsManipulation
         /*SETTER*/
         void    setOptions(const uint64_t&, char);
         /*MEMBER FUNCTION*/
-        bool    checkBits(const uint64_t&) const;
+        void    resetAndPreserverSomeFlags(const uint64_t& flags);
         void    resetOptions(void);
+        uint64_t    checkBits(const short int&) const;
 
     protected:
         uint64_t _options;

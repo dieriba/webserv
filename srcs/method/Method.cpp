@@ -74,7 +74,7 @@ void Method::setCookieHeader(IO& object)
     
     uniqueCookie = WELCOME_COOKIES + uniqueCookie + "; PATH=/;";
     appendToResponse(SET_COOKIE, uniqueCookie);
-    object.setOptions(IO::COOKIE, SET);
+    object.setOptions(IO::IO_COOKIE, SET);
 }
 
 void Method::makeStatusLine(IO& object, const int& status)
@@ -87,7 +87,7 @@ void Method::makeStatusLine(IO& object, const int& status)
     
     _response = version + " " + code + " " + HttpServer::getHttpResponse(status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime() + CRLF;
 
-    if (object.checkBits(IO::COOKIE) == 0) setCookieHeader(object);
+    if (object.checkBits(IO::IO_COOKIE) == 0) setCookieHeader(object);
 }
 
 void Method::addEndHeaderCRLF(void)

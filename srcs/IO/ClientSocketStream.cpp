@@ -1,16 +1,20 @@
 # include "../../includes/IO/ClientSocketStream.hpp"
 # include "../../includes/IO/CgiStream.hpp"
+# include "../../includes/IO/CgiStream.hpp"
 # include "../../includes/server/HttpServer.hpp"
 # include "../../includes/http/RequestChecker.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 ClientSocketStream::ClientSocketStream(){};
-ClientSocketStream::ClientSocketStream(const int& ws, const int& fd, Server* server):IO(ws, fd, server)
+ClientSocketStream::ClientSocketStream(const int& ws, const int& fd, Server* server, Server* base_server):IO(ws, fd, server)
 {
+    _prev_content_len = 0;
+    _prev_body_size = 0;
+    _base_server = base_server;
     _port = server -> getPort();
     _io = new CgiStream(-1, this, NULL);
     _io -> setIO(this);
-    _type = IO::CLIENT_SOCKET;
+    _type = IO::IO_CLIENT_SOCKET;
 };
 
 ClientSocketStream::ClientSocketStream(const ClientSocketStream& rhs):IO(rhs){};
@@ -41,9 +45,29 @@ const unsigned int& ClientSocketStream::getPort(void) const
 {
     return _port;
 }
+
+const unsigned int& ClientSocketStream::getPrevBodySize(void) const
+{
+    return _prev_body_size;
+}
+
+const unsigned int& ClientSocketStream::getPrevContentLength(void) const
+{
+    return _prev_content_len;
+}
+
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
+void ClientSocketStream::updatePrevBodySize(const unsigned int& prev_body_size)
+{
+    _prev_body_size += prev_body_size;
+}
+
+void ClientSocketStream::setPrevContentLength(const unsigned int& prev_content_len)
+{
+    _prev_content_len = prev_content_len;
+}
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
@@ -53,7 +77,6 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
 
     int res = _response.serveResponse((*this), getRequest());
     std::cout << "RES: " << res << std::endl;
-
     if (res > 0)
         _response.setErrorObjectResponse((*this), res);
     else if (_response.checkBits(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE))
@@ -67,13 +90,25 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
 
 int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event)
 {
-    char buffer[REQUEST_SIZE];
+    char buffer[REQUEST_SIZE + 1];
 
     int size = recv(this -> getFd(), buffer, REQUEST_SIZE, 0);
 
     if (size <= 0) return IO::IO_ERROR;
-        
-    _request.appendToBuffer(buffer, size);
+
+    if (checkBits(IO::IO_SOCKET_NOT_FINISH) == 0)
+        _request.appendToBuffer(buffer, size);
+    else
+    {
+        updatePrevBodySize(size);
+        if (_prev_body_size == _prev_content_len)
+        {
+            _prev_body_size = 0;
+            _prev_content_len = 0;
+            resetOptions();
+        }
+        return IO::IO_SUCCESS;
+    }
 
     if (_request.getHeaderSize() >= MAX_HEADER_SIZE)
     {
@@ -91,6 +126,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         if (!_req && ((_request.checkBits(HttpRequest::HTTP_REQUEST_CONTENT_LENGTH) || _request.checkBits(HttpRequest::HTTP_REQUEST_TRANSFER_ENCODING)) && !_request.checkBits(HttpRequest::HTTP_REQUEST_FINISH_BODY)))
         {
             _req = _response.serveResponse((*this), _request);
+            std::cout << "REQ: " <<_req << std::endl;
             if (_req)
                 _response.setErrorObjectResponse((*this), _req);
             else if (!_request.checkBits(HttpRequest::HTTP_REQUEST_FINISH_BODY))
@@ -126,7 +162,7 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
         }
     }
 
-    if (checkBits(IO::CGI_ON))
+    if (checkBits(IO::IO_CGI_ON))
     {
         CgiStream& cgi = static_cast<CgiStream& >(*(getIO()));
         if ((getTimestampInMillisecond(std::clock()) - cgi.getTimestampInMillisecond(cgi.getCgiTimeStamp())) >= TIMEOUT_CGI)
@@ -140,12 +176,14 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
                 return IO::IO_SUCCESS;
             }
             _response.setErrorObjectResponse((*this), GATEWAY_TIMEOUT);
-            setOptions(IO::CGI_ON, CLEAR);
+            setOptions(IO::IO_CGI_ON, CLEAR);
         }
     }
 
-    if (checkBits(IO::CGI_ON) == 0 && event.events & EPOLLOUT) return writeToSocket(_ws, event);
-
+    if (checkBits(IO::IO_CGI_ON) == 0 && event.events & EPOLLOUT)
+    {
+        return writeToSocket(_ws, event);
+    }
     return IO::IO_SUCCESS;
 }
 

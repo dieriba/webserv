@@ -204,7 +204,7 @@ void HttpServer::runningUpServer(void)
         
         event.data.ptr = new ServerStream(_servers[i].getServSocket(), &_servers[i]);
 
-        _servers[i].addToEventsMap((const IO *)event.data.ptr);
+        _servers[i].addToEventsMap(static_cast<IO*>(event.data.ptr));
         
         if (epoll_ctl(_epoll_ws, EPOLL_CTL_ADD, _servers[i].getServSocket(), &event) == -1)
             throw ExceptionThrower("Failled To Add Socket To EPOLL WATCHERS FD");
@@ -225,19 +225,19 @@ void HttpServer::makeServerServe(void)
 
     while (HttpServer::g_signal == 1)
     {
-        to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, EPOLL_TIMEOUT);
+        to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, -1);
 
         for (int i = 0; i < to_proceed; i++)
         {
             client = static_cast<IO *>(_events[i].data.ptr);
 
-            if (client -> checkBits(IO::KILL_MYSELF))
+            if (client -> checkBits(IO::IO_KILL_MYSELF))
             {
                 std::cout << "Killing myself Remember me as fd: " << client -> getFd() << " from interests list" << std::endl;
                 CgiStream& cgi = static_cast<CgiStream&>(*(client -> getIO()));
                 kill(cgi.getPid(), SIGTERM);
-                Server *server = client -> getServer();
-                server -> deleteFromEventsMap(client);
+                Server *server = client -> getBaseServer();
+                server -> deleteFromEventsMap(*client);
                 continue ;
             }
 
@@ -246,8 +246,8 @@ void HttpServer::makeServerServe(void)
             if (res == IO::IO_ERROR)
             {
                 std::cout << "Deletting client with fd: " << client -> getFd() << " from interests list" << std::endl;
-                Server *server = client -> getServer();
-                server -> deleteFromEventsMap(client);
+                Server *server = client -> getBaseServer();
+                server -> deleteFromEventsMap(*client);
             }
         }
     }

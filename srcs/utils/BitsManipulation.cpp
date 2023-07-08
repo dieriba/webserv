@@ -31,9 +31,17 @@ void    BitsManipulation::setOptions(const uint64_t& nbit, char actions)
 /*
 
 */
-bool    BitsManipulation::checkBits(const uint64_t& nbit) const
+
+void BitsManipulation::resetAndPreserverSomeFlags(const uint64_t &flags)
 {
-    return (bitcheck(_options, nbit) > 0);
+    _options = 0 | flags;
+}
+
+uint64_t    BitsManipulation::checkBits(const short int& nbit) const
+{
+    if (bitcheck(_options, nbit) > 0)
+        return ((unsigned int)1 << nbit);
+    return 0;
 }
 
 void    BitsManipulation::resetOptions(void)

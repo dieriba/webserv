@@ -6,7 +6,7 @@
 ServerStream::ServerStream(){};
 ServerStream::ServerStream(const int& fd, Server *server):IO(fd, server)
 {
-    _type = IO::VIRTUAL_SERV;
+    _type = IO::IO_VIRTUAL_SERV;
 };
 ServerStream::ServerStream(const ServerStream& rhs):IO(rhs){};
 ServerStream& ServerStream::operator=(const ServerStream& rhs)
@@ -38,15 +38,14 @@ int ServerStream::handleIoOperation(const int& _ws, struct epoll_event& /* event
     while (1)
     {
         int client_fd = accept(_fd, NULL, NULL);
-
         if (client_fd == -1) return IO::IO_SUCCESS;
                         
         struct epoll_event _ev;
 
-        _ev.data.ptr = new ClientSocketStream(_ws, client_fd, getServer());
+        _ev.data.ptr = new ClientSocketStream(_ws, client_fd, getServer(), getServer());
         _ev.events = EPOLLIN;
         std::cout << getServer()->getServerNames()[0] << std::endl;
-        this -> getServer() -> addToEventsMap((const IO*)_ev.data.ptr);
+        this -> getServer() -> addToEventsMap((IO*)_ev.data.ptr);
             
         if (HttpServer::makeNonBlockingFd(client_fd) || epoll_ctl(_ws, EPOLL_CTL_ADD, client_fd, &_ev))
             return IO::IO_ERROR;

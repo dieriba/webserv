@@ -186,7 +186,7 @@ int Get::firstStep(ClientSocketStream& client, const HttpRequest& req, HttpRespo
             return resp; 
         }
 
-        client.setOptions(IO::CGI_ON, SET);
+        client.setOptions(IO::IO_CGI_ON, SET);
         
         CgiStream& cgi = static_cast<CgiStream&>(*(client.getIO()));
         

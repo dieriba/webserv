@@ -31,6 +31,7 @@ int UtilityMethod::basicCgiSetup(IO& event, HttpResponse& res)
 
 int UtilityMethod::sendBuffer(int client_socket, const char *buffer, int bytes)
 {
+    std::cout << "BUFFERED" << std::endl;
     while (bytes > 0)
     {
         int bytesSent = send(client_socket, buffer, bytes, 0);

@@ -105,6 +105,8 @@ int Post::writeToFile(HttpRequest& req)
 
 int Post::handleMultipartData(ClientSocketStream& client, HttpRequest& req)
 {
+    client.updatePrevBodySize(req.getBuffer().size());
+
     while (1)
     {
         if (req.checkBits(HttpRequest::HTTP_REQUEST_STARTED) == 0)
@@ -157,7 +159,12 @@ int Post::handleMultipartData(ClientSocketStream& client, HttpRequest& req)
                 vector_filename[1].erase(vector_filename[1].begin());
                 
                 if (UtilityMethod::getFileExtension(vector_filename[1] ,1)
-                    != UtilityMethod::getFileExtension(vec_content_type[1] ,0)) return BAD_REQUEST;
+                    != UtilityMethod::getFileExtension(vec_content_type[1] ,0))
+                {
+                    if (client.getPrevBodySize() != req.getBodySize()) client.setOptions(IO::IO_SOCKET_NOT_FINISH, SET);
+
+                    return BAD_REQUEST;
+                }
                 
                 if (vector_filename[1].size()) req.open_file(client, vector_filename[1]);
 
@@ -318,7 +325,7 @@ int Post::handleCgiPost(ClientSocketStream& event, HttpRequest& req, HttpRespons
 
     req.setOptions(HttpRequest::HTTP_REQUEST_FINISH_BODY, SET);
 
-    event.setOptions(IO::CGI_ON, SET);
+    event.setOptions(IO::IO_CGI_ON, SET);
 
     CgiStream& cgi = static_cast<CgiStream&>(*(event.getIO()));
         

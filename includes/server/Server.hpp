@@ -24,6 +24,7 @@ class Server: public HttpServer
         const unsigned int& getPort(void) const;
         const std::vector<Location>& getLocations(void) const;
         std::vector<Location>& getLocations(void);
+        std::map<const IO*, const IO*>& getEventsMap();
         const std::vector<std::string>& getServerNames(void) const;
         HttpServer *getInstance(void) const;
 
@@ -37,8 +38,8 @@ class Server: public HttpServer
         void    setInstance(HttpServer*);
 
         /*MEMBER FUNCTION*/
-        void addToEventsMap(const IO*);
-        void deleteFromEventsMap(const IO*);
+        void addToEventsMap(IO*);
+        void deleteFromEventsMap(IO&);
         std::string launchServer(void);
 
     private:

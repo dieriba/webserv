@@ -36,6 +36,7 @@ const HttpRequest& IO::getRequest(void) const {return _request;}
 const uint32_t& IO::getEvents(void) const {return _event;};
 const int& IO::getWs(void) const {return _ws;};
 Server* IO::getServer(void) const { return _server;}
+Server* IO::getBaseServer(void) { return _base_server;}
 HttpRequest& IO::getRequest(void)  {return _request;}
 HttpResponse& IO::getReponse(void) {return _response;};
 IO* IO::getIO(void) const {return _io;}; 
@@ -68,6 +69,6 @@ void IO::clear(void)
 {
     _request.clear();
     _response.clear();
-    resetOptions();
+    resetAndPreserverSomeFlags(checkBits(IO::IO_SOCKET_NOT_FINISH));
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

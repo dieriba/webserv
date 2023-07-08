@@ -9,7 +9,7 @@ CgiStream::CgiStream(const int& fd, IO *event, int *pipes):_io(event),_pipes(pip
     setFD(fd);
     _pid = 0;
     _cgi_timestamp = 0;
-    _type = IO::CGI_STREAM;
+    _type = IO::IO_CGI_STREAM;
 };
 CgiStream::CgiStream(const CgiStream& rhs):IO(rhs),_io(rhs._io),_pipes(rhs._pipes)
 {};
@@ -66,7 +66,7 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
 {
     IO& object = *(getIO());
 
-    if (object.checkBits(IO::CGI_ON) == 0) return IO::IO_SUCCESS;
+    if (object.checkBits(IO::IO_CGI_ON) == 0) return IO::IO_SUCCESS;
 
     if (checkBits(CgiStream::STARTED) == 0)
     {
@@ -98,7 +98,7 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
     if (UtilityMethod::sendBuffer(object.getFd(), resp.data(), resp.size()) == IO::IO_ERROR)
     {
         UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
-        object.setOptions(IO::KILL_MYSELF, SET);
+        object.setOptions(IO::IO_KILL_MYSELF, SET);
         resp.clear();
         return IO::IO_SUCCESS;
     }
@@ -114,7 +114,7 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
         if (UtilityMethod::sendBuffer(object.getFd(), "0\r\n\r\n", 5) == IO::IO_ERROR)
         {
             UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
-            object.setOptions(IO::KILL_MYSELF, SET);
+            object.setOptions(IO::IO_KILL_MYSELF, SET);
             resp.clear();
             return IO::IO_SUCCESS;
         }
