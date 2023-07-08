@@ -246,6 +246,7 @@ void HttpRequest::clear(void)
 {
     _headers.clear();
     s_buffer.clear();
+    _header_size = 0;
     resetOptions();
 }
 
