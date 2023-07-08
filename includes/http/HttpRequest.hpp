@@ -45,7 +45,6 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         const size_t& getCurrentChunkSize(void) const;
         const std::string& getChunkBody(void) const;
         std::string& getChunkBody(void);
-        std::ofstream& getOutfile(void);
         const std::string& getBoundary(void) const;
         const std::string& getCrlfBoundary(void) const;
         const std::string& getEndBoundary(void) const;
@@ -69,10 +68,7 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         size_t _header_size;
         size_t _chunk_size;
         size_t _current_chunk_size;
-        std::ofstream outfile;
-        bool _start;
         mulitipart _form_data;
-        char    *filename;
 };
 
 # endif

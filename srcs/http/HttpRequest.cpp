@@ -8,11 +8,10 @@
 # include "../../includes/utils/FileWriter.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-HttpRequest::HttpRequest():HttpMessage(),_header_size(0),_chunk_size(0),_current_chunk_size(0),_start(true){};
+HttpRequest::HttpRequest():HttpMessage(),_header_size(0),_chunk_size(0),_current_chunk_size(0){};
 HttpRequest::HttpRequest(const HttpRequest& rhs):HttpMessage(rhs),BitsManipulation(rhs)
 {
     _header_size = rhs._header_size;
-    _start = rhs._start;
     _form_data.boundary = rhs._form_data.boundary;
     _form_data.crlf_boundary = rhs._form_data.crlf_boundary;
     _form_data.end_boundary = rhs._form_data.end_boundary;
@@ -25,7 +24,6 @@ HttpRequest& HttpRequest::operator=(const HttpRequest& rhs)
     _form_data.crlf_boundary = rhs._form_data.crlf_boundary;
     _form_data.end_boundary = rhs._form_data.end_boundary;
     _form_data.crlf_end_boundary = rhs._form_data.crlf_end_boundary;
-    _start = rhs._start;
     _header_size = rhs._header_size;
     s_buffer = rhs.s_buffer;
     _method = rhs._method;
@@ -41,7 +39,6 @@ const size_t& HttpRequest::getChunkSize(void) const {return _chunk_size;}
 const size_t& HttpRequest::getCurrentChunkSize(void) const {return _current_chunk_size;}
 std::string& HttpRequest::getChunkBody(void) {return _chunk_body;}
 const size_t& HttpRequest::getHeaderSize(void) const {return _header_size;}
-std::ofstream& HttpRequest::getOutfile(void) {return outfile;}
 const std::string& HttpRequest::getBoundary(void) const {return _form_data.boundary; }
 const std::string& HttpRequest::getCrlfBoundary(void) const {return _form_data.crlf_boundary; }
 const std::string& HttpRequest::getEndBoundary(void) const {return _form_data.end_boundary; }
@@ -177,7 +174,8 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
         else if (directory && instance.getIndex().size() == 0)
             full_path = "";
     }
-    else if (getMethod() == HttpServer::HTTP_SERVER_POST && checkBits(HttpRequest::HTTP_REQUEST_CGI_) == 0)
+    else if (((getMethod() == HttpServer::HTTP_SERVER_POST || getMethod() == HttpServer::HTTP_SERVER_PUT)) 
+        && checkBits(HttpRequest::HTTP_REQUEST_CGI_) == 0)
     {
         if (instance.getUploadsFilesFolder().size())
         {
@@ -238,7 +236,7 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
             writer = (static_cast<Put*>(res.getHttpMethod()));
 
         if (!checkBits(HttpRequest::HTTP_REQUEST_CGI_) && checkBits(HttpRequest::HTTP_REQUEST_NO_ENCODING))
-            writer -> open_file(instance, getHeaders()) ;
+            writer -> open_file(client) ;
     }
 
     return IO::IO_SUCCESS;

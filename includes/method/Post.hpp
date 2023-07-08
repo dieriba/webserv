@@ -19,8 +19,11 @@ class Post: public Method, public FileWriter
         int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
         int handleCgiPost(ClientSocketStream&, HttpRequest&, HttpResponse&);
         int postCgiHandler(HttpRequest&, HttpResponse&);
+        void create_file(std::string& filepath);
 
         /*VIRTUAL MEMBER FUNCTION*/
+        virtual int open_file(ClientSocketStream&);
+        virtual int open_file(ClientSocketStream&, std::string& filepath);
         virtual Method* clone(void) const;
 };
 

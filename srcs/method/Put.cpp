@@ -6,7 +6,7 @@
 # include "../../includes/IO/CgiStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-Put::Put():FileWriter(){};
+Put::Put():FileWriter(HttpServer::HTTP_SERVER_PUT){};
 Put::Put(const Put& rhs):Method(rhs),FileWriter(rhs){};
 Put& Put::operator=(const Put& rhs)
 {
@@ -26,6 +26,57 @@ Put::~Put(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+int Put::open_file(ClientSocketStream& client)
+{
+    std::map<std::string, std::string>& headers = client.getRequest().getHeaders();
+    std::string& path = headers.find(PATH) -> second; 
+    std::string fileExtenstion = UtilityMethod::getFileExtension(headers.find(CONTENT_TYP) -> second, 0);
+    std::string filepath(headers.find(FULLPATH) -> second);
+    
+    /*ADD THIS INTO A TRY CATCH BLOCK*/
+    if (path == client.getServer() -> getInstance() -> getIndexPath())
+        filepath += DEFAULT_FILE_NAME + UtilityMethod::numberToString(_nb) + fileExtenstion;
+
+    if (_outfile.is_open()) _outfile.close();
+    
+    _outfile.clear();
+    
+    _outfile.open(filepath.c_str(), std::ios::out);
+    
+    if (_outfile.fail()) return FORBIDEN;
+
+    updateNb() ;
+       
+    return IO::IO_SUCCESS;
+}
+
+int Put::open_file(ClientSocketStream& client, std::string& filepath)
+{
+    std::string& path = client.getRequest().getHeaders().find(PATH) -> second; 
+    HttpServer& instance = *(client.getServer() -> getInstance());
+    
+    /*ADD THIS INTO A TRY CATCH BLOCK*/
+    std::string root_dir;
+
+    if (instance.getUploadsFilesFolder().size() == 0)
+        filepath = instance.getRootDir() + path + "/" + filepath;
+    else
+        filepath = instance.getUploadsFilesFolder() + "/" + filepath;
+
+    if (_outfile.is_open()) _outfile.close();
+    
+    _outfile.clear();
+    
+    if (access(filepath.c_str(), F_OK) == 0)
+
+    _outfile.open(filepath.c_str(), std::ios::out);
+    if (_outfile.fail()) return FORBIDEN;
+    
+    _nb++;
+
+    return IO::IO_SUCCESS;
+}
 
 int Put::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpResponse& res)
 {

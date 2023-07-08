@@ -5,11 +5,14 @@
 # include "../../includes/IO/ClientSocketStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-FileWriter::FileWriter():_request_body_size(0){};
-FileWriter::FileWriter(const FileWriter& rhs):_request_body_size(rhs._request_body_size){};
+FileWriter::FileWriter():_request_body_size(0),_nb(0){};
+FileWriter::FileWriter(const short int& method):_request_body_size(0),_nb(0),_method(method){};
+FileWriter::FileWriter(const FileWriter& rhs):_request_body_size(rhs._request_body_size),_nb(rhs._nb),_method(rhs._method){};
 FileWriter& FileWriter::operator=(const FileWriter& rhs)
 {
     if (this == &rhs) return *this;
+    _nb = rhs._nb;
+    _method = rhs._method;
     _request_body_size = rhs._request_body_size;
     return *this;
 };
@@ -27,61 +30,22 @@ void FileWriter::updateSize(const size_t& size)
 {
     _request_body_size += size;
 };
+
+void FileWriter::updateNb(void)
+{
+    _nb++;
+}
+
+void FileWriter::setFileExist(const bool& file_exist)
+{
+    _file_exists = file_exist;
+}
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 void FileWriter::clearRequestBodySize(void)
 {
     _request_body_size = 0;
-}
-
-int FileWriter::open_file(HttpServer& instance, std::map<std::string, std::string>& headers, std::string& filepath)
-{
-    static int _nb;
-    std::string& path = headers.find(PATH) -> second; 
-    
-    /*ADD THIS INTO A TRY CATCH BLOCK*/
-    std::string root_dir;
-
-    if (instance.getUploadsFilesFolder().size() == 0)
-        filepath = instance.getRootDir() + path + "/" + filepath;
-    else
-        filepath = instance.getUploadsFilesFolder() + "/" + filepath;
-
-    if (_outfile.is_open()) _outfile.close();
-    
-    _outfile.clear();
-    
-    _outfile.open(filepath.c_str(), std::ios::out);
-    
-    if (_outfile.fail()) return FORBIDEN;
-    
-    _nb++;
-
-    return IO::IO_SUCCESS;
-}
-
-int FileWriter::open_file(HttpServer& instance, std::map<std::string, std::string>& headers)
-{
-    static int _nb;
-    std::string& path = headers.find(PATH) -> second; 
-    std::string fileExtenstion = UtilityMethod::getFileExtension(headers.find(CONTENT_TYP) -> second, 0);
-    std::string filepath(headers.find(FULLPATH) -> second);
-    
-    /*ADD THIS INTO A TRY CATCH BLOCK*/
-    if (path == instance.getIndexPath())
-        filepath += DEFAULT_FILE_NAME + UtilityMethod::numberToString(_nb) + fileExtenstion;
-
-    if (_outfile.is_open()) _outfile.close();
-    
-    _outfile.clear();
-    
-    _outfile.open(filepath.c_str(), std::ios::out);
-    
-    if (_outfile.fail()) return FORBIDEN;
-    _nb++;
-    
-    return IO::IO_SUCCESS;
 }
 
 int FileWriter::fillChunkBody(HttpRequest& req)
@@ -91,7 +55,7 @@ int FileWriter::fillChunkBody(HttpRequest& req)
     {
         size_t pos = 0;
         
-        std::string& s_buffer= req.getBuffer();
+        std::string& s_buffer = req.getBuffer();
 
         if (req.checkBits(HttpRequest::HTTP_REQUEST_CHUNK_SET) == 0)
         {
@@ -154,7 +118,7 @@ int FileWriter::fillChunkBody(HttpRequest& req)
             req.updateCurrentChunkSize(LEN_END_CHUNK - LEN_CRLF);
             std::cout << "Total body size: " << getRequestBodySize() << std::endl;
             clearRequestBodySize();
-            req.getOutfile().close();
+            _outfile.close();
             req.setOptions(HttpRequest::HTTP_REQUEST_FINISH_BODY, SET);
             return IO::IO_SUCCESS;
         }
@@ -286,16 +250,14 @@ int FileWriter::handleMultipartData(ClientSocketStream& client, HttpRequest& req
                 vector_filename[1].erase(vector_filename[1].size() - 1);
                 vector_filename[1].erase(vector_filename[1].begin());
                 
-                if (UtilityMethod::getFileExtension(vector_filename[1] ,1)
-                    != UtilityMethod::getFileExtension(vec_content_type[1] ,0))
+                if (UtilityMethod::getFileExtension(vector_filename[1] ,1) != UtilityMethod::getFileExtension(vec_content_type[1] ,0))
                 {
                     if (client.getPrevBodySize() != req.getBodySize()) client.setOptions(IO::IO_SOCKET_NOT_FINISH, SET);
 
                     return BAD_REQUEST;
                 }
                 
-                if (vector_filename[1].size()) 
-                    open_file(*(client.getServer() -> getInstance()), req.getHeaders(),vector_filename[1]);
+                if (vector_filename[1].size()) open_file(client, vector_filename[1]);
 
                 pos_two = pos_three;
             }
@@ -324,7 +286,7 @@ int FileWriter::handleMultipartData(ClientSocketStream& client, HttpRequest& req
             else
                 req.setOptions(HttpRequest::HTTP_REQUEST_CARRIAGE_FEED, SET);
             
-            if (req.getOutfile().is_open() && size > 0)
+            if (_outfile.is_open() && size > 0)
             {
                 int res = writeToFileMutltipartData(req, size);
 
@@ -343,10 +305,10 @@ int FileWriter::handleMultipartData(ClientSocketStream& client, HttpRequest& req
             if (req.getBuffer().size() == 0 || (pos_crlf != std::string::npos && boundary_br == std::string::npos))
                 break;
             
-            if (req.getOutfile().is_open())
+            if (_outfile.is_open())
             {
-                req.getOutfile().clear();
-                req.getOutfile().close();
+                _outfile.clear();
+                _outfile.close();
             }
 
             if (req.getBuffer().find(req.getCrlfEndBoundary()) == 0)

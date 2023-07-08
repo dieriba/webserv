@@ -29,7 +29,8 @@ class HttpResponse: public HttpMessage, public BitsManipulation
             HTTP_RESPONSE_FINISHED_RESPONSE,
             HTTP_RESPONSE_APPLICATION_FORM_URLENCODED,
             HTTP_RESPONSE_NO_ENCODING,
-            HTTP_RESPONSE_REDIRECT_SET
+            HTTP_RESPONSE_REDIRECT_SET,
+            HTTP_RESPONSE_RESSOURCE_CREATED
         };
         
         /*GETTER*/

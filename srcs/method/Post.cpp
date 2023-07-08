@@ -6,7 +6,7 @@
 # include "../../includes/IO/CgiStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-Post::Post():FileWriter(){};
+Post::Post():FileWriter(HttpServer::HTTP_SERVER_POST){};
 Post::Post(const Post& rhs):Method(rhs),FileWriter(rhs){};
 Post& Post::operator=(const Post& rhs)
 {
@@ -26,6 +26,82 @@ Post::~Post(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+void Post::create_file(std::string& filepath)
+{
+    while (1)
+    {
+        std::string num = "_" + UtilityMethod::numberToString(_nb);
+
+        if (access(filepath.c_str(), F_OK) == 0)
+            filepath.insert(filepath.rfind('.'), num);
+        else
+            break ;
+
+        _nb++;
+
+        if (access(filepath.c_str(), F_OK) == 0)
+        {
+            filepath.erase(filepath.rfind('_'), num.size());
+            filepath.insert(filepath.rfind('.'), "_" + UtilityMethod::numberToString(_nb));
+            _nb += 5;
+        }
+        else
+            break ;
+    }
+}
+
+int Post::open_file(ClientSocketStream& client)
+{
+    std::map<std::string, std::string>& headers = client.getRequest().getHeaders();
+    std::string& path = headers.find(PATH) -> second; 
+    std::string fileExtenstion = UtilityMethod::getFileExtension(headers.find(CONTENT_TYP) -> second, 0);
+    std::string filepath(headers.find(FULLPATH) -> second);
+    
+    /*ADD THIS INTO A TRY CATCH BLOCK*/
+    if (path == (client.getServer() -> getInstance() -> getIndexPath()))
+        filepath += DEFAULT_FILE_NAME + UtilityMethod::numberToString(_nb) + fileExtenstion;
+
+    if (_outfile.is_open()) _outfile.close();
+    
+    _outfile.clear();
+
+    create_file(filepath);
+
+    _outfile.open(filepath.c_str(), std::ios::out);
+    
+    if (_outfile.fail()) return FORBIDEN;
+    
+    _nb++;
+
+    return IO::IO_SUCCESS;
+}
+
+int Post::open_file(ClientSocketStream& client, std::string& filepath)
+{
+    std::string& path = client.getRequest().getHeaders().find(PATH) -> second; 
+    HttpServer& instance = *(client.getServer() -> getInstance());
+    /*ADD THIS INTO A TRY CATCH BLOCK*/
+    std::string root_dir;
+
+    if (instance.getUploadsFilesFolder().size() == 0)
+        filepath = instance.getRootDir() + path + "/" + filepath;
+    else
+        filepath = instance.getUploadsFilesFolder() + "/" + filepath;
+
+
+    if (_outfile.is_open()) _outfile.close();
+    
+    _outfile.clear();
+
+    create_file(filepath);
+    
+    _outfile.open(filepath.c_str(), std::ios::out);
+
+    if (_outfile.fail()) return FORBIDEN;
+    
+    return IO::IO_SUCCESS;
+}
 
 int Post::postCgiHandler(HttpRequest& req, HttpResponse& res)
 {

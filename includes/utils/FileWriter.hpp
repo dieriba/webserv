@@ -10,16 +10,22 @@ class HttpServer;
 class FileWriter
 {
     public:
+
+        /*SETTERS*/
+        void updateNb(void);
+        void setFileExist(const bool&);
+
         /*GETTERS*/
         const size_t& getRequestBodySize(void) const;
         std::ofstream& getOutfile(void);
-        
+
         /*Virtual Member Function*/
-        virtual int open_file(HttpServer& instance, std::map<std::string, std::string>&);
-        virtual int open_file(HttpServer& instance, std::map<std::string, std::string>&, std::string& filepath);
+        virtual int open_file(ClientSocketStream&) = 0;
+        virtual int open_file(ClientSocketStream&, std::string& filepath) = 0;
 
     protected:
         FileWriter();
+        FileWriter(const short int&);
         FileWriter(const FileWriter&);
         FileWriter& operator=(const FileWriter&);
         virtual ~FileWriter();
@@ -35,9 +41,12 @@ class FileWriter
         int writeToFileMutltipartData(HttpRequest&, const size_t&);
         void clearRequestBodySize(void);
         size_t _request_body_size;
+        std::ofstream _outfile;
+        unsigned int _nb;
 
     private:
-        std::ofstream _outfile;
+        short int _method;
+        bool _file_exists;
 };
 
 # endif
