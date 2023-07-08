@@ -165,7 +165,7 @@ int Error::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespon
     std::string error_page = getErrorPage(client.getErrStatus());
     size_t len = error_page.size();
 
-   err = IO::IO_SUCCESS;
+    err = IO::IO_SUCCESS;
     
     if (req.getMethod() == HttpServer::HTTP_SERVER_HEAD)
     {
@@ -174,10 +174,10 @@ int Error::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespon
         error_page[len] = 0;
         err = IO::IO_ERROR;
     }
-    std::cout << client.getFd() << std::endl;
+
     if (UtilityMethod::sendBuffer(client.getFd(), error_page.c_str(), len) == IO::IO_ERROR)
         return (IO::IO_ERROR);
-    std::cout << error_page << std::endl;
+
     res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
 
     return err;

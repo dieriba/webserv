@@ -122,7 +122,7 @@
 # define LEN_CRLF 2
 # define END_CHUNK "\r\n0\r\n\r\n"
 # define LEN_END_CHUNK 7
-# define MAX_HEADER_SIZE 4000
+# define MAX_HEADER_SIZE 2
 # define NO_VALUE "NO_VALUE"
 # define DOUBLE_HIPHEN "--"
 /*

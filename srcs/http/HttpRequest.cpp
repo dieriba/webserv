@@ -128,8 +128,6 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
 
     client.setServer(server);
 
-    server -> setInstance(server);
-
     if (headers.size() == 0) return BAD_REQUEST;
 
     header = UtilityMethod::stringSpliter(headers[0], " ");

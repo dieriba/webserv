@@ -6,6 +6,7 @@ Server::Server():HttpServer(),_serv_socket(-1),_tcp_server(NULL){};
 
 Server::Server(const Server& rhs):HttpServer(rhs)
 {
+    _instance = rhs._instance;
     _serv_socket = rhs._serv_socket;
     _ip = rhs._ip;
     _port = rhs._port;
@@ -17,6 +18,7 @@ Server::Server(const Server& rhs):HttpServer(rhs)
 Server& Server::operator=(const Server& rhs)
 {
     if (this == &rhs) return *(this);
+    _instance = rhs._instance;
     _upload_file_folders = rhs._upload_file_folders;
     _serv_socket = rhs._serv_socket;
     _error_pages = rhs._error_pages;

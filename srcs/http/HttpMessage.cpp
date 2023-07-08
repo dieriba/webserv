@@ -1,7 +1,7 @@
 # include "../../includes/http/HttpMessage.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-HttpMessage::HttpMessage():_body(0), s_buffer(""){};
+HttpMessage::HttpMessage():_body(0),_method(-1), s_buffer(""){};
 HttpMessage::HttpMessage(const HttpMessage& rhs):_body(rhs._body),_method(rhs._method),s_buffer(rhs.s_buffer),_headers(rhs._headers){};
 HttpMessage& HttpMessage::operator=(const HttpMessage& rhs)
 {

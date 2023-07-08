@@ -115,7 +115,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
     if (_request.getHeaderSize() >= MAX_HEADER_SIZE)
     {
         UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
-        setErrorStatus(TOO_LARGE_CONTENT);
+        _response.setErrorObjectResponse((*this), TOO_LARGE_CONTENT);
         return IO::IO_SUCCESS;
     }
 
