@@ -20,7 +20,7 @@ class RequestChecker
         static int checkBodySize(const HttpServer&, HttpRequest&);
         static int checkAll(ClientSocketStream&, HttpRequest&);
         static int checkGetHeadMethod(const HttpServer&, HttpRequest&);
-        static int checkPostMethod(const HttpServer&, HttpRequest&);
+        static int checkPostPutMethod(const HttpServer&, HttpRequest&);
         static int checkDeleteMethod(const HttpServer&, HttpRequest&);
         static int checkHeader(const HttpServer&, HttpRequest&);
         static Checker tab[10];

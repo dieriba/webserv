@@ -81,9 +81,9 @@ int RequestChecker::checkDeleteMethod(const HttpServer& instance, HttpRequest& r
     return IO::IO_SUCCESS;
 }
 
-int RequestChecker::checkPostMethod(const HttpServer& instance, HttpRequest& req)
+int RequestChecker::checkPostPutMethod(const HttpServer& instance, HttpRequest& req)
 {
-    if (req.getMethod() != HttpServer::HTTP_SERVER_POST) return IO::IO_SUCCESS;
+    if (req.getMethod() != HttpServer::HTTP_SERVER_POST && req.getMethod() != HttpServer::HTTP_SERVER_PUT) return IO::IO_SUCCESS;
 
     if (instance.checkBits(HttpServer::HTTP_SERVER_FILE_UPLOAD_) == false) return METHOD_NOT_ALLOWED;
 

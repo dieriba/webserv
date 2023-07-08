@@ -2,8 +2,10 @@
 # include "../../includes/http/RequestChecker.hpp"
 # include "../../includes/utils/UtilityMethod.hpp"
 # include "../../includes/method/Post.hpp"
+# include "../../includes/method/Put.hpp"
 # include "../../includes/server/HttpServer.hpp"
 # include "../../includes/IO/ClientSocketStream.hpp"
+# include "../../includes/utils/FileWriter.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 HttpRequest::HttpRequest():HttpMessage(),_header_size(0),_chunk_size(0),_current_chunk_size(0),_start(true){};
@@ -77,94 +79,16 @@ void HttpRequest::setCrlfEndBoundary(const std::string& crlf_end_boundary)
     _form_data.crlf_end_boundary = crlf_end_boundary;
 }
 /*----------------------------------------SETTER----------------------------------------*/
+
+/*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 void HttpRequest::appendToChunkBody(const std::string& chunk, const ssize_t& size)
 {
     _chunk_body.append(chunk, size);
 }
-/*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
 void HttpRequest::clearCurrentChunkSize(void)
 {
     _current_chunk_size = 0;
-}
-
-int HttpRequest::fillChunkBody(Post& post)
-{
-
-    while (1)
-    {
-        size_t pos = 0;
-        
-        if (checkBits(HttpRequest::HTTP_REQUEST_CHUNK_SET) == 0)
-        {
-            size_t start = 0;
-
-            if (checkBits(HttpRequest::HTTP_REQUEST_CARRIAGE_FEED))
-            {
-                size_t pos = s_buffer.find(CRLF);
-
-                if (pos != 0 || (pos == std::string::npos && s_buffer.size() > LEN_CRLF)) return BAD_REQUEST;
-
-                start = LEN_CRLF;
-
-                setOptions(HttpRequest::HTTP_REQUEST_CARRIAGE_FEED, CLEAR);
-            }
-
-            if (getCurrentChunkSize() > 0) clearCurrentChunkSize();
-
-            pos = s_buffer.find(CRLF, start);
-
-            if (pos == std::string::npos)  return (setOptions(HttpRequest::HTTP_REQUEST_CARRIAGE_FEED, SET), IO::IO_SUCCESS);
-            
-            pos += LEN_CRLF;
-
-            char c = s_buffer[pos];
-            s_buffer[pos] = 0;
-
-            if (s_buffer.find_first_not_of(BASE_16 CRLF) != pos) return BAD_REQUEST;
-
-            s_buffer[pos] = c;
-            setChunkSize(UtilityMethod::hexToDecimal(s_buffer.substr(start, pos - LEN_CRLF)));
-            
-            if (getChunkSize() == std::string::npos) return BAD_REQUEST;
-
-            setOptions(HttpRequest::HTTP_REQUEST_CHUNK_SET, SET);
-        }
-
-        size_t size = getChunkSize() - getCurrentChunkSize();
-
-        if (size > s_buffer.size() - pos)
-            size = s_buffer.size();
-            
-        updateCurrentChunkSize(size - pos);
-
-        int err = post.writeToFile((*this), pos, size - pos);
-        
-        if (err) return err;
-
-        s_buffer.erase(0, size);
-
-        if (getCurrentChunkSize() == getChunkSize())
-        {
-            setOptions(HttpRequest::HTTP_REQUEST_CHUNK_SET, CLEAR);
-            setOptions(HttpRequest::HTTP_REQUEST_CARRIAGE_FEED, SET);
-        };
-
-        if (s_buffer.find(END_CHUNK) == 0)
-        {
-            if (s_buffer.size() != LEN_END_CHUNK) return BAD_REQUEST;
-            updateCurrentChunkSize(LEN_END_CHUNK - LEN_CRLF);
-            std::cout << "Total body size: " << post.getRequestBodySize() << std::endl;
-            post.clearRequestBodySize();
-            outfile.close();
-            setOptions(HttpRequest::HTTP_REQUEST_FINISH_BODY, SET);
-            return IO::IO_SUCCESS;
-        }
-
-        if (s_buffer.size() <= LEN_CRLF) return IO::IO_SUCCESS;
-    }
-
-    return IO::IO_SUCCESS;
 }
 
 void HttpRequest::appendToBuffer(const char *toAppend, const ssize_t& size)
@@ -173,56 +97,6 @@ void HttpRequest::appendToBuffer(const char *toAppend, const ssize_t& size)
     s_buffer.append(toAppend, size);
     if (_header_size == 0 && ((len = s_buffer.find(CRLF CRLF)) != std::string::npos))
         _header_size = len + 1;
-}
-
-int HttpRequest::open_file(ClientSocketStream& event, std::string& filepath)
-{
-    static int _nb;
-    HttpServer& instance = *(event.getServer() -> getInstance());
-    std::string& path = getHeaders().find(PATH) -> second; 
-    
-    /*ADD THIS INTO A TRY CATCH BLOCK*/
-    std::string root_dir;
-
-    if (instance.getUploadsFilesFolder().size() == 0)
-        filepath = instance.getRootDir() + path + "/" + filepath;
-    else
-        filepath = instance.getUploadsFilesFolder() + "/" + filepath;
-
-    if (outfile.is_open()) outfile.close();
-    
-    outfile.clear();
-    
-    outfile.open(filepath.c_str(), std::ios::out);
-    
-    if (outfile.fail()) return FORBIDEN;
-    
-    _nb++;
-
-    return IO::IO_SUCCESS;
-}
-
-int HttpRequest::open_file(ClientSocketStream& event)
-{
-    static int _nb;
-    HttpServer& instance = *(event.getServer() -> getInstance());
-    std::string& path = getHeaders().find(PATH) -> second; 
-    std::string fileExtenstion = UtilityMethod::getFileExtension(getHeaders().find(CONTENT_TYP) -> second, 0);
-    std::string filepath(getHeaders().find(FULLPATH) -> second);
-    
-    /*ADD THIS INTO A TRY CATCH BLOCK*/
-    if (path == instance.getIndexPath())
-        filepath += DEFAULT_FILE_NAME + UtilityMethod::numberToString(_nb) + fileExtenstion;
-
-    if (outfile.is_open()) outfile.close();
-    
-    outfile.clear();
-    
-    outfile.open(filepath.c_str(), std::ios::out);
-    
-    if (outfile.fail()) return FORBIDEN;
-    _nb++;
-    return IO::IO_SUCCESS;
 }
 
 int HttpRequest::parseRequest(ClientSocketStream& client)
@@ -281,7 +155,7 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
 
     server -> setInstance((HttpServer *)RequestChecker::serverOrLocation(*server, (*this)));
 
-    const HttpServer& instance = *(server -> getInstance());
+    HttpServer& instance = *(server -> getInstance());
 
     std::string full_path = instance.getRootDir() + _headers[PATH];
 
@@ -356,7 +230,15 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
 
         res.setMethodObj(Method::_tab[getMethod()]());
 
-        if (!checkBits(HttpRequest::HTTP_REQUEST_CGI_) && checkBits(HttpRequest::HTTP_REQUEST_NO_ENCODING)) open_file(client);
+        FileWriter* writer;
+        
+        if (getMethod() == HttpServer::HTTP_SERVER_POST)
+            writer = (static_cast<Post*>(res.getHttpMethod()));
+        else
+            writer = (static_cast<Put*>(res.getHttpMethod()));
+
+        if (!checkBits(HttpRequest::HTTP_REQUEST_CGI_) && checkBits(HttpRequest::HTTP_REQUEST_NO_ENCODING))
+            writer -> open_file(instance, getHeaders()) ;
     }
 
     return IO::IO_SUCCESS;

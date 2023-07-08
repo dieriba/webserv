@@ -76,7 +76,9 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
 {
 
     int res = _response.serveResponse((*this), getRequest());
-    std::cout << "RES: " << res << std::endl;
+    
+    std::cout << "Response value: " << res << std::endl;
+    
     if (res > 0)
         _response.setErrorObjectResponse((*this), res);
     else if (_response.checkBits(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE))

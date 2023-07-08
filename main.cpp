@@ -103,7 +103,7 @@ void    init_static_data(void)
 {
     RequestChecker::tab[0] = RequestChecker::checkHeader;
     RequestChecker::tab[1] = RequestChecker::checkGetHeadMethod;
-    RequestChecker::tab[2] = RequestChecker::checkPostMethod;
+    RequestChecker::tab[2] = RequestChecker::checkPostPutMethod;
     RequestChecker::tab[3] = RequestChecker::checkDeleteMethod;
     RequestChecker::tab[4] = RequestChecker::checkAllowedMethod;
     RequestChecker::tab[5] = RequestChecker::checkBodySize;

@@ -8,6 +8,7 @@ SRCS_UTILS	= ./srcs/utils/ExceptionThrower.cpp \
               ./srcs/utils/UtilityMethod.cpp \
               ./srcs/utils/Parser.cpp \
               ./srcs/utils/BitsManipulation.cpp \
+              ./srcs/utils/FileWriter.cpp
 
 SRCS_IO     = ./srcs/IO/IO.cpp \
               ./srcs/IO/ServerStream.cpp \
@@ -24,6 +25,7 @@ SRCS_METHOD	= ./srcs/method/Method.cpp \
 			  ./srcs/method/Post.cpp \
 			  ./srcs/method/Delete.cpp \
               ./srcs/method/Head.cpp \
+              ./srcs/method/Put.cpp \
 			  ./srcs/method/Error.cpp \
 
 OBJ_DIR     = ./obj

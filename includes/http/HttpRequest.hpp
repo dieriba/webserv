@@ -52,9 +52,6 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         const std::string& getCrlfEndBoundary(void) const;
 
         /*MEMBER FUNCTION*/
-        int fillChunkBody(Post&);
-        int open_file(ClientSocketStream&);
-        int open_file(ClientSocketStream&, std::string&);
         int parseRequest(ClientSocketStream&);
         void clearCurrentChunkSize(void);
         void setChunkSize(const size_t&);
