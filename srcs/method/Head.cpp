@@ -44,7 +44,6 @@ int Head::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespons
         file.seekg(0, std::ios::beg);
 
         makeStatusLine(client, OK);
-        addCustomHeader(instance);
 
         std::string ressource(full_path);
         
@@ -56,7 +55,6 @@ int Head::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespons
     else if (directory == true || cgi_get == true)
     {
         makeStatusLine(client, OK);
-        addCustomHeader(instance);
         
         if (directory)
         {

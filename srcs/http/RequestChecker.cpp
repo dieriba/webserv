@@ -43,7 +43,7 @@ int RequestChecker::checkAll(ClientSocketStream& client, HttpRequest& req)
 
     int _res = 0;
     
-    for (size_t i = 0; tab[i] != 0; i++)
+    for (size_t i = 0; i < tab.size(); i++)
     {
         _res = tab[i](*(instance), req);
 
@@ -53,15 +53,28 @@ int RequestChecker::checkAll(ClientSocketStream& client, HttpRequest& req)
     return _res;
 }
 
-int RequestChecker::checkDeleteMethod(const HttpServer& instance, HttpRequest& req)
+int RequestChecker::checkOptionsMethod(const HttpServer& /* instance */, HttpRequest& req)
+{
+    if (req.getMethod() != HttpServer::HTTP_SERVER_OPTIONS) return IO::IO_SUCCESS;
+
+    const std::map<std::string, std::string>& _map = req.getHeaders();
+
+    if ((_map.find(CONTENT_LEN) != _map.end()) || (_map.find(TRANSFERT_ENCODING) != _map.end())) return BAD_REQUEST;
+
+    const std::string& full_path = req.getHeaders()[FULLPATH].c_str();
+    
+    if (full_path != "*" && access(req.getHeaders()[FULLPATH].c_str(), F_OK) != 0) return NOT_FOUND;
+
+    return IO::IO_SUCCESS;
+}
+
+int RequestChecker::checkDeleteMethod(const HttpServer& /* instance */, HttpRequest& req)
 {
     if (req.getMethod() != HttpServer::HTTP_SERVER_DELETE) return IO::IO_SUCCESS;
 
     const std::string& full_path(req.getHeaders()[FULLPATH]);
     const std::map<std::string, std::string>& _map = req.getHeaders();
     
-    std::string dir_path = instance.getRootDir() + req.getHeaders()[PATH];
-
     size_t i = full_path.rfind('/');
 
     const char *root_c = full_path.c_str();
@@ -242,4 +255,4 @@ int RequestChecker::checkBodySize(const HttpServer& instance, HttpRequest& req)
 }
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 
-RequestChecker::Checker RequestChecker::tab[10] = {0};
+std::vector<RequestChecker::Checker> RequestChecker::tab;

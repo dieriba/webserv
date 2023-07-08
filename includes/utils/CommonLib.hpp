@@ -25,9 +25,6 @@
 
 */
 
-/*
-
-*/
 # define DEFAULT_ERROR_PAGE_VALUE 0
 # define DEFAULT_FILE_NAME "/ressource_"
 # define WELCOME_COOKIES "Welcome_Cookie="
@@ -41,6 +38,7 @@
 */
 # define OK 200
 # define CREATED 201
+# define NO_CONTENT 204
 # define BAD_REQUEST 400
 # define FORBIDEN 403
 # define NOT_FOUND 404
@@ -53,9 +51,7 @@
 # define GATEWAY_TIMEOUT 504
 # define VERSION_NOT_SUPPORTED 505
 
-# define NUMBER_SUPPORTED_METHOD 5
 /*
-
 
 
 */
@@ -122,7 +118,7 @@
 # define LEN_CRLF 2
 # define END_CHUNK "\r\n0\r\n\r\n"
 # define LEN_END_CHUNK 7
-# define MAX_HEADER_SIZE 2
+# define MAX_HEADER_SIZE 4000
 # define NO_VALUE "NO_VALUE"
 # define DOUBLE_HIPHEN "--"
 /*

@@ -142,8 +142,6 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
 
     _headers[PATH] = UtilityMethod::remove_dup(header[1]);
 
-    if (header[1].find('/') == std::string::npos) return BAD_REQUEST;
-
     _headers[VERSION] = header[2];
     
     if (header[2] != HTTP_VERSION) return BAD_REQUEST;

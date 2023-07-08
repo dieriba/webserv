@@ -21,9 +21,10 @@ class RequestChecker
         static int checkAll(ClientSocketStream&, HttpRequest&);
         static int checkGetHeadMethod(const HttpServer&, HttpRequest&);
         static int checkPostPutMethod(const HttpServer&, HttpRequest&);
+        static int checkOptionsMethod(const HttpServer&, HttpRequest&);
         static int checkDeleteMethod(const HttpServer&, HttpRequest&);
         static int checkHeader(const HttpServer&, HttpRequest&);
-        static Checker tab[10];
+        static std::vector<Checker> tab;
     
     private:
         RequestChecker(const RequestChecker&);

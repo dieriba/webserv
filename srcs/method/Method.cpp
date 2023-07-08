@@ -32,6 +32,25 @@ std::string& Method::getResponse(void) {return _response;}
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
+std::string Method::getAllowedMethod(const HttpServer& instance, const std::map<std::string, short int>& _httpMethods)
+{
+    std::string allowed_method;
+    std::map<std::string, short int>::const_iterator end = --_httpMethods.end();
+    
+    for (std::map<std::string, short int>::const_iterator it = _httpMethods.begin(); it != _httpMethods.end(); it++)
+    {
+        if (instance.checkBits(it -> second))
+        {
+            if (it != end)
+                allowed_method += it -> first + ", ";
+            else
+                allowed_method += it -> first;
+        }
+    }
+
+    return allowed_method;
+}
+
 int Method::handleFileRessource(ClientSocketStream& event, HttpResponse& res)
 {
     try
@@ -50,6 +69,7 @@ int Method::handleFileRessource(ClientSocketStream& event, HttpResponse& res)
     {
         res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
     }
+    
     return IO::IO_SUCCESS;
 }
 
@@ -111,7 +131,7 @@ void Method::addCustomHeader(const HttpServer& instance)
     std::map<std::string, std::string>::const_iterator it = map.begin();
     for (; it != map.end(); it++)
         appendToResponse(it -> first, it -> second);
-}
+} 
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

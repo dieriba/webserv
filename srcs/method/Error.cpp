@@ -68,25 +68,6 @@ std::string Error::getErrorPage(const short int& err) const
     return res;
 }
 
-std::string Error::getAllowedMethod(const HttpServer& instance, const std::map<std::string, short int>& _httpMethods)
-{
-    std::string allowed_method;
-    std::map<std::string, short int>::const_iterator end = --_httpMethods.end();
-    
-    for (std::map<std::string, short int>::const_iterator it = _httpMethods.begin(); it != _httpMethods.end(); it++)
-    {
-        if (instance.checkBits(it -> second))
-        {
-            if (it != end)
-                allowed_method += it -> first + ", ";
-            else
-                allowed_method += it -> first;
-        }
-    }
-
-    return allowed_method;
-}
-
 void Error::addSpecificHeader(ClientSocketStream& client, const int& err)
 {
     switch (err)

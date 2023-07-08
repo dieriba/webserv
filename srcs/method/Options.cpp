@@ -23,9 +23,19 @@ Options::~Options(){};
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-int Options::sendResponse(ClientSocketStream& /* client */ , HttpRequest& /* req */ , HttpResponse& /* res */)
+int Options::sendResponse(ClientSocketStream& client, HttpRequest& /* req */, HttpResponse& res)
 {
+    makeStatusLine(client, NO_CONTENT);
     
+    HttpServer* instance = client.getServer() -> getInstance();
+    
+    appendToResponse("Allow", getAllowedMethod(*(instance), HttpServer::_httpMethods) + CRLF);
+    
+    if (UtilityMethod::sendBuffer(client.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR)
+        return IO::IO_ERROR;
+
+    res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
+
     return IO::IO_SUCCESS;
 }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

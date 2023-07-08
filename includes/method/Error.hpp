@@ -16,7 +16,6 @@ class Error: public Method
         ~Error();
 
         /*MEMBER FUNCTION*/
-        std::string getAllowedMethod(const HttpServer& instance, const std::map<std::string, short int>& _httpMethods);
         void addSpecificHeader(ClientSocketStream&, const int&);
         int firstStep(ClientSocketStream&, HttpResponse&, const int&);
         int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);

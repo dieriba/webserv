@@ -101,12 +101,15 @@ void    print_server_config(const Server& server)
 
 void    init_static_data(void)
 {
-    RequestChecker::tab[0] = RequestChecker::checkHeader;
-    RequestChecker::tab[1] = RequestChecker::checkGetHeadMethod;
-    RequestChecker::tab[2] = RequestChecker::checkPostPutMethod;
-    RequestChecker::tab[3] = RequestChecker::checkDeleteMethod;
-    RequestChecker::tab[4] = RequestChecker::checkAllowedMethod;
-    RequestChecker::tab[5] = RequestChecker::checkBodySize;
+    RequestChecker::tab.reserve(10);
+    RequestChecker::tab.push_back(RequestChecker::checkHeader);
+    RequestChecker::tab.push_back(RequestChecker::checkGetHeadMethod);
+    RequestChecker::tab.push_back(RequestChecker::checkPostPutMethod);
+    RequestChecker::tab.push_back(RequestChecker::checkPostPutMethod);
+    RequestChecker::tab.push_back(RequestChecker::checkOptionsMethod);
+    RequestChecker::tab.push_back(RequestChecker::checkDeleteMethod);
+    RequestChecker::tab.push_back(RequestChecker::checkAllowedMethod);
+    RequestChecker::tab.push_back(RequestChecker::checkBodySize);
     HttpServer::initMimeTypes();
     HttpServer::initHttpResponses();
     HttpServer::initHttpMethods();

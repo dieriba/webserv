@@ -23,6 +23,7 @@ class Method
         std::string& getResponse(void);
 
         /*MEMBER FUNCTION*/
+        std::string getAllowedMethod(const HttpServer& instance, const std::map<std::string, short int>& _httpMethods);
         int handleFileRessource(ClientSocketStream&, HttpResponse&);
         int sendRedirect(const ClientSocketStream&, HttpResponse&, const char *);
         void makeStatusLine(IO&, const int&);
