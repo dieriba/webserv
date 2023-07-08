@@ -28,7 +28,7 @@ class HttpServer: public Parser, public BitsManipulation
             HTTP_SERVER_DELETE,
             HTTP_SERVER_HEADER,
             HTTP_SERVER_LOCATION_BLOCK,
-            HTTP_SERVER_ERROR_PAGE_SET = 8,
+            HTTP_SERVER_ERROR_PAGE_SET,
             HTTP_SERVER_AUTO_INDEX_,
             HTTP_SERVER_FILE_UPLOAD_,
             HTTP_SERVER_CUSTOM_HEADER

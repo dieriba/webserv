@@ -32,7 +32,7 @@ class HttpRequest: public HttpMessage, public BitsManipulation
             HTTP_REQUEST_CHUNK_SET,
             HTTP_REQUEST_CHUNKED_FINISHED,
             HTTP_REQUEST_CARRIAGE_FEED,
-            HTTP_REQUEST_CGI_ = 8,
+            HTTP_REQUEST_CGI_,
             HTTP_REQUEST_STARTED,
             HTTP_REQUEST_MULTIPART_DATA,
             HTTP_REQUEST_NO_ENCODING,

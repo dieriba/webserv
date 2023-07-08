@@ -42,6 +42,11 @@ int Put::open_file(ClientSocketStream& client)
     
     _outfile.clear();
     
+    if (access(filepath.c_str(), F_OK) == 0)
+        client.getReponse().setOptions(HttpResponse::HTTP_RESPONSE_RESSOURCE_EXIST, SET);
+
+    std::cout << client.getReponse().checkBits(HttpResponse::HTTP_RESPONSE_RESSOURCE_EXIST) << std::endl;
+
     _outfile.open(filepath.c_str(), std::ios::out);
     
     FileWriter::_nb++;
@@ -68,12 +73,10 @@ int Put::open_file(ClientSocketStream& client, std::string& filepath)
     
     _outfile.clear();
     
-    if (access(filepath.c_str(), F_OK) == 0)
-
     _outfile.open(filepath.c_str(), std::ios::out);
     
     FileWriter::_nb++;
-    
+
     if (_outfile.fail()) return FORBIDEN;
 
     return IO::IO_SUCCESS;
@@ -96,14 +99,26 @@ int Put::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpResponse
     }
     else
     {
-        if (UtilityMethod::sendBuffer(client.getFd(), SERVER_SUCCESS_POST_RESPONSE, UtilityMethod::myStrlen(SERVER_SUCCESS_POST_RESPONSE)) == IO::IO_ERROR)
+        if (res.checkBits(HttpResponse::HTTP_RESPONSE_RESSOURCE_EXIST))
         {
-            res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
-            return IO::IO_ERROR;
+            if (UtilityMethod::sendBuffer(client.getFd(), SERVER_SUCCESS_PUT_RESPONSE, std::strlen(SERVER_SUCCESS_PUT_RESPONSE)) == IO::IO_ERROR)
+            {
+                res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
+                return IO::IO_ERROR;
+            }
+        }
+        else
+        {
+            if (UtilityMethod::sendBuffer(client.getFd(), SERVER_SUCCESS_POST_RESPONSE, std::strlen(SERVER_SUCCESS_POST_RESPONSE)) == IO::IO_ERROR)
+            {
+                res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
+                return IO::IO_ERROR;
+            }
         }
 
         res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
     }
+
     return IO::IO_SUCCESS;
 }
 
