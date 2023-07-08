@@ -5,9 +5,9 @@
 # include "../../includes/IO/ClientSocketStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-FileWriter::FileWriter():_request_body_size(0),_nb(0){};
-FileWriter::FileWriter(const short int& method):_request_body_size(0),_nb(0),_method(method){};
-FileWriter::FileWriter(const FileWriter& rhs):_request_body_size(rhs._request_body_size),_nb(rhs._nb),_method(rhs._method){};
+FileWriter::FileWriter():_request_body_size(0){};
+FileWriter::FileWriter(const short int& method):_request_body_size(0),_method(method){};
+FileWriter::FileWriter(const FileWriter& rhs):_request_body_size(rhs._request_body_size),_method(rhs._method){};
 FileWriter& FileWriter::operator=(const FileWriter& rhs)
 {
     if (this == &rhs) return *this;
@@ -30,11 +30,6 @@ void FileWriter::updateSize(const size_t& size)
 {
     _request_body_size += size;
 };
-
-void FileWriter::updateNb(void)
-{
-    _nb++;
-}
 
 void FileWriter::setFileExist(const bool& file_exist)
 {
@@ -326,3 +321,7 @@ int FileWriter::handleMultipartData(ClientSocketStream& client, HttpRequest& req
 }
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+/*----------------------------------------STATIC VARIABLES----------------------------------------*/
+unsigned int FileWriter::_nb = 0;
+/*----------------------------------------STATIC VARIABLES----------------------------------------*/

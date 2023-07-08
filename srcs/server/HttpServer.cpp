@@ -490,6 +490,8 @@ void HttpServer::switch_off_signal(int)
 }
 
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
+
+/*----------------------------------------STATIC VARIABLES----------------------------------------*/
 short int HttpServer::g_signal = 1;
 short int HttpServer::number_of_methods = 0;
 unsigned int HttpServer::_all_methods = 0;
@@ -499,3 +501,4 @@ std::map<std::string, bool> HttpServer::_knownLocationsDirectives;
 std::map<std::string, short int> HttpServer::_httpMethods;
 std::map<std::string, std::string> HttpServer::_mimeTypes;
 std::map<unsigned int, std::map<std::string, Server*> > HttpServer::_serverNameToServer;
+/*----------------------------------------STATIC VARIABLES----------------------------------------*/

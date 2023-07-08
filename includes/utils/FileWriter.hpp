@@ -12,7 +12,6 @@ class FileWriter
     public:
 
         /*SETTERS*/
-        void updateNb(void);
         void setFileExist(const bool&);
 
         /*GETTERS*/
@@ -42,7 +41,7 @@ class FileWriter
         void clearRequestBodySize(void);
         size_t _request_body_size;
         std::ofstream _outfile;
-        unsigned int _nb;
+        static unsigned int _nb;
 
     private:
         short int _method;

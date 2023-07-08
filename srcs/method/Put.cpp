@@ -44,10 +44,10 @@ int Put::open_file(ClientSocketStream& client)
     
     _outfile.open(filepath.c_str(), std::ios::out);
     
+    FileWriter::_nb++;
+
     if (_outfile.fail()) return FORBIDEN;
 
-    updateNb() ;
-       
     return IO::IO_SUCCESS;
 }
 
@@ -71,9 +71,10 @@ int Put::open_file(ClientSocketStream& client, std::string& filepath)
     if (access(filepath.c_str(), F_OK) == 0)
 
     _outfile.open(filepath.c_str(), std::ios::out);
-    if (_outfile.fail()) return FORBIDEN;
     
-    _nb++;
+    FileWriter::_nb++;
+    
+    if (_outfile.fail()) return FORBIDEN;
 
     return IO::IO_SUCCESS;
 }
