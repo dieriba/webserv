@@ -13,12 +13,12 @@ BitsManipulation::~BitsManipulation(){};
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
-uint64_t& BitsManipulation::getOption(void) {return _options;};
-const uint64_t& BitsManipulation::getOption(void) const { return _options ;};
+uint32_t& BitsManipulation::getOption(void) {return _options;};
+const uint32_t& BitsManipulation::getOption(void) const { return _options ;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
-void    BitsManipulation::setOptions(const uint64_t& nbit, char actions)
+void    BitsManipulation::setOptions(const uint32_t& nbit, char actions)
 {
     if (actions == SET)
         bitset(_options, nbit);
@@ -28,16 +28,13 @@ void    BitsManipulation::setOptions(const uint64_t& nbit, char actions)
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER/FUNCTION----------------------------------------*/
-/*
 
-*/
-
-void BitsManipulation::resetAndPreserverSomeFlags(const uint64_t &flags)
+void BitsManipulation::resetAndPreserverSomeFlags(const uint32_t &flags)
 {
     _options = 0 | flags;
 }
 
-uint64_t    BitsManipulation::checkBits(const short int& nbit) const
+uint32_t    BitsManipulation::checkBits(const short int& nbit) const
 {
     if (bitcheck(_options, nbit) > 0)
         return ((unsigned int)1 << nbit);

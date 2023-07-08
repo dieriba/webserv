@@ -10,17 +10,17 @@ class BitsManipulation
         ~BitsManipulation();
 
         /*GETTER*/
-        uint64_t&  getOption(void);
-        const uint64_t&  getOption(void) const;
+        uint32_t&  getOption(void);
+        const uint32_t&  getOption(void) const;
         /*SETTER*/
-        void    setOptions(const uint64_t&, char);
+        void    setOptions(const uint32_t&, char);
         /*MEMBER FUNCTION*/
-        void    resetAndPreserverSomeFlags(const uint64_t& flags);
+        void    resetAndPreserverSomeFlags(const uint32_t& flags);
         void    resetOptions(void);
-        uint64_t    checkBits(const short int&) const;
+        uint32_t    checkBits(const short int&) const;
 
     protected:
-        uint64_t _options;
+        uint32_t _options;
 
 };
 #endif

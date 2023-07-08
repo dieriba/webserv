@@ -36,12 +36,13 @@ class Method
         virtual int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&) = 0;
 
         /*STATIC MEMBER FUNCTION*/
-        static Method* createHead();
-        static Method* createGet();
-        static Method* createPost();
-        static Method* createPut();
-        static Method* createDelete();
-        static Factory _tab[NUMBER_SUPPORTED_METHOD];
+        static Method* createHead(void);
+        static Method* createGet(void);
+        static Method* createPost(void);
+        static Method* createPut(void);
+        static Method* createDelete(void);
+        static Method* createOptions(void);
+        static std::vector<Factory> _tab;
 
     protected:
         std::string _response;

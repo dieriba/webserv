@@ -26,6 +26,7 @@ SRCS_METHOD	= ./srcs/method/Method.cpp \
 			  ./srcs/method/Delete.cpp \
               ./srcs/method/Head.cpp \
               ./srcs/method/Put.cpp \
+              ./srcs/method/Options.cpp \
 			  ./srcs/method/Error.cpp \
 
 OBJ_DIR     = ./obj

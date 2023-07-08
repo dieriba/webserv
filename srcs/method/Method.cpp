@@ -5,6 +5,7 @@
 # include "../../includes/method/Post.hpp"
 # include "../../includes/method/Put.hpp"
 # include "../../includes/method/Delete.hpp"
+# include "../../includes/method/Options.hpp"
 # include "../../includes/IO/IO.hpp"
 # include "../../includes/IO/ClientSocketStream.hpp"
 
@@ -118,6 +119,7 @@ Method* Method::createHead() {return new Head; }
 Method* Method::createGet() {return new Get; }
 Method* Method::createPost() {return new Post; }
 Method* Method::createPut() {return new Put; }
+Method* Method::createOptions() {return new Options; }
 Method* Method::createDelete() {return new Delete; }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-Method::Factory Method::_tab[NUMBER_SUPPORTED_METHOD] = {0};
+std::vector<Method::Factory> Method::_tab;

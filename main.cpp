@@ -111,11 +111,14 @@ void    init_static_data(void)
     HttpServer::initHttpResponses();
     HttpServer::initHttpMethods();
     HttpServer::initKnownDirectives();
-    Method::_tab[HttpServer::HTTP_SERVER_HEAD] = Method::createHead;
-    Method::_tab[HttpServer::HTTP_SERVER_GET] = Method::createGet;
-    Method::_tab[HttpServer::HTTP_SERVER_POST] = Method::createPost;
-    Method::_tab[HttpServer::HTTP_SERVER_PUT] = Method::createPut;
-    Method::_tab[HttpServer::HTTP_SERVER_DELETE] = Method::createDelete;
+    Method::_tab.reserve(10);
+    Method::_tab.push_back(Method::createHead);
+    Method::_tab.push_back(Method::createGet);
+    Method::_tab.push_back(Method::createPost);
+    Method::_tab.push_back(Method::createPut);
+    Method::_tab.push_back(Method::createOptions);
+    Method::_tab.push_back(Method::createDelete);
+    HttpServer::number_of_methods = Method::_tab.size();
 }
 
 int main (int argc, char **argv)

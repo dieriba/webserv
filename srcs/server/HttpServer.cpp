@@ -446,23 +446,21 @@ void HttpServer::initHttpMethods(void)
 {
     _httpMethods["HEAD"] = HTTP_SERVER_HEAD;
     bitset(HttpServer::_all_methods, HTTP_SERVER_HEAD);
-    HttpServer::number_of_methods++;
 
     _httpMethods["GET"] = HTTP_SERVER_GET;
     bitset(HttpServer::_all_methods, HTTP_SERVER_GET);
-    HttpServer::number_of_methods++;
 
     _httpMethods["POST"] = HTTP_SERVER_POST;
     bitset(HttpServer::_all_methods, HTTP_SERVER_POST);
-    HttpServer::number_of_methods++;
 
     _httpMethods["PUT"] = HTTP_SERVER_PUT;
-    bitset(HttpServer::_all_methods, HTTP_SERVER_POST);
-    HttpServer::number_of_methods++;
+    bitset(HttpServer::_all_methods, HTTP_SERVER_PUT);
+
+    _httpMethods["OPTIONS"] = HTTP_SERVER_OPTIONS;
+    bitset(HttpServer::_all_methods, HTTP_SERVER_OPTIONS);
 
     _httpMethods["DELETE"] = HTTP_SERVER_DELETE;
     bitset(HttpServer::_all_methods, HTTP_SERVER_DELETE);
-    HttpServer::number_of_methods++;
 
 }
 

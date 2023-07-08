@@ -25,6 +25,7 @@ class HttpServer: public Parser, public BitsManipulation
             HTTP_SERVER_GET,
             HTTP_SERVER_POST,
             HTTP_SERVER_PUT,
+            HTTP_SERVER_OPTIONS,
             HTTP_SERVER_DELETE,
             HTTP_SERVER_HEADER,
             HTTP_SERVER_LOCATION_BLOCK,
