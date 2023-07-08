@@ -75,6 +75,7 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         std::ofstream outfile;
         bool _start;
         mulitipart _form_data;
+        char    *filename;
 };
 
 # endif

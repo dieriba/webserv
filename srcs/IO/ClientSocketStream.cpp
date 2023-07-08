@@ -126,7 +126,6 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         if (!_req && ((_request.checkBits(HttpRequest::HTTP_REQUEST_CONTENT_LENGTH) || _request.checkBits(HttpRequest::HTTP_REQUEST_TRANSFER_ENCODING)) && !_request.checkBits(HttpRequest::HTTP_REQUEST_FINISH_BODY)))
         {
             _req = _response.serveResponse((*this), _request);
-            std::cout << "REQ: " <<_req << std::endl;
             if (_req)
                 _response.setErrorObjectResponse((*this), _req);
             else if (!_request.checkBits(HttpRequest::HTTP_REQUEST_FINISH_BODY))
@@ -165,6 +164,7 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
     if (checkBits(IO::IO_CGI_ON))
     {
         CgiStream& cgi = static_cast<CgiStream& >(*(getIO()));
+
         if ((getTimestampInMillisecond(std::clock()) - cgi.getTimestampInMillisecond(cgi.getCgiTimeStamp())) >= TIMEOUT_CGI)
         {
             epoll_ctl(_ws, EPOLL_CTL_DEL, cgi.getFd(), NULL);
@@ -180,10 +180,8 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
         }
     }
 
-    if (checkBits(IO::IO_CGI_ON) == 0 && event.events & EPOLLOUT)
-    {
-        return writeToSocket(_ws, event);
-    }
+    if (checkBits(IO::IO_CGI_ON) == 0 && event.events & EPOLLOUT) return writeToSocket(_ws, event);
+    
     return IO::IO_SUCCESS;
 }
 

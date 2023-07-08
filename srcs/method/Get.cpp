@@ -153,6 +153,7 @@ int Get::firstStep(ClientSocketStream& client, const HttpRequest& req, HttpRespo
         if (file.fail()) return INTERNAL_SERVER_ERROR;
 
         makeStatusLine(client, OK);
+        addCustomHeader(instance);
 
         std::string ressource(full_path);
         
