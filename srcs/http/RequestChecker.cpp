@@ -228,7 +228,6 @@ int RequestChecker::checkHeader(const HttpServer& instance, HttpRequest& req)
 
 int RequestChecker::checkAllowedMethod(const HttpServer& instance, HttpRequest& req)
 {
-    std::cout << "Option value: " <<  instance.getOption() << std::endl;
     if (instance.checkBits(req.getMethod()) == 0) return METHOD_NOT_ALLOWED;
     
     return IO::IO_SUCCESS;

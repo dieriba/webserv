@@ -1,9 +1,10 @@
 # include "../../includes/method/Method.hpp"
 # include "../../includes/server/HttpServer.hpp"
+# include "../../includes/method/Head.hpp"
 # include "../../includes/method/Get.hpp"
 # include "../../includes/method/Post.hpp"
+# include "../../includes/method/Put.hpp"
 # include "../../includes/method/Delete.hpp"
-# include "../../includes/method/Head.hpp"
 # include "../../includes/IO/IO.hpp"
 # include "../../includes/IO/ClientSocketStream.hpp"
 
@@ -113,9 +114,10 @@ void Method::addCustomHeader(const HttpServer& instance)
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+Method* Method::createHead() {return new Head; }
 Method* Method::createGet() {return new Get; }
 Method* Method::createPost() {return new Post; }
+Method* Method::createPut() {return new Put; }
 Method* Method::createDelete() {return new Delete; }
-Method* Method::createHead() {return new Head; }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 Method::Factory Method::_tab[NUMBER_SUPPORTED_METHOD] = {0};

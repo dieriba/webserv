@@ -456,6 +456,10 @@ void HttpServer::initHttpMethods(void)
     bitset(HttpServer::_all_methods, HTTP_SERVER_POST);
     HttpServer::number_of_methods++;
 
+    _httpMethods["PUT"] = HTTP_SERVER_PUT;
+    bitset(HttpServer::_all_methods, HTTP_SERVER_POST);
+    HttpServer::number_of_methods++;
+
     _httpMethods["DELETE"] = HTTP_SERVER_DELETE;
     bitset(HttpServer::_all_methods, HTTP_SERVER_DELETE);
     HttpServer::number_of_methods++;

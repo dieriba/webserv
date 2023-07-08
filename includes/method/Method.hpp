@@ -36,10 +36,11 @@ class Method
         virtual int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&) = 0;
 
         /*STATIC MEMBER FUNCTION*/
+        static Method* createHead();
         static Method* createGet();
         static Method* createPost();
+        static Method* createPut();
         static Method* createDelete();
-        static Method* createHead();
         static Factory _tab[NUMBER_SUPPORTED_METHOD];
 
     protected:

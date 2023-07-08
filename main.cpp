@@ -114,6 +114,7 @@ void    init_static_data(void)
     Method::_tab[HttpServer::HTTP_SERVER_HEAD] = Method::createHead;
     Method::_tab[HttpServer::HTTP_SERVER_GET] = Method::createGet;
     Method::_tab[HttpServer::HTTP_SERVER_POST] = Method::createPost;
+    Method::_tab[HttpServer::HTTP_SERVER_PUT] = Method::createPut;
     Method::_tab[HttpServer::HTTP_SERVER_DELETE] = Method::createDelete;
 }
 
