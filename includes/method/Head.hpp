@@ -15,10 +15,8 @@ class Head: public Method
         Head& operator=(const Head&);
         virtual ~Head();
 
-        /*MEMBER FUNCTION*/
-        int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
-
-        /*VIRTUAL FUNCTION*/
+        /*PURE VIRTUAL MEMBER FUNCTION OVERRIDEN*/
+        virtual int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
         virtual Method* clone(void) const;
 };
 

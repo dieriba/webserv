@@ -17,18 +17,25 @@ class ClientSocketStream: public IO
         const unsigned int& getPort(void) const;
         const unsigned int& getPrevContentLength(void) const;
         const unsigned int& getPrevBodySize(void) const;
+        std::string& getFilename(void);
         
         /*SETTERS*/
         void setPrevContentLength(const unsigned int&);
         void updatePrevBodySize(const unsigned int&);
+        void setFilename(const std::string&);
 
-        int handleIoOperation(const int&, struct epoll_event&);
+        /*PURE VIRTUAL MEMBER FUNCTION OVERRIDEN*/
+        virtual int handleIoOperation(const int&, struct epoll_event&);
+ 
+        /*VIRTUAL MEMBER FUNCTION OVERRIDEN*/
+        virtual void clear(void);
     private:
         int readFromSocket(const int&, struct epoll_event&);
         int writeToSocket(const int&, struct epoll_event&);
         unsigned int _port;
         unsigned int _prev_body_size;
         unsigned int _prev_content_len;
+        std::string _filename;
 };
 
 # endif

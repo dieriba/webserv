@@ -31,13 +31,23 @@ void FileWriter::updateSize(const size_t& size)
     _request_body_size += size;
 };
 
-void FileWriter::setFileExist(const bool& file_exist)
+void FileWriter::setFilename(const std::string& filename)
 {
-    _file_exists = file_exist;
+    _filename = filename;
+    _filename_c_str = _filename.c_str();
 }
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+void FileWriter::erase_file(void)
+{
+    if (_filename_c_str == NULL) return;
+  
+    std::remove(_filename_c_str);
+    _filename = "";
+    _filename_c_str = NULL;
+}
+
 void FileWriter::clearRequestBodySize(void)
 {
     _request_body_size = 0;
@@ -124,15 +134,25 @@ int FileWriter::fillChunkBody(HttpRequest& req)
     return IO::IO_SUCCESS;
 }
 
-int FileWriter::writeToFileMutltipartData(HttpRequest& req, const size_t& size)
+int FileWriter::writeToFileMutltipartData(ClientSocketStream& client, const size_t& size)
 {
     try
     {
-        _outfile.write(req.getBuffer().data(), size);
+        if (access(_filename_c_str, F_OK) != 0)
+            throw std::runtime_error("An error occurred while trying reaching for the file located at: " + _filename);
+
+        _outfile.write(client.getRequest().getBuffer().data(), size);
+
+        if (_outfile.bad()) 
+            throw std::runtime_error("An error occurred while writing to the file!");
     }
     catch(const std::exception& e)
     {
+        std::cout << e.what() << std::endl;
         _outfile.close();
+        erase_file();
+        if (client.getPrevBodySize() != client.getRequest().getBodySize())
+            client.setOptions(IO::IO_SOCKET_NOT_FINISH, SET);
         clearRequestBodySize();
         return INTERNAL_SERVER_ERROR;
     }
@@ -144,6 +164,9 @@ int FileWriter::writeToFile(HttpRequest& req, const size_t& pos, const size_t& b
 {
     try
     {
+        if (access(_filename_c_str, F_OK) != 0)
+            throw std::runtime_error("An error occurred while trying reaching for the file located at: " + _filename);
+        
         std::string& alias = req.getBuffer();
         if (bytes)
         {
@@ -154,6 +177,8 @@ int FileWriter::writeToFile(HttpRequest& req, const size_t& pos, const size_t& b
     }
     catch(const std::exception& e)
     {
+        std::cout << e.what() << std::endl;
+        erase_file();
         _outfile.close();
         clearRequestBodySize();
         return INTERNAL_SERVER_ERROR;
@@ -165,12 +190,17 @@ int FileWriter::writeToFile(HttpRequest& req, const size_t& pos, const size_t& b
 
 int FileWriter::writeToFile(HttpRequest& req)
 {
+    std::string& alias = req.getBuffer();
+
     try
     {
-        std::string& alias = req.getBuffer();
-        
+
+        if (access(_filename_c_str, F_OK) != 0)
+            throw std::runtime_error("An error occurred while trying reaching for the file located at: " + _filename);
+
         _outfile.write(alias.data(), alias.size());
         updateSize(alias.size());
+        
         if (getRequestBodySize() >= req.getBodySize())
         {
             std::cout << _request_body_size << std::endl;
@@ -178,10 +208,14 @@ int FileWriter::writeToFile(HttpRequest& req)
             clearRequestBodySize();
             _outfile.close();
         }
+
         alias.clear();
     }
     catch(const std::exception& e)
     {
+        std::cout << e.what() << std::endl;
+        alias.clear();
+        erase_file();
         _outfile.close();
         clearRequestBodySize();
         return INTERNAL_SERVER_ERROR;
@@ -248,7 +282,6 @@ int FileWriter::handleMultipartData(ClientSocketStream& client, HttpRequest& req
                 if (UtilityMethod::getFileExtension(vector_filename[1] ,1) != UtilityMethod::getFileExtension(vec_content_type[1] ,0))
                 {
                     if (client.getPrevBodySize() != req.getBodySize()) client.setOptions(IO::IO_SOCKET_NOT_FINISH, SET);
-
                     return BAD_REQUEST;
                 }
                 
@@ -283,7 +316,7 @@ int FileWriter::handleMultipartData(ClientSocketStream& client, HttpRequest& req
             
             if (_outfile.is_open() && size > 0)
             {
-                int res = writeToFileMutltipartData(req, size);
+                int res = writeToFileMutltipartData(client, size);
 
                 if (res) return res;
             }

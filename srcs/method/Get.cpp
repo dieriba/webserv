@@ -191,7 +191,7 @@ int Get::firstStep(ClientSocketStream& client, const HttpRequest& req, HttpRespo
         
         CgiStream& cgi = static_cast<CgiStream&>(*(client.getIO()));
         
-        cgi.updateCgiTimeStamp();
+        cgi.updateTimeStamp();
     }
     
     if (UtilityMethod::sendBuffer(client.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);

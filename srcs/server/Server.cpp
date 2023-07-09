@@ -44,8 +44,8 @@ Server::~Server()
     
     if (getHttpServer() != NULL)
     {
-        std::map<const IO*, const IO*>::const_iterator it = _events.begin();
-        std::map<const IO*, const IO*>::const_iterator end = _events.end();
+        std::map<const IO*, IO*>::const_iterator it = _events.begin();
+        std::map<const IO*, IO*>::const_iterator end = _events.end();
         int _ws = getHttpServer() -> getEpollWs();
         
         for ( ; it != end; it++)
@@ -67,7 +67,7 @@ HttpServer *Server::getHttpServer(void) const {return _tcp_server;};
 std::vector<Location>& Server::getLocations(void) {return _locations;}
 const std::vector<std::string>& Server::getServerNames(void) const {return _server_names;};
 HttpServer *Server::getInstance(void) const {return _instance;}
-std::map<const IO*, const IO*>& Server::getEventsMap(void) { return _events ;};
+std::map<const IO*, IO*>& Server::getEventsMap(void) { return _events ;};
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
@@ -144,7 +144,6 @@ void Server::deleteFromEventsMap(IO& client)
 {
     if (_events.find(&client) == _events.end()) return;
     _events.erase(&client);
-    std::cout << "FD: " << client.getFd() << std::endl;
     if (client.getFd() > 0) epoll_ctl(getEpollWs(), EPOLL_CTL_DEL, client.getFd(), NULL);
     delete &client;
 }

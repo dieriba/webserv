@@ -24,43 +24,46 @@ class IO: public BitsManipulation
         const uint32_t& getEvents() const;
         const int& getFd(void) const;
         const HttpRequest& getRequest(void) const;
-        const HttpResponse& getReponse(void) const;
+        const HttpResponse& getResponse(void) const;
         const int& getErrStatus(void) const;
         HttpRequest& getRequest(void);
-        HttpResponse& getReponse(void);
+        HttpResponse& getResponse(void);
         Server* getServer(void) const;
         const int& getWs(void) const;
-        long getTimeStamp() const;
-
-        /*GETTERS*/
+        long getTimeStamp(void) const;
         IO* getIO(void) const;
         Server *getBaseServer(void);
 
         /*SETTERS*/
+        void updateTimeStamp(void);
         void setServer(Server *);
         void setWs(const int&);
         void setIO(IO*);
         void setEvents(const uint32_t&);
         void setFD(const int&);
         void setErrorStatus(const int&);
-        void updateTimeStamp();
 
         /*MEMBER FUNCTION*/
         long getTimestampInMillisecond(const long& _cgi_timesamp) const;
-        /*PURE VIRTUAL FUNCTION*/
-        virtual int handleIoOperation(const int&, struct epoll_event&) = 0;
+        
         /*MEMBER FUNCTION*/
         int deleteAndResetIO(HttpResponse&);
-        void clear(void);
+        
+        /*PURE VIRTUAL MEMBER FUNCTION*/
+        virtual int handleIoOperation(const int&, struct epoll_event&) = 0;
 
+        /*VIRTUAL MEMBER FUNCTION*/
+        virtual void clear(void);
+        
         enum
         {
             IO_ERROR = -1,
             IO_SUCCESS,
             IO_CGI_ON,
             IO_COOKIE,
+            IO_KILL_CGI,
             IO_KILL_MYSELF,
-            IO_SOCKET_NOT_FINISH
+            IO_SOCKET_NOT_FINISH,
         };
 
         enum type
@@ -74,14 +77,13 @@ class IO: public BitsManipulation
             int _ws;
             int _fd;
             int _err;
+            long _timestamp;
             Server *_server;
             uint32_t     _event;
             IO  *_io;
             HttpRequest _request;
             HttpResponse _response;
             enum type _type;
-            std::clock_t _timestamp;
-            std::clock_t _end;
             Server *_base_server;
 };
 

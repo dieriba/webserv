@@ -15,10 +15,8 @@ class Options: public Method
         Options& operator=(const Options&);
         ~Options();
 
-        /*MEMBER FUNCTION*/
-        int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
-
-        /*VIRTUAL MEMBER FUNCTION*/
+        /*PURE VIRTUAL MEMBER FUNCTION OVERRIDEN*/
+        virtual int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
         virtual Method* clone(void) const;
 };
 

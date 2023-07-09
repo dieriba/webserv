@@ -43,9 +43,10 @@ int Put::open_file(ClientSocketStream& client)
     _outfile.clear();
     
     if (access(filepath.c_str(), F_OK) == 0)
-        client.getReponse().setOptions(HttpResponse::HTTP_RESPONSE_RESSOURCE_EXIST, SET);
+        client.getResponse().setOptions(HttpResponse::HTTP_RESPONSE_RESSOURCE_EXIST, SET);
 
-    std::cout << client.getReponse().checkBits(HttpResponse::HTTP_RESPONSE_RESSOURCE_EXIST) << std::endl;
+    client.setFilename(filepath);
+    setFilename(filepath);
 
     _outfile.open(filepath.c_str(), std::ios::out);
     
@@ -61,7 +62,6 @@ int Put::open_file(ClientSocketStream& client, std::string& filepath)
     std::string& path = client.getRequest().getHeaders().find(PATH) -> second; 
     HttpServer& instance = *(client.getServer() -> getInstance());
     
-    /*ADD THIS INTO A TRY CATCH BLOCK*/
     std::string root_dir;
 
     if (instance.getUploadsFilesFolder().size() == 0)
@@ -73,6 +73,9 @@ int Put::open_file(ClientSocketStream& client, std::string& filepath)
     
     _outfile.clear();
     
+    client.setFilename(filepath);
+    setFilename(filepath);
+
     _outfile.open(filepath.c_str(), std::ios::out);
     
     FileWriter::_nb++;

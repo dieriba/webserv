@@ -18,10 +18,11 @@ class Error: public Method
         /*MEMBER FUNCTION*/
         void addSpecificHeader(ClientSocketStream&, const int&);
         int firstStep(ClientSocketStream&, HttpResponse&, const int&);
-        int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
 
-        /*VIRTUAL MEMBER FUNCTION*/
+        /*PURE VIRTUAL MEMBER FUNCTION OVERRIDEN*/
+        virtual int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
         virtual Method* clone(void) const;
+        
     private:
         std::string getErrorPage(const short int&) const;
 };

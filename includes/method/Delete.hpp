@@ -15,10 +15,8 @@ class Delete: public Method
         Delete& operator=(const Delete&);
         ~Delete();
 
-        /*MEMBER FUNCTION*/
-        int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
-
-        /*VIRTUAL MEMBER FUNCTION*/
+        /*PURE VIRTUAL MEMBER FUNCTION OVERRIDEN*/
+        virtual int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
         virtual Method* clone(void) const;
 };
 

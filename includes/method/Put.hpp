@@ -15,14 +15,13 @@ class Put: public Method, public FileWriter
         Put& operator=(const Put&);
         virtual ~Put();
 
-        /*MEMBER FUNCTION*/
-        int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
-
-        /*VIRTUAL MEMBER FUNCTION*/
+        /*VIRTUAL MEMBER FUNCTION OVERRIDEN*/
         virtual int open_file(ClientSocketStream&);
         virtual int open_file(ClientSocketStream&, std::string& filepath);
+        
+        /*PURE VIRTUAL MEMBER FUNCTION OVERRIDEN*/
+        int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
         virtual Method* clone(void) const;
-
 };
 
 # endif

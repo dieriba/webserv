@@ -102,6 +102,7 @@
 
 */
 # define TIMEOUT_CGI 3000
+# define TIMEOUT_REQUEST 10000
 # define MAX_TIMEOUT_CGI 4000
 # define COMMON_TIMEOUT 3000
 # define NO_BODY "-2"

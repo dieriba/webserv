@@ -8,7 +8,6 @@ CgiStream::CgiStream(const int& fd, IO *event, int *pipes):_io(event),_pipes(pip
 {
     setFD(fd);
     _pid = 0;
-    _cgi_timestamp = 0;
     _type = IO::IO_CGI_STREAM;
 };
 CgiStream::CgiStream(const CgiStream& rhs):IO(rhs),_io(rhs._io),_pipes(rhs._pipes)
@@ -17,7 +16,7 @@ CgiStream& CgiStream::operator=(const CgiStream& rhs)
 {
     if (this == &rhs) return (*this);
     _fd = rhs._fd;
-    _cgi_timestamp = 0;
+    _timestamp = rhs._timestamp;
     _err = rhs._err;
     _server = rhs._server;
     _event = rhs._event;
@@ -35,7 +34,6 @@ CgiStream::~CgiStream()
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
-long CgiStream::getCgiTimeStamp(void) const { return _cgi_timestamp; }
 long CgiStream::getCgiBeginTimestamp(void) const { return _cgi_begin; }
 const pid_t& CgiStream::getPid(void) const { return _pid; };
 /*----------------------------------------GETTER----------------------------------------*/
@@ -44,7 +42,6 @@ const pid_t& CgiStream::getPid(void) const { return _pid; };
 void CgiStream::setPipes(int *pipes) { _pipes = pipes; }
 void CgiStream::setBeginTimeStamp(void) { _cgi_begin = std::clock(); }
 void CgiStream::setPid(const pid_t& pid) { _pid = pid; }
-void CgiStream::updateCgiTimeStamp(void) { _cgi_timestamp = std::clock(); };
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
@@ -58,7 +55,7 @@ int CgiStream::resetCgi(IO& object, const int& _ws)
     object.clear();
     this -> clear();
     _pid = 0;
-    object.getReponse().clearReadEnd();
+    object.getResponse().clearReadEnd();
     return IO::IO_SUCCESS;
 }
 
@@ -80,7 +77,7 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
         setOptions(CgiStream::STARTED, SET);
     }        
 
-    updateCgiTimeStamp();
+    updateTimeStamp();
 
     int bytes = read(_pipes[0], _buffer, REQUEST_SIZE);
 
@@ -98,7 +95,7 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
     if (UtilityMethod::sendBuffer(object.getFd(), resp.data(), resp.size()) == IO::IO_ERROR)
     {
         UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
-        object.setOptions(IO::IO_KILL_MYSELF, SET);
+        object.setOptions(IO::IO_KILL_CGI, SET);
         resp.clear();
         return IO::IO_SUCCESS;
     }
@@ -106,15 +103,14 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
     resp.clear();
         
     if (bytes == 0) return resetCgi(object, _ws);
-
     if ((getTimestampInMillisecond(std::clock()) - getTimestampInMillisecond(getCgiBeginTimestamp())) >= MAX_TIMEOUT_CGI)
     {
         kill(_pid, SIGTERM);
-
+        std::cout << "TIMEOUT EPOLLOUT" << std::endl;
         if (UtilityMethod::sendBuffer(object.getFd(), "0\r\n\r\n", 5) == IO::IO_ERROR)
         {
             UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
-            object.setOptions(IO::IO_KILL_MYSELF, SET);
+            object.setOptions(IO::IO_KILL_CGI, SET);
             resp.clear();
             return IO::IO_SUCCESS;
         }

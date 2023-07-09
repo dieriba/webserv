@@ -16,14 +16,16 @@ class Post: public Method, public FileWriter
         virtual ~Post();
 
         /*MEMBER FUNCTION*/
-        int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
         int handleCgiPost(ClientSocketStream&, HttpRequest&, HttpResponse&);
         int postCgiHandler(HttpRequest&, HttpResponse&);
         void create_file(std::string& filepath);
 
-        /*VIRTUAL MEMBER FUNCTION*/
+        /*VIRTUAL MEMBER FUNCTION OVERRIDEN*/
         virtual int open_file(ClientSocketStream&);
         virtual int open_file(ClientSocketStream&, std::string& filepath);
+ 
+        /*PURE VIRTUAL MEMBER FUNCTION OVERRIDEN*/
+        virtual int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
         virtual Method* clone(void) const;
 };
 

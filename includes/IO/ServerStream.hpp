@@ -12,7 +12,8 @@ class ServerStream: public IO
         ServerStream& operator=(const ServerStream&);
         ~ServerStream();
 
-        int handleIoOperation(const int&, struct epoll_event&);
+        /*PURE VIRTUAL MEMBER FUNCTION OVERRIDEN*/
+        virtual int handleIoOperation(const int&, struct epoll_event&);
 };
 
 # endif

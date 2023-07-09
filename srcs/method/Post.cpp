@@ -68,8 +68,10 @@ int Post::open_file(ClientSocketStream& client)
 
     create_file(filepath);
 
+    client.setFilename(filepath);
+    setFilename(filepath);
     _outfile.open(filepath.c_str(), std::ios::out);
-    
+
     if (_outfile.fail()) return FORBIDEN;
     
     FileWriter::_nb++;
@@ -94,6 +96,9 @@ int Post::open_file(ClientSocketStream& client, std::string& filepath)
     _outfile.clear();
 
     create_file(filepath);
+    client.setFilename(filepath);
+    setFilename(filepath);
+    
     
     _outfile.open(filepath.c_str(), std::ios::out);
 
@@ -107,6 +112,7 @@ int Post::postCgiHandler(HttpRequest& req, HttpResponse& res)
     pid_t pid = fork();
 
     if (pid == -1) return INTERNAL_SERVER_ERROR;
+    
     if (pid == 0)
     {
         res.clearReadEnd();
@@ -191,7 +197,7 @@ int Post::handleCgiPost(ClientSocketStream& event, HttpRequest& req, HttpRespons
 
     CgiStream& cgi = static_cast<CgiStream&>(*(event.getIO()));
         
-    cgi.updateCgiTimeStamp();
+    cgi.updateTimeStamp();
 
     return IO::IO_SUCCESS;
 }

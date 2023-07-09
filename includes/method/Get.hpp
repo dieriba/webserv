@@ -14,12 +14,12 @@ class Get: public Method
         virtual ~Get();
 
         /*MEMBER FUNCTION*/
-        int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
         int getCgiHandler(ClientSocketStream&, const HttpRequest&, HttpResponse&);
         int firstStep(ClientSocketStream&, const HttpRequest&, HttpResponse&);
         int directoryCgi(ClientSocketStream&, const HttpRequest&, HttpResponse&);
 
-        /*VIRTUAL FUNCTION*/
+        /*PURE VIRTUAL MEMBER FUNCTION OVERRIDEN*/
+        virtual int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&);
         virtual Method* clone(void) const;
 };
 

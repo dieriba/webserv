@@ -35,33 +35,29 @@ ClientSocketStream& ClientSocketStream::operator=(const ClientSocketStream& rhs)
 };
 
 ClientSocketStream::~ClientSocketStream()
-{
+{   
+    if (_filename.size()) std::remove(_filename.c_str());
+
     delete _io;
 };
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
 /*----------------------------------------GETTER----------------------------------------*/
-const unsigned int& ClientSocketStream::getPort(void) const
-{
-    return _port;
-}
-
-const unsigned int& ClientSocketStream::getPrevBodySize(void) const
-{
-    return _prev_body_size;
-}
-
-const unsigned int& ClientSocketStream::getPrevContentLength(void) const
-{
-    return _prev_content_len;
-}
-
+const unsigned int& ClientSocketStream::getPort(void) const { return _port; }
+const unsigned int& ClientSocketStream::getPrevBodySize(void) const { return _prev_body_size; }
+const unsigned int& ClientSocketStream::getPrevContentLength(void) const { return _prev_content_len; }
+std::string& ClientSocketStream::getFilename(void)  { return _filename; }
 /*----------------------------------------GETTER----------------------------------------*/
 
 /*----------------------------------------SETTER----------------------------------------*/
 void ClientSocketStream::updatePrevBodySize(const unsigned int& prev_body_size)
 {
     _prev_body_size += prev_body_size;
+}
+
+void ClientSocketStream::setFilename(const std::string& filename)
+{
+    _filename = filename;
 }
 
 void ClientSocketStream::setPrevContentLength(const unsigned int& prev_content_len)
@@ -84,7 +80,10 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
     else if (_response.checkBits(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE))
     {
         UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
+        
         clear();
+
+        if (checkBits(IO::IO_KILL_MYSELF)) return IO::IO_ERROR;
     }
 
     return res;
@@ -166,11 +165,11 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
     if (checkBits(IO::IO_CGI_ON))
     {
         CgiStream& cgi = static_cast<CgiStream& >(*(getIO()));
-
-        if ((getTimestampInMillisecond(std::clock()) - cgi.getTimestampInMillisecond(cgi.getCgiTimeStamp())) >= TIMEOUT_CGI)
+        if ((getTimestampInMillisecond(std::clock()) - cgi.getTimestampInMillisecond(cgi.getTimeStamp())) >= TIMEOUT_CGI)
         {
+            std::cout << "TIMEOUT EPOLLIN" << std::endl;
             epoll_ctl(_ws, EPOLL_CTL_DEL, cgi.getFd(), NULL);
-            getReponse().clearReadEnd();
+            getResponse().clearReadEnd();
             if (cgi.checkBits(CgiStream::STARTED) != 0)
             {
                 this -> clear();
@@ -186,5 +185,13 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
     
     return IO::IO_SUCCESS;
 }
-
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+/*----------------------------------------VIRTUAL MEMBER FUNCTION----------------------------------------*/
+void ClientSocketStream::clear(void)
+{
+    if (_filename.size()) _filename = "";
+    _request.clear();
+    _response.clear();
+    resetAndPreserverSomeFlags(checkBits(IO::IO_SOCKET_NOT_FINISH));
+}/*----------------------------------------VIRTUAL MEMBER FUNCTION----------------------------------------*/

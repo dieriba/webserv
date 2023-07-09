@@ -227,17 +227,18 @@ void HttpServer::makeServerServe(void)
     {
         to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, EPOLL_TIMEOUT);
 
+        if (HttpServer::g_signal == 1 && to_proceed == IO::IO_ERROR) throw ExceptionThrower("Epoll_wait failled");
+
         for (int i = 0; i < to_proceed; i++)
         {
             client = static_cast<IO *>(_events[i].data.ptr);
 
-            if (client -> checkBits(IO::IO_KILL_MYSELF))
+            if (client -> checkBits(IO::IO_KILL_CGI))
             {
                 std::cout << "Killing myself Remember me as fd: " << client -> getFd() << " from interests list" << std::endl;
-                CgiStream& cgi = static_cast<CgiStream&>(*(client -> getIO()));
-                kill(cgi.getPid(), SIGTERM);
-                Server *server = client -> getBaseServer();
-                server -> deleteFromEventsMap(*client);
+                CgiStream* cgi = static_cast<CgiStream*>(client -> getIO());
+                kill(cgi -> getPid(), SIGTERM);
+                client -> getBaseServer() -> deleteFromEventsMap(*client);
                 continue ;
             }
 
@@ -246,8 +247,7 @@ void HttpServer::makeServerServe(void)
             if (res == IO::IO_ERROR)
             {
                 std::cout << "Deletting client with fd: " << client -> getFd() << " from interests list" << std::endl;
-                Server *server = client -> getBaseServer();
-                server -> deleteFromEventsMap(*client);
+                client -> getBaseServer() -> deleteFromEventsMap(*client);
             }
         }
     }

@@ -188,7 +188,7 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
 
     if (server -> getInstance() -> getRedirect().size() > 0)
     {
-        client.getReponse().setOptions(HttpResponse::HTTP_RESPONSE_REDIRECT_SET, SET);
+        client.getResponse().setOptions(HttpResponse::HTTP_RESPONSE_REDIRECT_SET, SET);
         return getMethod();
     }
     
@@ -220,7 +220,7 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
     
     if (_it_transfert != _headers.end() || _it_content != _headers.end())
     {
-        HttpResponse& res = client.getReponse();
+        HttpResponse& res = client.getResponse();
 
         res.setMethodObj(Method::_tab[getMethod()]());
 

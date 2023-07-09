@@ -32,9 +32,9 @@ class Method
         void appendToResponse(const std::string&, const std::string&);
         void addCustomHeader(const HttpServer&);
 
-        /*VIRTUAL FUNCTION*/
-        virtual Method* clone(void) const = 0;
+        /*PURE VIRTUAL MEMBER FUNCTION*/
         virtual int sendResponse(ClientSocketStream&, HttpRequest&, HttpResponse&) = 0;
+        virtual Method* clone(void) const = 0;
 
         /*STATIC MEMBER FUNCTION*/
         static Method* createHead(void);

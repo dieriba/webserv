@@ -24,7 +24,7 @@ class Server: public HttpServer
         const unsigned int& getPort(void) const;
         const std::vector<Location>& getLocations(void) const;
         std::vector<Location>& getLocations(void);
-        std::map<const IO*, const IO*>& getEventsMap();
+        std::map<const IO*, IO*>& getEventsMap();
         const std::vector<std::string>& getServerNames(void) const;
         HttpServer *getInstance(void) const;
 
@@ -49,7 +49,7 @@ class Server: public HttpServer
         std::string _ip;
         HttpServer *_instance; //POLYMORPHISM
         HttpServer *_tcp_server; //REAL TCP SERVER POINTER
-        std::map<const IO*, const IO*> _events;
+        std::map<const IO*, IO*> _events;
         std::vector<std::string> _server_names;
         std::vector<Location> _locations;
 };

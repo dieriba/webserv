@@ -11,16 +11,15 @@ class FileWriter
 {
     public:
 
-        /*SETTERS*/
-        void setFileExist(const bool&);
-
         /*GETTERS*/
         const size_t& getRequestBodySize(void) const;
         std::ofstream& getOutfile(void);
 
         /*Virtual Member Function*/
+        void erase_file(void);
+
         virtual int open_file(ClientSocketStream&) = 0;
-        virtual int open_file(ClientSocketStream&, std::string& filepath) = 0;
+        virtual int open_file(ClientSocketStream&, std::string&) = 0;
 
     protected:
         FileWriter();
@@ -30,6 +29,7 @@ class FileWriter
         virtual ~FileWriter();
 
         /*SETTERS*/
+        void setFilename(const std::string&);
         void updateSize(const size_t&);
 
         /*MEMBER FUNCTION*/
@@ -37,15 +37,16 @@ class FileWriter
         int handleMultipartData(ClientSocketStream&, HttpRequest&);
         int writeToFile(HttpRequest&);
         int writeToFile(HttpRequest&, const size_t&, const size_t&);
-        int writeToFileMutltipartData(HttpRequest&, const size_t&);
+        int writeToFileMutltipartData(ClientSocketStream&, const size_t&);
         void clearRequestBodySize(void);
         size_t _request_body_size;
         std::ofstream _outfile;
         static unsigned int _nb;
+        std::string _filename;
+        const char *_filename_c_str;
 
     private:
         short int _method;
-        bool _file_exists;
 };
 
 # endif
