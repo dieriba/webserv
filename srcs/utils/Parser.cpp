@@ -14,13 +14,13 @@ void    Parser::checkEndSemicolons(std::vector<std::string>& vec)
     if (vec.size() == 3)
     {
         if (vec.rbegin() -> length() != 1 || vec.rbegin() -> at(0) != ';')
-            throw ExceptionThrower(LAST_ARGS);
+            throwException(LAST_ARGS);
         if (vec[1].find(';') != std::string::npos)
-            throw ExceptionThrower(BAD_SYNTAX);
+            throwException(BAD_SYNTAX);
         return ;
     }
     if (UtilityMethod::count(vec[1], ';') > 1 || vec[1].at(vec[1].size() - 1) != ';')
-        throw ExceptionThrower(MISSING_SEMICOLONS);
+        throwException(MISSING_SEMICOLONS);
     vec[1].erase(vec[1].length() - 1);
 }
 
@@ -28,7 +28,7 @@ void    Parser::setCommonDirectives(std::vector<std::string>& vec, std::map<std:
 {
     checkEndSemicolons(vec);
     if (_map.find(vec[0]) != _map.end())
-        throw ExceptionThrower("Redeclaration of the same directive");
+        throwException("Redeclaration of the same directive");
 
     _map[vec[0]] = vec[1];
 }
@@ -128,32 +128,32 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
     std::map<std::string, std::string>::iterator end = _serv_conf.end();
     
     if (it == end)
-        throw ExceptionThrower("Missing \"listen\" Directive");
+        throwException("Missing \"listen\" Directive");
     
     if ((it -> second.find(':') != std::string::npos) && UtilityMethod::count(it -> second, ':') != 2)
-        throw ExceptionThrower(IP_FORMAT);
+        throwException(IP_FORMAT);
     
     vec = UtilityMethod::stringSpliter(it -> second, ":");
     
     if (vec.size() == 2 && ((vec[0].find_first_not_of(BASE_10".") != std::string::npos) || (vec[1].find_first_not_of(BASE_10";") != std::string::npos)))
-        throw ExceptionThrower(LISTEN_FORMAT);
+        throwException(LISTEN_FORMAT);
 
-    if (vec.size() > 2 || vec.size() == 0) throw ExceptionThrower(LISTEN_FORMAT);
+    if (vec.size() > 2 || vec.size() == 0) throwException(LISTEN_FORMAT);
     
     if (vec.size() == 1 && (vec[0].find_first_not_of(BASE_10) != std::string::npos))
-        throw ExceptionThrower(LISTEN_FORMAT);
+        throwException(LISTEN_FORMAT);
 
     if (vec.size() == 2)
     {
         if (!validIpFormat(vec[0]))
-            throw ExceptionThrower(IP_FORMAT);
+            throwException(IP_FORMAT);
         server.setIp(vec[0]);
     }
 
     ss << (vec.size() == 2 ? vec[1] : vec[0]);
     ss >> val;
 
-    if (ss.fail()) throw ExceptionThrower("PORT VALUE IS TOO HIGH");
+    if (ss.fail()) throwException("PORT VALUE IS TOO HIGH");
 
     server.setPort(val);
 
@@ -170,7 +170,7 @@ int    Parser::setAllowedMethods(HttpServer& instance, std::vector<std::string>&
         if (vec[i].size() == 0 && i == len) break ;
         int method = HttpServer::getHttpMethod(vec[i]);
         if (method < 0)
-            throw ExceptionThrower("Unknown HTTP Method");
+            throwException("Unknown HTTP Method");
         instance.setOptions(method, SET);
     }
     _serv_conf[vec[0]] = "HTTP METHODS";
@@ -182,6 +182,8 @@ void    Parser::checkOpeningLine(std::ifstream& file, std::string& line)
 {
     while (std::getline(file, line))
     {
+        _line_number++;
+
         line = UtilityMethod::trimBothEnd(line, WHITESPACES);
             
         if (line.size())
@@ -190,17 +192,17 @@ void    Parser::checkOpeningLine(std::ifstream& file, std::string& line)
                 break ;
                 
             if (line.size() == 1)
-                throw ExceptionThrower("Missing Opening Bracket");
+                throwException("Missing Opening Bracket");
                 
             if (UtilityMethod::count(line, '{') > 1)
-                throw ExceptionThrower("Too Many Opening Bracket");
+                throwException("Too Many Opening Bracket");
                 
             if (line.at(0) != '{')
-                throw ExceptionThrower("Opening Bracket Should Start The Line");
+                throwException("Opening Bracket Should Start The Line");
             line.erase(line.begin());
             break ;
         }
-        if (file.eof()) throw ExceptionThrower(WRONG_FILE_FORMAT);
+        if (file.eof()) throwException(WRONG_FILE_FORMAT);
     }
 }
 
@@ -209,15 +211,15 @@ void    Parser::SemicolonCheck(std::string& line, size_t i, size_t len)
     size_t  pos = line.find(';');
 
     if (i != len && pos != std::string::npos)
-        throw ExceptionThrower("BAD_SYNTAX");
+        throwException("BAD_SYNTAX");
             
     if (i == len)
     {
         if (UtilityMethod::count(line, ';') > 1)
-            throw ExceptionThrower("Too Many Semicolons");
+            throwException("Too Many Semicolons");
                 
         if (*(line.rbegin()) != ';')
-            throw ExceptionThrower("Missing Semicolons At end");
+            throwException("Missing Semicolons At end");
 
         line.erase(line.size() - 1);
     }
@@ -231,11 +233,11 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
     
     vec = UtilityMethod::stringSpliter(line, WHITESPACES);
     
-    if (vec.size() != 2 && vec.size() != 3)
-        throw ExceptionThrower("Too Many/Not Enough Arguments");
+    if (vec.size() < 2)
+        throwException("Missing Location Path");
 
     if (bracket && (vec.size() == 2 && vec[1].size() == 1))
-        throw ExceptionThrower("Missing Location Path");
+        throwException("Missing Location Path");
     
     if (bracket && vec.size() == 2)
         vec[1].erase(vec[1].length() - 1);
@@ -249,10 +251,12 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
         if (line.size() > 1) fillMap(line, _location, _map);
     }
 
-    if (file.eof()) throw ExceptionThrower(WRONG_FILE_FORMAT);
+    if (file.eof()) throwException(WRONG_FILE_FORMAT);
     
     while (std::getline(file, line))
     {
+        _line_number++;
+
         line = UtilityMethod::trimBothEnd(line, WHITESPACES);
 
         if (line.size())
@@ -263,10 +267,10 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
                     break ;
 
                 if (UtilityMethod::count(line, '}') > 1)
-                    throw ExceptionThrower("Too Many Closing Bracket");
+                    throwException("Too Many Closing Bracket");
                 
                 if (*(line.rbegin()) != '}')
-                    throw ExceptionThrower("Missing Closing Bracket");
+                    throwException("Missing Closing Bracket");
                 
                 line.erase(--line.end());
                 fillMap(line, _location, _map);
@@ -288,21 +292,21 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
 
 int Parser::setHeaderMap(HttpServer& instance, std::vector<std::string>& vec)
 {
-    if (vec.size() < 3) throw ExceptionThrower("Missing Key And/Or value");
+    if (vec.size() < 3) throwException("Missing Key And/Or value");
 
     const std::map<std::string, std::string>& headers = instance.getHeadersMap();
     
     if (headers.find(vec[1]) != headers.end())
-        throw ExceptionThrower("Redeclaration of same header");
+        throwException("Redeclaration of same header");
 
     std::string& last = *(vec.rbegin());
 
     if (*(last.rbegin()) != ';')
-        throw ExceptionThrower("Missing Semicolon At the End");
+        throwException("Missing Semicolon At the End");
     
     last.erase(last.size() - 1);
 
-    if (vec[2].size() == 0) throw ExceptionThrower("Missing Key Value");
+    if (vec[2].size() == 0) throwException("Missing Key Value");
 
     instance.pushNewHeaderDirective(vec[1], vec[2]);
 
@@ -317,13 +321,13 @@ int Parser::setCgiMap(HttpServer& instance, std::vector<std::string>& vec)
     std::string path;
         
     if (instance.getCgiPath(vec[1], path))
-        throw ExceptionThrower("CGI " + vec[1] + " already exists with path: " + vec[2]);
+        throwException("CGI " + vec[1] + " already exists with path: " + vec[2]);
 
     if (vec[1].find(';') != std::string::npos || (UtilityMethod::count(vec[2], ';') > 1))
-        throw ExceptionThrower("Bad Syntax");
+        throwException("Bad Syntax");
         
     if (*(vec.rbegin() -> rbegin()) != ';')
-        throw ExceptionThrower("Missing Semicolon At the End");
+        throwException("Missing Semicolon At the End");
     vec[2].erase(vec[2].size() - 1);
     instance.pushNewCGI(vec[1], vec[2]);
 
@@ -344,7 +348,7 @@ int    Parser::fillInstance(HttpServer& instance, std::vector<std::string>& vec,
     {
         checkEndSemicolons(vec);
         if (vec[1].compare("on") != 0 && vec[1].compare("off") != 0)
-            throw ExceptionThrower("auto_index possible value are either 'on' or 'off'");
+            throwException("auto_index possible value are either 'on' or 'off'");
         _map[vec[0]] = vec[1];
         return 1;
     }
@@ -359,13 +363,13 @@ void    Parser::fillMap(const std::string& line, Location& location, std::map<st
     vec = UtilityMethod::stringSpliter(line, WHITESPACES);
     
     if (!HttpServer::isKnownLocationDirectives(vec[0]))
-        throw ExceptionThrower("Directive " + vec[0] + " is unknown");
+        throwException("Directive " + vec[0] + " is unknown");
 
     if (vec.size() == 1)
-        throw ExceptionThrower(MISSING_TOO_MANY_KEY_VALUE);
+        throwException(MISSING_TOO_MANY_KEY_VALUE);
 
     if (vec.size() > 3 && (vec[0] != ALLOWED_METHOD && vec[0] != ERROR_PAGE && vec[0] != ADD_HEADER))
-        throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
+        throwException("Directives " + vec[0] + " Has Too Many Arguments");
     if (fillInstance(static_cast<HttpServer&>(location), vec, _map))
         return ;
     else
@@ -380,7 +384,7 @@ int    Parser::handleErrorPages(HttpServer& instance, std::vector<std::string>& 
         SemicolonCheck(vec[i], i, len);
     
     if ((vec.size() % 2 != 0) || vec.size() < 4)
-        throw ExceptionThrower("Missing root_error_page directory");
+        throwException("Missing root_error_page directory");
 
     std::string directory("." + vec[len--]);
 
@@ -393,13 +397,13 @@ int    Parser::handleErrorPages(HttpServer& instance, std::vector<std::string>& 
         number >> err;
 
         if (number.fail())
-            throw ExceptionThrower("Error value must is too high");
+            throwException("Error value must is too high");
 
         if (vec[i].find_first_not_of(BASE_10) != std::string::npos)
-            throw ExceptionThrower("Error status code must only contains number between 0-9");
+            throwException("Error status code must only contains number between 0-9");
             
         if (instance.addToErrorMap(err, vec[i + 1], directory) == -1)
-            throw ExceptionThrower("Cannot rewrite the same status code");
+            throwException("Cannot rewrite the same status code");
     }
 
     instance.setOptions(HttpServer::HTTP_SERVER_ERROR_PAGE_SET, SET);
@@ -420,16 +424,16 @@ void    Parser::fillMap(const std::string& line, Server& server, std::map<std::s
     */
 
     if (!HttpServer::isKnownDirective(vec[0]))
-        throw ExceptionThrower("Directive " + vec[0] + " is unknown");
+        throwException("Directive " + vec[0] + " is unknown");
 
     if (vec.size() == 1)
-        throw ExceptionThrower(MISSING_TOO_MANY_KEY_VALUE);
+        throwException(MISSING_TOO_MANY_KEY_VALUE);
 
     if (vec.size() > 3 && (vec[0] != SERVER_NAMES && vec[0] != ALLOWED_METHOD && vec[0] != ADD_HEADER && vec[0] != ERROR_PAGE))
-        throw ExceptionThrower("Directives " + vec[0] + " Has Too Many Arguments");
+        throwException("Directives " + vec[0] + " Has Too Many Arguments");
         
     if (vec.size() != 3 && vec[0] == CGI)
-        throw ExceptionThrower("CGI PATTERN MISSING: cgi 'extensions' 'path to exentions'");
+        throwException("CGI PATTERN MISSING: cgi 'extensions' 'path to exentions'");
 
     len = vec.size() - 1;
     
@@ -458,10 +462,13 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
             fillMap(line, server, _serv_conf);
     }
 
-    if (file.eof()) throw ExceptionThrower(WRONG_FILE_FORMAT); 
+    if (file.eof()) throwException(WRONG_FILE_FORMAT); 
     
     while (std::getline(file, line))
     {
+
+        _line_number++;
+
         line = UtilityMethod::trimBothEnd(line, WHITESPACES);
 
         if (line.size())
@@ -472,10 +479,10 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
                     break ;
 
                 if (UtilityMethod::count(line, '}') > 1)
-                    throw ExceptionThrower("Too Many Closing Bracket");
+                    throwException("Too Many Closing Bracket");
                 
                 if (*(line.rbegin()) != '}')
-                    throw ExceptionThrower("Missing Closing Bracket");
+                    throwException("Missing Closing Bracket");
                 
                 line.erase(--line.end());
                 fillMap(line, server, _serv_conf);
@@ -487,20 +494,20 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
             
             if ((pos = line.find(LOCATION)) != std::string::npos)
             {
-                if (pos != 0) throw ExceptionThrower("Unkown Context");
+                if (pos != 0) throwException("Unkown Context");
                     
                 pos = line.find('{');
                 
                 if (UtilityMethod::count(line, '{') > 1)
-                    throw ExceptionThrower("Too Many Opening Bracket");
+                    throwException("Too Many Opening Bracket");
                 
                 if ((pos != std::string::npos) && *(line.rbegin()) != '{')
-                    throw ExceptionThrower("Opening Bracket Must Be At The End Of The Line");
+                    throwException("Opening Bracket Must Be At The End Of The Line");
                 
                 server.pushNewLocation(fillUpLocation(&server, file, line, pos != std::string::npos));
 
                 if (line.find("}") == std::string::npos)
-                    throw ExceptionThrower("Missing End Bracket");
+                    throwException("Missing End Bracket");
             }
             else
                 fillMap(line, server, _serv_conf);
@@ -536,9 +543,16 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
     return server;
 }
 
-/*----------------------------------------MEMBER FUNCTION-----line.find('{') != std::string::npos-----------------------------------*/
+/*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+void Parser::throwException(const std::string& error) const
+{
+    throw ExceptionThrower("Line " + UtilityMethod::numberToString(_line_number) + ": " + error);
+}
+
 std::vector<Server> Parser::getServerConfig(std::ifstream& file, HttpServer *http_server)
 {
+    _line_number = 0;
     std::string line;
     Server serv;
     std::vector<Server> server;
@@ -549,11 +563,13 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, HttpServer *htt
     while (std::getline(file, line))
     {
         line = UtilityMethod::trimBothEnd(line, WHITESPACES);
+        
+        _line_number++;
 
         if (line.size())
         {
             if (line.find('}') != std::string::npos)
-                    throw ExceptionThrower("BAD_SYNTAX");
+                throwException("BAD_SYNTAX");
             
             if (line.find(SERVER_CONTEXT) == 0)
             {
@@ -561,15 +577,15 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, HttpServer *htt
                 
                 if ((pos == std::string::npos && line.size() != UtilityMethod::myStrlen(SERVER_CONTEXT))
                     || (pos != std::string::npos && (UtilityMethod::myStrlen(SERVER_CONTEXT) != pos)))
-                    throw ExceptionThrower("Unknow Context: " + line + " please refer to dieriba for the known context");
+                    throwException("Unknow Context: " + line + " please refer to dieriba for the known context");
 
                 if (UtilityMethod::count(line, '{') > 1)
-                    throw ExceptionThrower("Too Many Opening Bracket");
+                    throwException("Too Many Opening Bracket");
 
                 pos = line.find('{');
 
                 if ((pos != std::string::npos) && *line.rbegin() != '{')
-                    throw ExceptionThrower("Opening Bracket Must Be At The End Of The Line");
+                    throwException("Opening Bracket Must Be At The End Of The Line");
                 
                 serv = fillServer(file, line, (pos != std::string::npos));
                 
@@ -580,10 +596,10 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, HttpServer *htt
                 server.push_back(serv);
 
                 if (line.find("}") == std::string::npos)
-                    throw ExceptionThrower("Missing End Bracket Here");
+                    throwException("Missing End Bracket Here");
             }
             else
-                throw ExceptionThrower("Unknow Context: " + line + " please refer to dieriba for the known context");
+                throwException("Unknow Context: " + line + " please refer to dieriba for the known context");
         }
 
         if (file.eof()) break ;

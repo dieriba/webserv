@@ -25,6 +25,8 @@
 
 */
 
+# define CONFIG_OPTION "-t"
+
 # define DEFAULT_ERROR_PAGE_VALUE 0
 # define DEFAULT_FILE_NAME "/ressource_"
 # define WELCOME_COOKIES "Welcome_Cookie="

@@ -18,7 +18,6 @@ class Parser
     private:
 
         /*MEMBER FUNC*/
-
         Parser& operator=(const Parser&);
         Location fillUpLocation(Server *, std::ifstream&, std::string&, bool);
         Server fillServer(std::ifstream&, std::string&, bool);
@@ -36,6 +35,10 @@ class Parser
         void    feedingUpServer(std::map<std::string, std::string>&, Server&);
         void    feedingUpInstance(std::map<std::string, std::string>&, HttpServer&);
         void    setCommonDirectives(std::vector<std::string>&, std::map<std::string, std::string>&);
+        void    throwException(const std::string&) const;
+
+        /*VARIABLES*/
+        uint32_t _line_number;
 };
 
 #endif
