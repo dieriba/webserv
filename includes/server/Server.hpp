@@ -38,6 +38,7 @@ class Server: public HttpServer
         void    setInstance(HttpServer*);
 
         /*MEMBER FUNCTION*/
+        void makeLocationInherits(void);
         void addToEventsMap(IO*);
         void deleteFromEventsMap(IO&);
         std::string launchServer(void);

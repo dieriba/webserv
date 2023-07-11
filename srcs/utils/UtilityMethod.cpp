@@ -234,9 +234,8 @@ std::string UtilityMethod::remove_dup(std::string& ressource)
     }
 
     for ( ; i < vec.size(); i++)
-    {
         path += "/" + vec[i];
-    }
+
     return path;
 }
 

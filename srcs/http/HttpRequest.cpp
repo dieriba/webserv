@@ -146,11 +146,20 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
     
     if (header[2] != HTTP_VERSION) return BAD_REQUEST;
 
-    server -> setInstance((HttpServer *)RequestChecker::serverOrLocation(*server, (*this)));
+    bool location = false;
+
+    server -> setInstance((HttpServer *)RequestChecker::serverOrLocation(*server, (*this), location));
 
     HttpServer& instance = *(server -> getInstance());
 
-    std::string full_path = instance.getRootDir() + _headers[PATH];
+    std::string full_path;
+    
+    if (location == true && instance.checkBits(HttpServer::HTTP_SERVER_ALIAS))
+        full_path = instance.getRootDir() + &_headers[PATH][instance.getIndexPath().size()];
+    else
+        full_path = instance.getRootDir() + _headers[PATH];
+
+    std::cout << "Full path: " << full_path << std::endl;
 
     int directory = UtilityMethod::is_a_directory(full_path.c_str());
 

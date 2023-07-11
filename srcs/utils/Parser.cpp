@@ -81,6 +81,18 @@ void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, Http
         instance.setFullIndexPath(instance.getRootDir() + instance.getIndexPath());
     }
 
+    std::map<std::string, std::string>::iterator it_alias = _map.find(ALIAS);
+
+    if (it_alias != end)
+    {
+        if (it != end) throw ExceptionThrower("Either choose alias directive or root but not both");
+
+        instance.setOptions(HttpServer::HTTP_SERVER_ALIAS, SET);
+        instance.setRootDir(UtilityMethod::rtrim("." + it_alias -> second, "/"));
+        instance.setFullIndexPath(instance.getRootDir() + instance.getIndexPath());
+    }
+
+
     it = _map.find(ALLOWED_METHOD);
 
     if (it == end) instance.getOption() |= HttpServer::_all_methods;
@@ -242,7 +254,12 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
     if (bracket && vec.size() == 2)
         vec[1].erase(vec[1].length() - 1);
 
+
     _location.setIndexPath(UtilityMethod::rtrim(vec[1], "/"));
+
+    if (_loc.find(_location.getIndexPath()) != _loc.end()) throw ExceptionThrower("Location: " + _location.getIndexPath() +  " subpath already exist");
+
+    _loc[_location.getIndexPath()];
 
     if (!bracket)
     {
@@ -518,28 +535,9 @@ Server Parser::fillServer(std::ifstream& file, std::string& line, bool bracket)
 
     feedingUpServer(_serv_conf, server);
     
-    std::vector<Location>& serv_locations(server.getLocations());
-
-    bool header = server.checkBits(HttpServer::HTTP_SERVER_CUSTOM_HEADER);
-    std::map<std::string, std::string>& _map = server.getHeadersMap();
-    for (size_t i = 0; i < serv_locations.size(); i++)
-    {
-        if (serv_locations[i].getRootDir().size() == 0)
-            serv_locations[i].setRootDir(server.getRootDir());
-        
-        if (header == true && serv_locations[i].checkBits(HttpServer::HTTP_SERVER_CUSTOM_HEADER) == 0)
-        {
-            serv_locations[i].setOptions(HttpServer::HTTP_SERVER_CUSTOM_HEADER, SET);
-            std::map<std::string, std::string>::const_iterator it = _map.begin();
-            std::map<std::string, std::string>& _location_map = serv_locations[i].getHeadersMap();
-            for (; it != _map.end(); it++)
-            {
-                if (_location_map.find(it -> first) == _location_map.end())
-                    _location_map[it -> first] = it -> second;
-            }
-        }
-    }
+    server.makeLocationInherits();
     
+    _loc.clear();
     return server;
 }
 
@@ -553,6 +551,7 @@ void Parser::throwException(const std::string& error) const
 std::vector<Server> Parser::getServerConfig(std::ifstream& file, HttpServer *http_server)
 {
     _line_number = 0;
+    bool file_read_data = false;
     std::string line;
     Server serv;
     std::vector<Server> server;
@@ -568,6 +567,8 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, HttpServer *htt
 
         if (line.size())
         {
+            file_read_data = true;
+
             if (line.find('}') != std::string::npos)
                 throwException("BAD_SYNTAX");
             
@@ -605,6 +606,8 @@ std::vector<Server> Parser::getServerConfig(std::ifstream& file, HttpServer *htt
         if (file.eof()) break ;
         
     }
+
+    if (file_read_data == false) throw ExceptionThrower("File is empty");
 
     return server;
 }

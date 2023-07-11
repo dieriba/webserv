@@ -185,6 +185,7 @@
 # define UPLOAD_FILE_FOLDERS "uploads_folder"
 # define FILE_UPLOAD "file_upload"
 # define DEFAULT_SERVER "default_server"
+# define ALIAS "alias"
 /*
 
 */

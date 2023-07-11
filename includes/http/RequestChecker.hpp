@@ -15,7 +15,7 @@ class RequestChecker
         typedef int (*Checker)(const HttpServer&, HttpRequest&);
 
         /*STATIC FUNCTION*/
-        static const HttpServer* serverOrLocation(const Server&, const HttpRequest&);
+        static const HttpServer* serverOrLocation(const Server&, const HttpRequest&, bool&);
         static int checkAllowedMethod(const HttpServer&, HttpRequest&);
         static int checkBodySize(const HttpServer&, HttpRequest&);
         static int checkAll(ClientSocketStream&, HttpRequest&);

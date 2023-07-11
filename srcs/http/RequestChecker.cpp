@@ -21,15 +21,18 @@
 
 /*----------------------------------------STATIC FUNCTION----------------------------------------*/
 
-const HttpServer *RequestChecker::serverOrLocation(const Server& server, const HttpRequest& req)
+const HttpServer *RequestChecker::serverOrLocation(const Server& server, const HttpRequest& req, bool& location)
 {
     std::string path = req.getHeaders().find(PATH) -> second;
     const std::vector<Location>& locations = server.getLocations();
 
     for (size_t i = 0; i < locations.size(); i++)
     {
-        if ((path.size() == 1 && locations[i].getIndexPath() == path) || path.find(locations[i].getIndexPath()) == 0)
+        if ((locations[i].getIndexPath() == path) || path.find(locations[i].getIndexPath()) == 0)
+        {
+            location = true;
             return &locations[i];
+        }
     }
 
     return &server;

@@ -39,6 +39,7 @@ class Parser
 
         /*VARIABLES*/
         uint32_t _line_number;
+        std::map<std::string, bool> _loc;
 };
 
 #endif

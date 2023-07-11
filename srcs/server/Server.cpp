@@ -109,6 +109,32 @@ void Server::setHttpServer(HttpServer *tcp_server)
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+void    Server::makeLocationInherits(void)
+{
+    std::vector<Location>& serv_locations(getLocations());
+
+    bool header = checkBits(HttpServer::HTTP_SERVER_CUSTOM_HEADER);
+    std::map<std::string, std::string>& _map = getHeadersMap();
+    for (size_t i = 0; i < serv_locations.size(); i++)
+    {
+        if (serv_locations[i].getRootDir().size() == 0)
+            serv_locations[i].setRootDir(getRootDir());
+        
+        if (header == true && serv_locations[i].checkBits(HttpServer::HTTP_SERVER_CUSTOM_HEADER) == 0)
+        {
+            serv_locations[i].setOptions(HttpServer::HTTP_SERVER_CUSTOM_HEADER, SET);
+            std::map<std::string, std::string>::const_iterator it = _map.begin();
+            std::map<std::string, std::string>& _location_map = serv_locations[i].getHeadersMap();
+            for (; it != _map.end(); it++)
+            {
+                if (_location_map.find(it -> first) == _location_map.end())
+                    _location_map[it -> first] = it -> second;
+            }
+        }
+    }
+}
+
 std::string Server::launchServer(void)
 {
     int option = 1;

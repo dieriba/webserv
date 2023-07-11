@@ -144,6 +144,8 @@ void HttpServer::settingUpServer(const char *filename)
 
     if (file.is_open() == false) throw ExceptionThrower("Failled to open file");
     
+    if (file.peek() == std::ifstream::traits_type::eof()) throw ExceptionThrower("File is empty");
+
     _servers = Parser::getServerConfig(file, this);
     
     HttpServer::setUpServerNameToServerMap(_servers);
@@ -303,38 +305,40 @@ bool HttpServer::isKnownLocationDirectives(const std::string& directive)
 
 void HttpServer::initknownLocationsDirectives(void)
 {
-    _knownLocationsDirectives[AUTO_INDEX] = true;
-    _knownLocationsDirectives[ADD_HEADER]= true;
-    _knownLocationsDirectives[ROOT] = true;
-    _knownLocationsDirectives[ALLOWED_METHOD] = true;
-    _knownLocationsDirectives[INDEX] = true;
-    _knownLocationsDirectives[REDIRECT] = true;
-    _knownLocationsDirectives[ERROR_PAGE] = true;
-    _knownLocationsDirectives[CLIENT_BODY] = true;
-    _knownLocationsDirectives[LOCATION] = true;
-    _knownLocationsDirectives[ROOT_ERROR_PAGE] = true;
-    _knownDirectives[UPLOAD_FILE_FOLDERS] = true;
-    _knownDirectives[FILE_UPLOAD] = true;
+    _knownLocationsDirectives[AUTO_INDEX];
+    _knownLocationsDirectives[ADD_HEADER];
+    _knownLocationsDirectives[ALIAS];
+    _knownLocationsDirectives[ROOT];
+    _knownLocationsDirectives[ALLOWED_METHOD];
+    _knownLocationsDirectives[INDEX];
+    _knownLocationsDirectives[REDIRECT];
+    _knownLocationsDirectives[ERROR_PAGE];
+    _knownLocationsDirectives[CLIENT_BODY];
+    _knownLocationsDirectives[LOCATION];
+    _knownLocationsDirectives[ROOT_ERROR_PAGE];
+    _knownDirectives[UPLOAD_FILE_FOLDERS];
+    _knownDirectives[FILE_UPLOAD];
 }   
 
 void HttpServer::initKnownDirectives(void)
 {
-    _knownDirectives[AUTO_INDEX] = true;
-    _knownDirectives[ADD_HEADER] = true;
-    _knownDirectives[ROOT_ERROR_PAGE] = true;
-    _knownDirectives[LISTEN] = true;
-    _knownDirectives[SERVER_NAMES] = true;
-    _knownDirectives[ROOT] = true;
-    _knownDirectives[ALLOWED_METHOD] = true;
-    _knownDirectives[INDEX] = true;
-    _knownDirectives[CLIENT_BODY] = true;
-    _knownDirectives[LOCATION] = true;
-    _knownDirectives[ERROR_PAGE] = true;
-    _knownDirectives[REDIRECT] = true;
-    _knownDirectives[CGI] = true;
-    _knownDirectives[ROOT_ERROR_PAGE] = true;
-    _knownDirectives[UPLOAD_FILE_FOLDERS] = true;
-    _knownDirectives[FILE_UPLOAD] = true;
+    _knownDirectives[AUTO_INDEX];
+    _knownDirectives[ALIAS];
+    _knownDirectives[ADD_HEADER];
+    _knownDirectives[ROOT_ERROR_PAGE];
+    _knownDirectives[LISTEN];
+    _knownDirectives[SERVER_NAMES];
+    _knownDirectives[ROOT];
+    _knownDirectives[ALLOWED_METHOD];
+    _knownDirectives[INDEX];
+    _knownDirectives[CLIENT_BODY];
+    _knownDirectives[LOCATION];
+    _knownDirectives[ERROR_PAGE];
+    _knownDirectives[REDIRECT];
+    _knownDirectives[CGI];
+    _knownDirectives[ROOT_ERROR_PAGE];
+    _knownDirectives[UPLOAD_FILE_FOLDERS];
+    _knownDirectives[FILE_UPLOAD];
 }
 
 void HttpServer::initHttpResponses(void)

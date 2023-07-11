@@ -103,12 +103,12 @@ void    init_static_data(void)
 {
     RequestChecker::tab.reserve(10);
     RequestChecker::tab.push_back(RequestChecker::checkHeader);
+    RequestChecker::tab.push_back(RequestChecker::checkAllowedMethod);
+    RequestChecker::tab.push_back(RequestChecker::checkBodySize);
     RequestChecker::tab.push_back(RequestChecker::checkGetHeadMethod);
     RequestChecker::tab.push_back(RequestChecker::checkPostPutMethod);
     RequestChecker::tab.push_back(RequestChecker::checkOptionsMethod);
     RequestChecker::tab.push_back(RequestChecker::checkDeleteMethod);
-    RequestChecker::tab.push_back(RequestChecker::checkAllowedMethod);
-    RequestChecker::tab.push_back(RequestChecker::checkBodySize);
     HttpServer::initMimeTypes();
     HttpServer::initHttpResponses();
     HttpServer::initHttpMethods();
