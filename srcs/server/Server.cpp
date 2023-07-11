@@ -116,11 +116,15 @@ void    Server::makeLocationInherits(void)
 
     bool header = checkBits(HttpServer::HTTP_SERVER_CUSTOM_HEADER);
     std::map<std::string, std::string>& _map = getHeadersMap();
+
     for (size_t i = 0; i < serv_locations.size(); i++)
     {
         if (serv_locations[i].getRootDir().size() == 0)
             serv_locations[i].setRootDir(getRootDir());
         
+        if (serv_locations[i].checkBits(HttpServer::HTTP_SERVER_METHOD_NOT_SET))
+            serv_locations[i].getOption() |= _all_available_method_allowed;
+
         if (header == true && serv_locations[i].checkBits(HttpServer::HTTP_SERVER_CUSTOM_HEADER) == 0)
         {
             serv_locations[i].setOptions(HttpServer::HTTP_SERVER_CUSTOM_HEADER, SET);

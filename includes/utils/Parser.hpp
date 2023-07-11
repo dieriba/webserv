@@ -33,7 +33,7 @@ class Parser
         void    checkOpeningLine(std::ifstream&, std::string&);
         void    checkEndSemicolons(std::vector<std::string>&);
         void    feedingUpServer(std::map<std::string, std::string>&, Server&);
-        void    feedingUpInstance(std::map<std::string, std::string>&, HttpServer&);
+        void    feedingUpInstance(std::map<std::string, std::string>&, HttpServer&, const bool&);
         void    setCommonDirectives(std::vector<std::string>&, std::map<std::string, std::string>&);
         void    throwException(const std::string&) const;
 

@@ -25,17 +25,23 @@ void    print_header_map(const HttpServer& instance)
         std::cout << "Custom_header:  Key: " << it -> first << ", Value: " << it -> second << std::endl;
 }
 
+void    print_allowed_method(const HttpServer& instance)
+{   
+    for (std::map<std::string, short int>::const_iterator it = HttpServer::_httpMethods.begin(); it != HttpServer::_httpMethods.end(); it++)
+    {
+        std::cout << "Method: " << it -> first << (instance.checkBits(it -> second) > 0 ? " Enabled" : " Disabled") << std::endl;
+    }
+}
+
 void    print_location_config(const Location& location)
 {
     std::map<std::string, std::string> map(location.getCgiMap());
     std::map<std::string, std::string>::iterator m_it = map.begin();
     std::map<std::string, std::string>::iterator m_end = map.end();
     std::cout << std::endl << std::endl ;
-    std::cout << "----------Location----------";
-    std::cout << std::endl << std::endl
-        << "METHOD GET: " << (location.checkBits(HttpServer::HTTP_SERVER_GET) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD POST: " << (location.checkBits(HttpServer::HTTP_SERVER_POST) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD DELETE: " << (location.checkBits(HttpServer::HTTP_SERVER_DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
+    std::cout << "----------Location----------" << std::endl;
+    print_allowed_method(location);
+    std::cout << std::endl
         << "Client Max Body Size: " << location.getBodySize() << std::endl
         << "Index HTML: " << (location.getIndex().size() > 0 ? location.getIndex() : "No root index") << std::endl
         << "Sub Path: " << location.getIndexPath() << std::endl
@@ -66,10 +72,8 @@ void    print_server_config(const Server& server)
     std::map<std::string, std::string> map(server.getCgiMap());
     std::map<std::string, std::string>::iterator m_it = map.begin();
     std::map<std::string, std::string>::iterator m_end = map.end();
+    print_allowed_method(server);
     std::cout
-        << "METHOD GET: " << (server.checkBits(HttpServer::HTTP_SERVER_GET) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD POST: " << (server.checkBits(HttpServer::HTTP_SERVER_POST) > 0 ? "Enabled" : "Disabled") << std::endl
-        << "METHOD DELETE: " << (server.checkBits(HttpServer::HTTP_SERVER_DELETE) > 0 ? "Enabled" : "Disabled") << std::endl << std::endl
         << "IP: " << (server.getIp().size() > 0 ? server.getIp() : "NO IP SET") << std::endl
         << "Redirect: " << (server.getRedirect().size() > 0 ? server.getRedirect(): "No redirection") << std::endl
         << "PORT: " << server.getPort() << std::endl

@@ -8,12 +8,12 @@
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 HttpServer::HttpServer():BitsManipulation(),_body_size(0),
-            _index(""),_root_dir(""),_redirect(""),_epoll_ws(-1){};
+            _index(""),_root_dir(""),_redirect(""),_all_available_method_allowed(0),_epoll_ws(-1){};
 
 HttpServer::HttpServer(const HttpServer& rhs)
     :Parser(rhs),BitsManipulation(rhs),_body_size(rhs._body_size),_index(rhs._index),
     _root_dir(rhs._root_dir),_redirect(rhs._redirect),_index_path(rhs._index_path),_upload_file_folders(rhs._upload_file_folders)
-    ,_error_pages(rhs._error_pages),_cgi(rhs._cgi),_headers(rhs._headers),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
+    ,_error_pages(rhs._error_pages),_cgi(rhs._cgi),_headers(rhs._headers),_all_available_method_allowed(rhs._all_available_method_allowed),_epoll_ws(rhs._epoll_ws),_servers(rhs._servers){};
 
 HttpServer& HttpServer::operator=(const HttpServer& rhs)
 {
@@ -25,6 +25,7 @@ HttpServer& HttpServer::operator=(const HttpServer& rhs)
     _index = rhs._index;
     _headers = rhs._headers;
     _cgi = rhs._cgi;
+    _all_available_method_allowed = rhs._all_available_method_allowed;
     _root_dir = rhs._root_dir;
     _redirect = rhs._redirect;
     _epoll_ws = rhs._epoll_ws;
@@ -54,7 +55,7 @@ const std::string& HttpServer::getIndexPath(void) const {return _index_path;};
 const std::string& HttpServer::getFullIndexPath(void) const {return _full_index_path;};
 const std::string& HttpServer::getRedirect(void) const {return _redirect;};
 const std::string& HttpServer::getUploadsFilesFolder(void) const {return _upload_file_folders;}
-
+const uint32_t& HttpServer::getAllAvailableMethod(void) const { return _all_available_method_allowed ;}
 bool HttpServer::getCgiPath(const std::string& key, std::string& path)
 {
     it_map it = _cgi.find(key);
@@ -130,6 +131,12 @@ void    HttpServer::pushNewCGI(const std::string& key, const std::string& value)
 {
     _cgi[key] = value;
 }
+
+void    HttpServer::setAllAvailableMethod(const size_t& option)
+{
+    bitset(_all_available_method_allowed, option);
+}
+
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/

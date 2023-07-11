@@ -26,14 +26,27 @@ const HttpServer *RequestChecker::serverOrLocation(const Server& server, const H
     std::string path = req.getHeaders().find(PATH) -> second;
     const std::vector<Location>& locations = server.getLocations();
 
+    size_t size_sub_path = 0;
+    const Location* location_address = NULL;
+
     for (size_t i = 0; i < locations.size(); i++)
     {
-        if ((locations[i].getIndexPath() == path) || path.find(locations[i].getIndexPath()) == 0)
+        if ((locations[i].getIndexPath() == path))
         {
             location = true;
             return &locations[i];
         }
+        else if (path.find(locations[i].getIndexPath()) == 0)
+        {
+            if (locations[i].getIndexPath().size() > size_sub_path)
+            {
+                location_address = &locations[i];
+                size_sub_path = locations[i].getIndexPath().size();
+            }
+        }
     }
+
+    if (location_address) return location_address;
 
     return &server;
 }

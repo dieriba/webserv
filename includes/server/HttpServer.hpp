@@ -33,10 +33,12 @@ class HttpServer: public Parser, public BitsManipulation
             HTTP_SERVER_AUTO_INDEX_,
             HTTP_SERVER_FILE_UPLOAD_,
             HTTP_SERVER_CUSTOM_HEADER,
-            HTTP_SERVER_ALIAS
+            HTTP_SERVER_ALIAS,
+            HTTP_SERVER_METHOD_NOT_SET
         };
 
         /*GETTERS*/
+        const uint32_t& getAllAvailableMethod(void) const;
         bool getCgiPath(const std::string&, std::string&);
         std::vector<Server> getServers(void) const;
         const size_t& getBodySize(void) const;
@@ -56,6 +58,7 @@ class HttpServer: public Parser, public BitsManipulation
 
         /*SETTERS*/
         int addToErrorMap(const short int&, std::string&, const std::string&);
+        void setAllAvailableMethod(const size_t&);
         void pushNewServer(const Server&);
         void setBodySize(const size_t&);
         void setIndex(const std::string&);
@@ -108,6 +111,7 @@ class HttpServer: public Parser, public BitsManipulation
         std::map<short int, std::string> _error_pages;
         std::map<std::string, std::string> _cgi;
         std::map<std::string, std::string> _headers;
+        uint32_t _all_available_method_allowed;
 
     private:
         int _epoll_ws;

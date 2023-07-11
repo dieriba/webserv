@@ -61,7 +61,7 @@ bool    Parser::validIpFormat(const std::string& ip)
     return true;
 }
 
-void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, HttpServer& instance)
+void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, HttpServer& instance, const bool& location)
 {
     std::stringstream ss;
 
@@ -95,7 +95,13 @@ void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, Http
 
     it = _map.find(ALLOWED_METHOD);
 
-    if (it == end) instance.getOption() |= HttpServer::_all_methods;
+    if (it == end)
+    {
+        if (location)
+            instance.setOptions(HttpServer::HTTP_SERVER_METHOD_NOT_SET, SET);
+        else
+            instance.getOption() |= HttpServer::_all_methods;
+    }
 
     it = _map.find(CLIENT_BODY);
 
@@ -169,7 +175,7 @@ void    Parser::feedingUpServer(std::map<std::string, std::string>& _serv_conf, 
 
     server.setPort(val);
 
-    feedingUpInstance(_serv_conf, static_cast<HttpServer&>(server));
+    feedingUpInstance(_serv_conf, static_cast<HttpServer&>(server), false);
 }
 
 int    Parser::setAllowedMethods(HttpServer& instance, std::vector<std::string>& vec, std::map<std::string, std::string>& _serv_conf)
@@ -183,6 +189,7 @@ int    Parser::setAllowedMethods(HttpServer& instance, std::vector<std::string>&
         int method = HttpServer::getHttpMethod(vec[i]);
         if (method < 0)
             throwException("Unknown HTTP Method");
+        instance.setAllAvailableMethod(method);
         instance.setOptions(method, SET);
     }
     _serv_conf[vec[0]] = "HTTP METHODS";
@@ -301,7 +308,7 @@ Location Parser::fillUpLocation(Server *server, std::ifstream& file, std::string
         if (file.eof()) break ;
     }
 
-    feedingUpInstance(_map, static_cast<HttpServer&>(_location));
+    feedingUpInstance(_map, static_cast<HttpServer&>(_location), true);
 
     _location.setServer(server);
     return _location;
