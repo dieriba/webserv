@@ -36,10 +36,10 @@ class Parser
         void    feedingUpInstance(std::map<std::string, std::string>&, HttpServer&, const bool&);
         void    setCommonDirectives(std::vector<std::string>&, std::map<std::string, std::string>&);
         void    throwException(const std::string&) const;
+        static std::map<std::string, bool> _loc;
 
         /*VARIABLES*/
         uint32_t _line_number;
-        std::map<std::string, bool> _loc;
 };
 
 #endif

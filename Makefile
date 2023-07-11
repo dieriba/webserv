@@ -8,7 +8,8 @@ SRCS_UTILS	= ./srcs/utils/ExceptionThrower.cpp \
               ./srcs/utils/UtilityMethod.cpp \
               ./srcs/utils/Parser.cpp \
               ./srcs/utils/BitsManipulation.cpp \
-              ./srcs/utils/FileWriter.cpp
+              ./srcs/utils/FileWriter.cpp \
+              ./srcs/utils/Checker.cpp
 
 SRCS_IO     = ./srcs/IO/IO.cpp \
               ./srcs/IO/ServerStream.cpp \

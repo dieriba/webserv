@@ -1,4 +1,5 @@
 # include "./includes/utils/CommonLib.hpp"
+# include "./includes/utils/Checker.hpp"
 # include "./includes/server/HttpServer.hpp"
 # include "./includes/server/Server.hpp"
 # include "./includes/utils/ExceptionThrower.hpp"
@@ -131,9 +132,18 @@ int main (int argc, char **argv)
 {
     try
     {
+        if (argc > 3) throw ExceptionThrower("Usage: ./webserv [config-file] [option]");
+
+        init_static_data();
+        
+        if (std::strcmp(argv[argc - 1], CONFIG_OPTION) == 0)
+        {
+            const char *filename = argc == 2 ? NULL : argv[1]; 
+            return Checker::checkConfigFile(filename);
+        }
+
         signal(SIGINT, HttpServer::switch_off_signal);
         signal(SIGPIPE, SIG_IGN);
-        init_static_data();
         HttpServer http_server;
         http_server.settingUpServer(argc > 1 ? argv[1] : NULL);
         http_server.runningUpServer();
