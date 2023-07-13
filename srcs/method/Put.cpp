@@ -31,7 +31,7 @@ int Put::open_file(ClientSocketStream& client)
 {
     std::map<std::string, std::string>& headers = client.getRequest().getHeaders();
     std::string& path = headers.find(PATH) -> second; 
-    std::string fileExtenstion = UtilityMethod::getFileExtension(headers.find(CONTENT_TYP) -> second, 0);
+    std::string fileExtenstion = UtilityMethod::getFileExtension(headers.find(CONTENT_TYP) -> second, false);
     std::string filepath(headers.find(FULLPATH) -> second);
     
     /*ADD THIS INTO A TRY CATCH BLOCK*/

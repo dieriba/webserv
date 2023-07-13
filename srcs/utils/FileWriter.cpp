@@ -39,6 +39,11 @@ void FileWriter::setFilename(const std::string& filename)
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+void FileWriter::clearAndUpdateRequestBodySize(const size_t& request_size)
+{
+    _request_body_size = request_size;
+}
+
 void FileWriter::erase_file(void)
 {
     if (_filename_c_str == NULL) return;
@@ -152,7 +157,10 @@ int FileWriter::writeToFileMutltipartData(ClientSocketStream& client, const size
         _outfile.close();
         erase_file();
         if (client.getPrevBodySize() != client.getRequest().getBodySize())
+        {
             client.setOptions(IO::IO_SOCKET_NOT_FINISH, SET);
+            client.setOptions(IO::IO_CONTENT_LEN, SET);
+        }
         clearRequestBodySize();
         return INTERNAL_SERVER_ERROR;
     }
@@ -194,22 +202,34 @@ int FileWriter::writeToFile(HttpRequest& req)
 
     try
     {
-
         if (access(_filename_c_str, F_OK) != 0)
             throw std::runtime_error("An error occurred while trying reaching for the file located at: " + _filename);
 
-        _outfile.write(alias.data(), alias.size());
-        updateSize(alias.size());
+        size_t len = alias.size();
+
+        if (len + getRequestBodySize() > req.getBodySize())
+        {
+            req.setOptions(HttpRequest::HTTP_REQUEST_SAVE_STRING, SET);
+            req.setRequestSize(len + getRequestBodySize() - req.getBodySize());  
+            len = req.getBodySize() - getRequestBodySize();
+        }
+
+        _outfile.write(alias.data(), len);
+
+        if (_outfile.fail())
+            throw std::runtime_error("An error occurred while writing into the file located at: " + _filename);
+
+        updateSize(len);
         
         if (getRequestBodySize() >= req.getBodySize())
         {
-            std::cout << _request_body_size << std::endl;
+            std::cout << "Request body: " << _request_body_size << std::endl;
             req.setOptions(HttpRequest::HTTP_REQUEST_FINISH_BODY, SET);
             clearRequestBodySize();
             _outfile.close();
         }
 
-        alias.clear();
+        if (req.checkBits(HttpRequest::HTTP_REQUEST_SAVE_STRING) == 0) alias.clear();
     }
     catch(const std::exception& e)
     {
@@ -279,9 +299,11 @@ int FileWriter::handleMultipartData(ClientSocketStream& client, HttpRequest& req
                 vector_filename[1].erase(vector_filename[1].size() - 1);
                 vector_filename[1].erase(vector_filename[1].begin());
                 
-                if (UtilityMethod::getFileExtension(vector_filename[1] ,1) != UtilityMethod::getFileExtension(vec_content_type[1] ,0))
+                if (UtilityMethod::getFileExtension(vector_filename[1] , true) != UtilityMethod::getFileExtension(vec_content_type[1] , false))
                 {
-                    if (client.getPrevBodySize() != req.getBodySize()) client.setOptions(IO::IO_SOCKET_NOT_FINISH, SET);
+                    if (client.getPrevBodySize() != req.getBodySize())
+                        client.setOptions(IO::IO_SOCKET_NOT_FINISH, SET);
+                    client.setOptions(IO::IO_CONTENT_LEN, SET);
                     return BAD_REQUEST;
                 }
                 

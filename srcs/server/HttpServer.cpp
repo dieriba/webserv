@@ -214,8 +214,8 @@ void HttpServer::runningUpServer(void)
         
         event.data.ptr = new ServerStream(_servers[i].getServSocket(), &_servers[i]);
 
-        _servers[i].addToEventsMap(static_cast<IO*>(event.data.ptr));
-        
+        _servers[i].setServerStream(static_cast<IO*>(event.data.ptr));
+
         if (epoll_ctl(_epoll_ws, EPOLL_CTL_ADD, _servers[i].getServSocket(), &event) == -1)
             throw ExceptionThrower("Failled To Add Socket To EPOLL WATCHERS FD");
         
@@ -224,13 +224,29 @@ void HttpServer::runningUpServer(void)
 
 }
 
+void HttpServer::clearOutTimedClient(void)
+{
+    for (size_t i = 0; i < _servers.size(); i++)
+    {
+        std::map<const IO*, IO*> _events = _servers[i].getEventsMap();
+        
+        for (std::map<const IO*, IO*>::iterator it = _events.begin(); it != _events.end(); it++)
+        {
+            IO* client = it -> second;
+            
+            if (client -> getEvents() != EPOLLIN || (client -> getCurrentTimestampMs() - client -> getTimeStamp()) < TIMEOUT_REQUEST)
+                continue;
+            
+            Server* server = client -> getBaseServer();
+            server -> deleteFromEventsMap(*client);
+        }
+    }
+}
+
 void HttpServer::makeServerServe(void)
 {
     int to_proceed;
-    int res;
-
     struct epoll_event _events[MAXEVENTS];
-
     IO  *client;
 
     while (HttpServer::g_signal == 1)
@@ -238,6 +254,8 @@ void HttpServer::makeServerServe(void)
         to_proceed = epoll_wait(_epoll_ws, _events, MAXEVENTS, EPOLL_TIMEOUT);
 
         if (HttpServer::g_signal == 1 && to_proceed == IO::IO_ERROR) throw ExceptionThrower("Epoll_wait failled");
+
+        if (to_proceed == 0) clearOutTimedClient();
 
         for (int i = 0; i < to_proceed; i++)
         {
@@ -252,9 +270,7 @@ void HttpServer::makeServerServe(void)
                 continue ;
             }
 
-            res = client -> handleIoOperation(_epoll_ws, _events[i]);
-
-            if (res == IO::IO_ERROR)
+            if (client -> handleIoOperation(_epoll_ws, _events[i]) == IO::IO_ERROR)
             {
                 std::cout << "Deletting client with fd: " << client -> getFd() << " from interests list" << std::endl;
                 client -> getBaseServer() -> deleteFromEventsMap(*client);
@@ -280,7 +296,7 @@ const std::string& HttpServer::getMimeType(const std::string& key)
     std::map<std::string, std::string>::iterator it = _mimeTypes.find(key);
 
     if (it == _mimeTypes.end())
-        return _mimeTypes.find(MIME_PLAIN) -> second;
+        return _mimeTypes.find(DEFAULT_CONTENT_TYPE) -> second;
     return it -> second;
 }
 
@@ -436,7 +452,8 @@ void HttpServer::initMimeTypes(void)
 
     _mimeTypes[BIN] = MIME_BIN;
     _mimeTypes[MIME_BIN] = BIN; 
-    _mimeTypes[DEFAULT] = MIME_PLAIN;
+    _mimeTypes[DEFAULT_CONTENT_TYPE] = MIME_BIN;
+    _mimeTypes[DEFAULT_EXTENSION] = BIN;
     _mimeTypes[HTM] = MIME_HTM;
     _mimeTypes[HTML] = MIME_HTML;
     _mimeTypes[SLASH] = MIME_HTML;

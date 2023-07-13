@@ -37,6 +37,7 @@ int ServerStream::handleIoOperation(const int& _ws, struct epoll_event& /* event
 
     while (1)
     {
+        std::cout << "Entered" << std::endl;
         int client_fd = accept(_fd, NULL, NULL);
         if (client_fd == -1) return IO::IO_SUCCESS;
                         
@@ -46,7 +47,6 @@ int ServerStream::handleIoOperation(const int& _ws, struct epoll_event& /* event
         _ev.events = EPOLLIN;
 
         this -> getServer() -> addToEventsMap((IO*)_ev.data.ptr);
-        this -> getServer() -> setInstance(getServer());
         if (HttpServer::makeNonBlockingFd(client_fd) || epoll_ctl(_ws, EPOLL_CTL_ADD, client_fd, &_ev))
             return IO::IO_ERROR;
     }

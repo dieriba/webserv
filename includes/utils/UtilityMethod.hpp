@@ -26,10 +26,9 @@ class UtilityMethod
         static int switchEvents(const int&, uint32_t, struct epoll_event&, IO&);
         static std::string numberToString(const size_t&);
         static const std::string& getMimeType(std::string&, const std::string&, const std::string&, const bool&);
-        static std::string getFileExtension(const std::string&, const short int&);
+        static std::string getFileExtension(const std::string&, const bool&);
         static std::string decimalToHex(const int&);
         static size_t hexToDecimal(const std::string&);
-        static char *mystrstr(const char *, const char *);
         static int is_a_directory(const char *);
         static size_t myStrlen(const char *);
         static std::string remove_dup(std::string&);

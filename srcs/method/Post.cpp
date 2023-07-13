@@ -34,7 +34,13 @@ void Post::create_file(std::string& filepath)
         std::string num = "_" + UtilityMethod::numberToString(_nb);
 
         if (access(filepath.c_str(), F_OK) == 0)
-            filepath.insert(filepath.rfind('.'), num);
+        {
+            size_t dot = filepath.rfind('.');
+            if (dot != 0)
+                filepath.insert(dot, num);
+            else
+                filepath.insert(std::string::npos, num);
+        }
         else
             break ;
 
@@ -55,7 +61,7 @@ int Post::open_file(ClientSocketStream& client)
 {
     std::map<std::string, std::string>& headers = client.getRequest().getHeaders();
     std::string& path = headers.find(PATH) -> second; 
-    std::string fileExtenstion = UtilityMethod::getFileExtension(headers.find(CONTENT_TYP) -> second, 0);
+    std::string fileExtenstion = UtilityMethod::getFileExtension(headers.find(CONTENT_TYP) -> second, false);
     std::string filepath(headers.find(FULLPATH) -> second);
     
     /*ADD THIS INTO A TRY CATCH BLOCK*/
@@ -65,12 +71,11 @@ int Post::open_file(ClientSocketStream& client)
     if (_outfile.is_open()) _outfile.close();
     
     _outfile.clear();
-
     create_file(filepath);
-
     client.setFilename(filepath);
     setFilename(filepath);
     _outfile.open(filepath.c_str(), std::ios::out);
+    std::cout << "Filepath: " << filepath << std::endl;
 
     if (_outfile.fail()) return FORBIDEN;
     

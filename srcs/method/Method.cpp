@@ -10,7 +10,7 @@
 # include "../../includes/IO/ClientSocketStream.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-Method::Method(){};
+Method::Method():_message("{\n\t\"message\": \n}"){};
 Method::Method(const Method& rhs){(void)rhs;};
 Method& Method::operator=(const Method& rhs)
 {
@@ -27,7 +27,10 @@ std::string& Method::getResponse(void) {return _response;}
 
 
 /*----------------------------------------SETTER----------------------------------------*/
-
+void Method::setMessage(const std::string& message)
+{
+    _message = message;
+}
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
@@ -142,4 +145,9 @@ Method* Method::createPut() {return new Put; }
 Method* Method::createOptions() {return new Options; }
 Method* Method::createDelete() {return new Delete; }
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
+
+/*----------------------------------------STATIC VARIABLE----------------------------------------*/
 std::vector<Method::Factory> Method::_tab;
+const short int Method::INSERT = 14;
+/*----------------------------------------STATIC VARIABLE----------------------------------------*/

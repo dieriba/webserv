@@ -29,6 +29,7 @@ class Server: public HttpServer
         HttpServer *getInstance(void) const;
 
         /*Setters*/
+        void    setServerStream(IO*);
         void    setHttpServer(HttpServer *);
         void    setPort(const unsigned int&);
         void    pushNewServerName(const std::string&);
@@ -53,5 +54,6 @@ class Server: public HttpServer
         std::map<const IO*, IO*> _events;
         std::vector<std::string> _server_names;
         std::vector<Location> _locations;
+        IO* _server_stream;
 };
 #endif

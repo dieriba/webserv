@@ -27,45 +27,40 @@ Error::~Error(){};
 
 std::string Error::getErrorPage(const short int& err) const
 {
-    std::string res;
-
     switch (err)
     {
-        case FORBIDEN : res = SERVER_ERROR_PAGE_FORBIDDEN;
-            break;
+        case FORBIDEN : return SERVER_ERROR_PAGE_FORBIDDEN;
+            
         
-        case NOT_FOUND : res = SERVER_ERROR_PAGE_NOT_FOUND;
-            break;
+        case NOT_FOUND : return SERVER_ERROR_PAGE_NOT_FOUND;
+            
 
-        case METHOD_NOT_ALLOWED : res = SERVER_ERROR_PAGE_METHOD_NOT_ALLOWED;
-            break;
+        case METHOD_NOT_ALLOWED : return SERVER_ERROR_PAGE_METHOD_NOT_ALLOWED;
+            
 
-        case REQUEST_TIMEOUT : res = SERVER_ERROR_PAGE_REQUEST_TIMEOUT;
-            break;
+        case REQUEST_TIMEOUT : return SERVER_ERROR_PAGE_REQUEST_TIMEOUT;
+            
 
-        case TOO_LARGE_CONTENT : res = SERVER_ERROR_TOO_LARGE_CONTENT;
-            break;
+        case TOO_LARGE_CONTENT : return SERVER_ERROR_TOO_LARGE_CONTENT;
+            
 
-        case UNSUPPORTED_MEDIA_TYPE : res = SERVER_ERROR_PAGE_UNSUPPORTED_MEDIA_TYPE;
-            break;
+        case UNSUPPORTED_MEDIA_TYPE : return SERVER_ERROR_PAGE_UNSUPPORTED_MEDIA_TYPE;
+            
 
-        case INTERNAL_SERVER_ERROR : res = SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR;
-            break;
+        case INTERNAL_SERVER_ERROR : return SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR;
+            
 
-        case METHOD_NOT_SUPPORTED : res = SERVER_ERROR_PAGE_METHOD_NOT_SUPPORTED;
-            break;
+        case METHOD_NOT_SUPPORTED : return SERVER_ERROR_PAGE_METHOD_NOT_SUPPORTED;
+            
 
-        case GATEWAY_TIMEOUT : res = SERVER_ERROR_PAGE_GATEWAY_TIMEOUT;
-            break;
+        case GATEWAY_TIMEOUT : return SERVER_ERROR_PAGE_GATEWAY_TIMEOUT;
+            
 
-        case VERSION_NOT_SUPPORTED : res = SERVER_ERROR_PAGE_VERSION_NOT_SUPPORTED;
-            break;
+        case VERSION_NOT_SUPPORTED : return SERVER_ERROR_PAGE_VERSION_NOT_SUPPORTED;
+            
 
-        default: res = SERVER_ERROR_PAGE_BAD_REQUEST;
-            break;
+        default: return SERVER_ERROR_PAGE_BAD_REQUEST;    
     }
-    
-    return res;
 }
 
 void Error::addSpecificHeader(ClientSocketStream& client, const int& err)
@@ -107,6 +102,7 @@ int Error::firstStep(ClientSocketStream& client, HttpResponse& res, const int& e
 
     makeStatusLine(client, err);
     addSpecificHeader(client, err);
+    std::cout << "second: " << it -> second << " Res: " << UtilityMethod::getMimeType(it -> second, "", "", false) << std::endl;
     appendToResponse(CONTENT_TYP, UtilityMethod::getMimeType(it -> second, "", "", false));
     appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()));
     _response += CRLF;

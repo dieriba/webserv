@@ -20,7 +20,7 @@
 # include <signal.h>
 # include <sys/stat.h>
 # include <sys/types.h>
-
+# include <sys/time.h>
 /*
 
 */
@@ -104,7 +104,7 @@
 
 */
 # define TIMEOUT_CGI 3000
-# define TIMEOUT_REQUEST 10000
+# define TIMEOUT_REQUEST 6000
 # define MAX_TIMEOUT_CGI 4000
 # define COMMON_TIMEOUT 3000
 # define NO_BODY "-2"
@@ -115,7 +115,7 @@
 # define BASE_16 "0123456789ABCDEFabcdef"
 # define REQUEST_SIZE 60000
 # define REQUEST_SIZE_PLUS 100000
-# define EPOLL_TIMEOUT 1000
+# define EPOLL_TIMEOUT 2000
 # define MAXEVENTS 64
 # define CRLF "\r\n"
 # define LEN_CRLF 2
@@ -124,13 +124,15 @@
 # define MAX_HEADER_SIZE 4000
 # define NO_VALUE "NO_VALUE"
 # define DOUBLE_HIPHEN "--"
+# define PARENT_DIRECTORY "../"
 /*
 
 
 */
 
 # define SLASH "/"
-# define DEFAULT "default"
+# define DEFAULT_CONTENT_TYPE "default_content_type"
+# define DEFAULT_EXTENSION "default_extension"
 # define HTM ".html"
 # define HTML ".html"
 # define CSS ".css"

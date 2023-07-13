@@ -8,10 +8,11 @@
 # include "../../includes/utils/FileWriter.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-HttpRequest::HttpRequest():HttpMessage(),_header_size(0),_chunk_size(0),_current_chunk_size(0){};
+HttpRequest::HttpRequest():HttpMessage(),_header_size(0),_chunk_size(0),_current_chunk_size(0),_request_start(0){};
 HttpRequest::HttpRequest(const HttpRequest& rhs):HttpMessage(rhs),BitsManipulation(rhs)
 {
     _header_size = rhs._header_size;
+    _request_start = rhs._request_start;
     _form_data.boundary = rhs._form_data.boundary;
     _form_data.crlf_boundary = rhs._form_data.crlf_boundary;
     _form_data.end_boundary = rhs._form_data.end_boundary;
@@ -25,6 +26,7 @@ HttpRequest& HttpRequest::operator=(const HttpRequest& rhs)
     _form_data.end_boundary = rhs._form_data.end_boundary;
     _form_data.crlf_end_boundary = rhs._form_data.crlf_end_boundary;
     _header_size = rhs._header_size;
+    _request_start = rhs._request_start;
     s_buffer = rhs.s_buffer;
     _method = rhs._method;
     _body = rhs._body;
@@ -75,6 +77,11 @@ void HttpRequest::setCrlfEndBoundary(const std::string& crlf_end_boundary)
 {
     _form_data.crlf_end_boundary = crlf_end_boundary;
 }
+
+void HttpRequest::setRequestSize(const size_t& request_start)
+{
+    _request_start = request_start;
+}
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
@@ -101,6 +108,8 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
     if (checkBits(HttpRequest::HTTP_REQUEST_CONTENT_LENGTH) || checkBits(HttpRequest::HTTP_REQUEST_TRANSFER_ENCODING))
         return 0;
     
+    setOptions(HttpRequest::HTTP_REQUEST_END_HEADER_FOUND, SET);
+
     std::vector<std::string> headers = UtilityMethod::stringSpliter(s_buffer.substr(0, s_buffer.find(CRLF CRLF)), CRLF);
     std::vector<std::string> header;
     std::map<std::string, std::string>::const_iterator _it_content;
@@ -124,9 +133,9 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
 
     Server* server = (HttpServer::getHostnameServerMap(client.getPort(), _headers[HOST]));
     
-    if (server == NULL) server = client.getServer();
-
     client.setServer(server);
+
+    server -> setInstance(server);
 
     if (headers.size() == 0) return BAD_REQUEST;
 
@@ -140,11 +149,13 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
     
     if (_method == -1) return METHOD_NOT_SUPPORTED;
 
+    if (header[1].find(PARENT_DIRECTORY) != std::string::npos) return FORBIDEN;
+
     _headers[PATH] = UtilityMethod::remove_dup(header[1]);
 
     _headers[VERSION] = header[2];
     
-    if (header[2] != HTTP_VERSION) return BAD_REQUEST;
+    if (header[2] != HTTP_VERSION) return VERSION_NOT_SUPPORTED;
 
     bool location = false;
 
@@ -168,13 +179,13 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
 
     if (i != std::string::npos) path = path.substr(0, i);
     const std::map<std::string, std::string>& cgi_map = instance.getCgiMap();
-    const std::map<std::string, std::string>::const_iterator& it = cgi_map.find(UtilityMethod::getFileExtension(full_path, 1));
+    const std::map<std::string, std::string>::const_iterator& it = cgi_map.find(UtilityMethod::getFileExtension(full_path, true));
 
     if (it != cgi_map.end()) setOptions(HttpRequest::HTTP_REQUEST_CGI_, SET);
 
     if (getMethod() == HttpServer::HTTP_SERVER_GET)
     {
-        if ((directory && instance.getIndex().size()) && (_headers[PATH] == instance.getIndexPath()))
+        if (directory && instance.getIndex().size())
             full_path += '/' + instance.getIndex();
         else if (directory && instance.getIndex().size() == 0)
             full_path = "";
@@ -221,6 +232,9 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
         client.setPrevContentLength(getBodySize());
     }
 
+    if (_headers.find(CONTENT_TYP) == _headers.end())
+        _headers[CONTENT_TYP] = MIME_BIN;
+
     int _req = RequestChecker::checkAll(client, (*this));
 
     std::cout << "REQ VALUE: " << _req << std::endl;
@@ -250,7 +264,12 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
 void HttpRequest::clear(void)
 {
     _headers.clear();
-    s_buffer.clear();
+    
+    if (checkBits(HttpRequest::HTTP_REQUEST_SAVE_STRING))
+        s_buffer = s_buffer.substr(_request_start, std::string::npos);
+    else
+        s_buffer.clear();
+    
     _header_size = 0;
     resetOptions();
 }

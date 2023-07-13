@@ -39,6 +39,8 @@ class FileWriter
         int writeToFile(HttpRequest&, const size_t&, const size_t&);
         int writeToFileMutltipartData(ClientSocketStream&, const size_t&);
         void clearRequestBodySize(void);
+        void clearAndUpdateRequestBodySize(const size_t&);
+
         size_t _request_body_size;
         std::ofstream _outfile;
         static unsigned int _nb;

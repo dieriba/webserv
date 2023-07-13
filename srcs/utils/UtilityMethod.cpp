@@ -171,44 +171,19 @@ const std::string& UtilityMethod::getMimeType(std::string& path, const std::stri
     return HttpServer::getMimeType(&path[i]);
 }
 
-std::string UtilityMethod::getFileExtension(const std::string& content_type, const short int& opt)
+std::string UtilityMethod::getFileExtension(const std::string& content_type, const bool& option)
 {
-    if (opt == 0) 
-    {
-        std::string res = HttpServer::getMimeType(content_type);
-
-        if (res.size() == 0 && content_type != MIME_PLAIN) return ".bin";
-
-        return res;
-    }
+    if (option == false) 
+        return HttpServer::getMimeType(content_type);
     
     int i = content_type.size() - 1;
 
     for (; i >= 0; i--)
         if (content_type[i] == '.') break ;
 
-    if (content_type.size() == 0) return ".bin";
+    if (i == 0) return BIN;
     
     return &content_type[i];
-}
-
-char *UtilityMethod::mystrstr(const char *big, const char *needle)
-{
-    size_t	i;
-	size_t	j;
-
-	if (*(needle) == 0)
-		return ((char *)(big));
-	i = -1;
-	while (big[++i])
-	{
-		j = 0;
-		while ((big[i + j]) && (big[i + j] == needle[j]))
-		j++;
-		if (needle[j] == 0)
-			return ((char *)(&big[i]));
-	}
-	return (NULL);
 }
 
 size_t  UtilityMethod::myStrlen(const char *buffer)

@@ -36,6 +36,7 @@ class IO: public BitsManipulation
 
         /*SETTERS*/
         void updateTimeStamp(void);
+        void updateTimeStamp(const long&);
         void setServer(Server *);
         void setWs(const int&);
         void setIO(IO*);
@@ -45,6 +46,7 @@ class IO: public BitsManipulation
 
         /*MEMBER FUNCTION*/
         long getTimestampInMillisecond(const long& _cgi_timesamp) const;
+        long getCurrentTimestampMs(void) const;
         
         /*MEMBER FUNCTION*/
         int deleteAndResetIO(HttpResponse&);
@@ -64,6 +66,7 @@ class IO: public BitsManipulation
             IO_KILL_CGI,
             IO_KILL_MYSELF,
             IO_SOCKET_NOT_FINISH,
+            IO_CONTENT_LEN,
         };
 
         enum type

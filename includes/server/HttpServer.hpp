@@ -71,6 +71,7 @@ class HttpServer: public Parser, public BitsManipulation
         void setUploadsFilesFolder(const std::string&);
 
         /*MEMBER FUNCTION*/
+        void clearOutTimedClient(void);
         void settingUpServer(const char *);
         void runningUpServer(void);
         void makeServerServe(void);

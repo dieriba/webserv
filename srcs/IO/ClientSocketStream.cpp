@@ -101,13 +101,22 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         _request.appendToBuffer(buffer, size);
     else
     {
-        updatePrevBodySize(size);
-        if (_prev_body_size == _prev_content_len)
+        if (checkBits(IO::IO_CONTENT_LEN))
         {
-            _prev_body_size = 0;
-            _prev_content_len = 0;
-            resetOptions();
+            updatePrevBodySize(size);
+            if (_prev_body_size == _prev_content_len)
+            {
+                _prev_body_size = 0;
+                _prev_content_len = 0;
+                resetOptions();
+            }
         }
+        else
+        {
+            if (std::strstr(_request.getBuffer().c_str(), "0\r\n\r\n"))
+                resetOptions();
+        }
+
         return IO::IO_SUCCESS;
     }
 
@@ -118,9 +127,8 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         return IO::IO_SUCCESS;
     }
 
-    char *end_header = UtilityMethod::mystrstr(_request.getBuffer().c_str(), CRLF CRLF);
-    
-    if (end_header != NULL || (_request.checkBits(HttpRequest::HTTP_REQUEST_CONTENT_LENGTH) || _request.checkBits(HttpRequest::HTTP_REQUEST_TRANSFER_ENCODING)))
+    if ((_request.checkBits(HttpRequest::HTTP_REQUEST_END_HEADER_FOUND) || std::strstr(_request.getBuffer().c_str(), CRLF CRLF))
+        || (_request.checkBits(HttpRequest::HTTP_REQUEST_CONTENT_LENGTH) || _request.checkBits(HttpRequest::HTTP_REQUEST_TRANSFER_ENCODING)))
     {
         int _req = _request.parseRequest(*this);
 
@@ -149,6 +157,8 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
 {
     if (event.events & EPOLLIN)
     {
+        updateTimeStamp(getCurrentTimestampMs());
+        
         try
         {
             return readFromSocket(_ws, event);
@@ -193,5 +203,5 @@ void ClientSocketStream::clear(void)
     if (_filename.size()) _filename = "";
     _request.clear();
     _response.clear();
-    resetAndPreserverSomeFlags(checkBits(IO::IO_SOCKET_NOT_FINISH));
+    resetAndPreserverSomeFlags(checkBits(IO::IO_SOCKET_NOT_FINISH) | checkBits(IO::IO_CONTENT_LEN));
 }/*----------------------------------------VIRTUAL MEMBER FUNCTION----------------------------------------*/

@@ -2,8 +2,8 @@
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 IO::IO(){};
-IO::IO(const int& ws, const int& fd, Server *server):BitsManipulation(),_ws(ws),_fd(fd),_err(0),_timestamp(0),_server(server),_event(EPOLLIN),_io(NULL){};
-IO::IO(const int& fd, Server *server):BitsManipulation(),_ws(-1),_fd(fd),_err(0),_timestamp(0),_server(server),_event(EPOLLIN),_io(NULL){};
+IO::IO(const int& ws, const int& fd, Server *server):BitsManipulation(),_ws(ws),_fd(fd),_err(0),_timestamp(getCurrentTimestampMs()),_server(server),_event(EPOLLIN),_io(NULL){};
+IO::IO(const int& fd, Server *server):BitsManipulation(),_ws(-1),_fd(fd),_err(0),_timestamp(getCurrentTimestampMs()),_server(server),_event(EPOLLIN),_io(NULL){};
 IO::IO(const IO& rhs):BitsManipulation(rhs),_ws(rhs._ws),_fd(rhs._fd),_err(rhs._err),_timestamp(rhs._timestamp),_server(rhs._server),_event(rhs._event),_io(rhs._io)
 ,_request(rhs._request),_response(rhs._response){};
 IO& IO::operator=(const IO& rhs)
@@ -42,7 +42,13 @@ HttpRequest& IO::getRequest(void)  {return _request;}
 HttpResponse& IO::getResponse(void) {return _response;};
 IO* IO::getIO(void) const {return _io;}; 
 /*----------------------------------------GETTER----------------------------------------*/
+long IO::getCurrentTimestampMs(void) const 
+{
+	struct timeval	now;
 
+	gettimeofday(&now, NULL);
+	return ((now.tv_sec * 1000) + (now.tv_usec / 1000));
+}
 /*----------------------------------------SETTER----------------------------------------*/
 void IO::setFD(const int& fd) {_fd = fd;}
 void IO::setErrorStatus(const int& err) {_err = err;}
@@ -50,6 +56,7 @@ void IO::setEvents(const uint32_t& event) {_event = event;};
 void IO::setIO(IO *io) {_io = io;};
 void IO::setWs(const int& ws) {_ws = ws;}
 void IO::updateTimeStamp(void) { _timestamp = std::clock(); };
+void IO::updateTimeStamp(const long& timestamp) { _timestamp = timestamp; };
 void IO::setServer(Server *server) { _server = server;};
 /*----------------------------------------SETTER----------------------------------------*/
 

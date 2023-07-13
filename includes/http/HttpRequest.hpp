@@ -25,6 +25,7 @@ class HttpRequest: public HttpMessage, public BitsManipulation
 
         enum
         {
+            HTTP_REQUEST_END_HEADER_FOUND,
             HTTP_REQUEST_CONTENT_LENGTH,
             HTTP_REQUEST_TRANSFER_ENCODING,
             HTTP_REQUEST_FINISH_BODY,
@@ -36,7 +37,8 @@ class HttpRequest: public HttpMessage, public BitsManipulation
             HTTP_REQUEST_STARTED,
             HTTP_REQUEST_MULTIPART_DATA,
             HTTP_REQUEST_NO_ENCODING,
-            HTTP_REQUEST_DIRECTORY
+            HTTP_REQUEST_DIRECTORY,
+            HTTP_REQUEST_SAVE_STRING
         };
 
         /*GETTERS*/
@@ -49,6 +51,9 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         const std::string& getCrlfBoundary(void) const;
         const std::string& getEndBoundary(void) const;
         const std::string& getCrlfEndBoundary(void) const;
+
+        /*SETTERS*/
+        void setRequestSize(const size_t&);
 
         /*MEMBER FUNCTION*/
         int parseRequest(ClientSocketStream&);
@@ -68,6 +73,7 @@ class HttpRequest: public HttpMessage, public BitsManipulation
         size_t _header_size;
         size_t _chunk_size;
         size_t _current_chunk_size;
+        size_t _request_start;
         mulitipart _form_data;
 };
 

@@ -2,7 +2,7 @@
 # include "../../includes/server/Location.hpp"
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
-Server::Server():HttpServer(),_serv_socket(-1),_tcp_server(NULL){};
+Server::Server():HttpServer(),_serv_socket(-1),_tcp_server(NULL),_server_stream(NULL){};
 
 Server::Server(const Server& rhs):HttpServer(rhs)
 {
@@ -13,12 +13,14 @@ Server::Server(const Server& rhs):HttpServer(rhs)
     _server_names = rhs._server_names;
     _locations = rhs._locations;
     _tcp_server = rhs._tcp_server;
+    _server_stream = rhs._server_stream;
 }
 
 Server& Server::operator=(const Server& rhs)
 {
     if (this == &rhs) return *(this);
     _instance = rhs._instance;
+    _server_stream = rhs._server_stream;
     _upload_file_folders = rhs._upload_file_folders;
     _serv_socket = rhs._serv_socket;
     _error_pages = rhs._error_pages;
@@ -55,6 +57,8 @@ Server::~Server()
             delete it -> first;
         }
     }
+
+    delete _server_stream;
 };
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 
@@ -104,6 +108,11 @@ void Server::setInstance(HttpServer* instance)
 void Server::setHttpServer(HttpServer *tcp_server) 
 {
     _tcp_server = tcp_server;
+}
+
+void Server::setServerStream(IO* server_stream)
+{
+    _server_stream = server_stream;
 }
 
 /*----------------------------------------SETTER----------------------------------------*/
@@ -177,6 +186,8 @@ void Server::deleteFromEventsMap(IO& client)
     if (client.getFd() > 0) epoll_ctl(getEpollWs(), EPOLL_CTL_DEL, client.getFd(), NULL);
     delete &client;
 }
+
+
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 

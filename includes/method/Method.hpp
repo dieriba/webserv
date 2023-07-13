@@ -22,6 +22,9 @@ class Method
         /*GETTERS*/
         std::string& getResponse(void);
 
+        /*SETTERS*/
+        void setMessage(const std::string&);
+
         /*MEMBER FUNCTION*/
         std::string getAllowedMethod(const HttpServer& instance, const std::map<std::string, short int>& _httpMethods);
         int handleFileRessource(ClientSocketStream&, HttpResponse&);
@@ -45,8 +48,11 @@ class Method
         static Method* createOptions(void);
         static std::vector<Factory> _tab;
 
+        /*STATIC VARIABLES*/
+        static const short int INSERT;
     protected:
         std::string _response;
+        std::string _message;
 };
 
 # endif

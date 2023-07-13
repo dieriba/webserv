@@ -122,13 +122,14 @@ int RequestChecker::checkPostPutMethod(const HttpServer& instance, HttpRequest& 
     std::map<std::string, std::string>::iterator it_length = _map.find(CONTENT_LEN);
     std::map<std::string, std::string>::iterator it_transfer = _map.find(TRANSFERT_ENCODING);
 
-    if ((((it_length == _map.end()) && (it_transfer == _map.end())) || (it_length != _map.end() && it_transfer != _map.end()))
-        || it == _map.end()) 
+    if ((it_length == _map.end() && it_transfer == _map.end()) || (it_length != _map.end() && it_transfer != _map.end())) 
         return BAD_REQUEST;
         
     if (req.checkBits(HttpRequest::HTTP_REQUEST_CGI_)) return IO::IO_SUCCESS;
 
     const std::string& full_path(req.getHeaders()[FULLPATH]);
+
+    std::cout << "Full path: " << full_path << std::endl;
 
     size_t i = full_path.rfind('/');
 
@@ -239,7 +240,7 @@ int RequestChecker::checkHeader(const HttpServer& instance, HttpRequest& req)
 
         if (i != std::string::npos) full_path = full_path.substr(0, i);
         const std::map<std::string, std::string>& cgi_map = instance.getCgiMap();
-        const std::map<std::string, std::string>::const_iterator& it = cgi_map.find(UtilityMethod::getFileExtension(full_path, 1));
+        const std::map<std::string, std::string>::const_iterator& it = cgi_map.find(UtilityMethod::getFileExtension(full_path, true));
 
         std::cout << "Full path value: " << full_path << std::endl;
 
