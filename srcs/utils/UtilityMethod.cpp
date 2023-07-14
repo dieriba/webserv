@@ -181,7 +181,7 @@ std::string UtilityMethod::getFileExtension(const std::string& content_type, con
     for (; i >= 0; i--)
         if (content_type[i] == '.') break ;
 
-    if (i == 0) return BIN;
+    if (i == 0) return "";
     
     return &content_type[i];
 }

@@ -452,8 +452,8 @@ void HttpServer::initMimeTypes(void)
 
     _mimeTypes[BIN] = MIME_BIN;
     _mimeTypes[MIME_BIN] = BIN; 
-    _mimeTypes[DEFAULT_CONTENT_TYPE] = MIME_BIN;
-    _mimeTypes[DEFAULT_EXTENSION] = BIN;
+    _mimeTypes[DEFAULT_CONTENT_TYPE] = MIME_PLAIN;
+    _mimeTypes[DEFAULT_EXTENSION] = "";
     _mimeTypes[HTM] = MIME_HTM;
     _mimeTypes[HTML] = MIME_HTML;
     _mimeTypes[SLASH] = MIME_HTML;
