@@ -13,7 +13,6 @@ ServerStream& ServerStream::operator=(const ServerStream& rhs)
 {
     if (this == &rhs) return (*this);
     _fd = rhs._fd;
-    _err = rhs._err;
     _server = rhs._server;
     _event = rhs._event;
     _io = rhs._io;

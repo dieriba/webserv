@@ -25,7 +25,7 @@ Delete::~Delete(){};
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 int Delete::sendResponse(ClientSocketStream& event, HttpRequest& req, HttpResponse& res)
 {
-    if (res.checkBits(HttpResponse::HTTP_RESPONSE_REDIRECT_SET)) return sendRedirect(event, res, FOUND_REDIRECT_IND_METHOD);
+    if (res.checkBits(HttpResponse::HTTP_RESPONSE_REDIRECT_SET)) return res.sendRedirect(event, res, FOUND_REDIRECT_IND_METHOD);
 
     const std::string& full_path(req.getHeaders().find(FULLPATH) -> second);
 

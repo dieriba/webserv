@@ -87,7 +87,7 @@ int Put::open_file(ClientSocketStream& client, std::string& filepath)
 
 int Put::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpResponse& res)
 {
-    if (res.checkBits(HttpResponse::HTTP_RESPONSE_REDIRECT_SET)) return sendRedirect(client, res, FOUND_REDIRECT_POST);
+    if (res.checkBits(HttpResponse::HTTP_RESPONSE_REDIRECT_SET)) return res.sendRedirect(client, res, FOUND_REDIRECT_POST);
 
     if (client.getEvents() & EPOLLIN)
     {
@@ -104,7 +104,7 @@ int Put::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpResponse
     {
         if (res.checkBits(HttpResponse::HTTP_RESPONSE_RESSOURCE_EXIST))
         {
-            if (UtilityMethod::sendBuffer(client.getFd(), SERVER_SUCCESS_PUT_RESPONSE, std::strlen(SERVER_SUCCESS_PUT_RESPONSE)) == IO::IO_ERROR)
+            if (res.sendResponse(SERVER_SUCCESS_PUT_RESPONSE) == IO::IO_ERROR)
             {
                 res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
                 return IO::IO_ERROR;
@@ -112,7 +112,7 @@ int Put::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpResponse
         }
         else
         {
-            if (UtilityMethod::sendBuffer(client.getFd(), SERVER_SUCCESS_POST_RESPONSE, std::strlen(SERVER_SUCCESS_POST_RESPONSE)) == IO::IO_ERROR)
+            if (res.sendResponse(SERVER_SUCCESS_POST_RESPONSE) == IO::IO_ERROR)
             {
                 res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
                 return IO::IO_ERROR;

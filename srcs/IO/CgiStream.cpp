@@ -17,7 +17,6 @@ CgiStream& CgiStream::operator=(const CgiStream& rhs)
     if (this == &rhs) return (*this);
     _fd = rhs._fd;
     _timestamp = rhs._timestamp;
-    _err = rhs._err;
     _server = rhs._server;
     _event = rhs._event;
     _io = rhs._io;
@@ -62,18 +61,17 @@ int CgiStream::resetCgi(IO& object, const int& _ws)
 int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */)
 {
     IO& object = *(getIO());
+    
 
     if (object.checkBits(IO::IO_CGI_ON) == 0) return IO::IO_SUCCESS;
 
     if (checkBits(CgiStream::STARTED) == 0)
     {
-        Get object;
-        object.makeStatusLine((*this), OK);
-        object.appendToResponse(CONTENT_TYP, "text/html");
-        object.appendToResponse(TRANSFERT_ENCODING, "chunked");
-        object.addEndHeaderCRLF();
+        _response.makeStatusLine((*this), OK)
+                 .setHeader(CONTENT_TYP, "text/html")
+                 .setHeader(TRANSFERT_ENCODING, "chunked")
+                 .addEndHeaderCRLF();
         setBeginTimeStamp();
-        _response.getBuffer().append(object.getResponse());
         setOptions(CgiStream::STARTED, SET);
     }        
 
@@ -85,10 +83,10 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
         
     std::string hex = UtilityMethod::decimalToHex(bytes);
 
-    _response.appendToBuffer(hex.c_str(), hex.size());
-    _response.appendToBuffer(CRLF, LEN_CRLF);
-    _response.appendToBuffer(_buffer, bytes);
-    _response.appendToBuffer(CRLF, LEN_CRLF);
+    _response.appendToResponse(hex.c_str(), hex.size());
+    _response.appendToResponse(CRLF, LEN_CRLF);
+    _response.appendToResponse(_buffer, bytes);
+    _response.appendToResponse(CRLF, LEN_CRLF);
 
     std::string& resp = _response.getBuffer();
 

@@ -8,6 +8,7 @@
 ClientSocketStream::ClientSocketStream(){};
 ClientSocketStream::ClientSocketStream(const int& ws, const int& fd, Server* server, Server* base_server):IO(ws, fd, server)
 {
+    _response.setFd(fd);
     _prev_content_len = 0;
     _prev_body_size = 0;
     _base_server = base_server;
@@ -24,7 +25,6 @@ ClientSocketStream& ClientSocketStream::operator=(const ClientSocketStream& rhs)
     if (this == &rhs) return (*this);
     _ws = rhs._ws;
     _fd = rhs._fd;
-    _err = rhs._err;
     _server = rhs._server;
     _event = rhs._event;
     _io = rhs._io;
@@ -68,6 +68,26 @@ void ClientSocketStream::setPrevContentLength(const unsigned int& prev_content_l
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
+
+std::string ClientSocketStream::getAllowedMethod(const HttpServer& instance, const std::map<std::string, short int>& _httpMethods)
+{
+    std::string allowed_method;
+    std::map<std::string, short int>::const_iterator end = --_httpMethods.end();
+    
+    for (std::map<std::string, short int>::const_iterator it = _httpMethods.begin(); it != _httpMethods.end(); it++)
+    {
+        if (instance.checkBits(it -> second))
+        {
+            if (it != end)
+                allowed_method += it -> first + ", ";
+            else
+                allowed_method += it -> first;
+        }
+    }
+
+    return allowed_method;
+}
+
 int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
 {
 
@@ -76,7 +96,7 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
     std::cout << "Response value: " << res << std::endl;
     
     if (res > 0)
-        _response.setErrorObjectResponse((*this), res);
+        _response.setErrorObjectResponse(res);
     else if (_response.checkBits(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE))
     {
         UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
@@ -123,7 +143,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
     if (_request.getHeaderSize() >= MAX_HEADER_SIZE)
     {
         UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
-        _response.setErrorObjectResponse((*this), TOO_LARGE_CONTENT);
+        _response.setErrorObjectResponse(TOO_LARGE_CONTENT);
         return IO::IO_SUCCESS;
     }
 
@@ -136,7 +156,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         {
             _req = _response.serveResponse((*this), _request);
             if (_req)
-                _response.setErrorObjectResponse((*this), _req);
+                _response.setErrorObjectResponse( _req);
             else if (!_request.checkBits(HttpRequest::HTTP_REQUEST_FINISH_BODY))
                 return IO::IO_SUCCESS;
         }
@@ -144,7 +164,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         if (_response.getHttpMethod() == NULL)
             _response.setMethodObj((_req < 10 ? Method::_tab[_request.getMethod()]() : new Error));
 
-        setErrorStatus(_req);
+        _response.setStatus(_req);
 
         _request.getBuffer().clear();
         UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
@@ -165,7 +185,7 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
         }
         catch(const std::exception& e)
         {
-            _response.setErrorObjectResponse((*this), INTERNAL_SERVER_ERROR);
+            _response.setErrorObjectResponse(INTERNAL_SERVER_ERROR);
             resetOptions();
             _request.getBuffer().clear();
             UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
@@ -186,7 +206,7 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
                 UtilityMethod::switchEvents(_ws, EPOLLIN, event, (*this));
                 return IO::IO_SUCCESS;
             }
-            _response.setErrorObjectResponse((*this), GATEWAY_TIMEOUT);
+            _response.setErrorObjectResponse(GATEWAY_TIMEOUT);
             setOptions(IO::IO_CGI_ON, CLEAR);
         }
     }

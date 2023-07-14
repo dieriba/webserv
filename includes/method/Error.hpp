@@ -16,7 +16,6 @@ class Error: public Method
         ~Error();
 
         /*MEMBER FUNCTION*/
-        void addSpecificHeader(ClientSocketStream&, const int&);
         int firstStep(ClientSocketStream&, HttpResponse&, const int&);
 
         /*PURE VIRTUAL MEMBER FUNCTION OVERRIDEN*/

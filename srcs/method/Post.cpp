@@ -192,10 +192,8 @@ int Post::handleCgiPost(ClientSocketStream& event, HttpRequest& req, HttpRespons
         return resp; 
     }
 
-    if (UtilityMethod::sendBuffer(event.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
+    if (res.sendResponse() == IO::IO_ERROR) return (IO::IO_ERROR);
     
-    _response.clear();
-
     req.setOptions(HttpRequest::HTTP_REQUEST_FINISH_BODY, SET);
 
     event.setOptions(IO::IO_CGI_ON, SET);
@@ -209,7 +207,7 @@ int Post::handleCgiPost(ClientSocketStream& event, HttpRequest& req, HttpRespons
 
 int Post::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpResponse& res)
 {
-    if (res.checkBits(HttpResponse::HTTP_RESPONSE_REDIRECT_SET)) return sendRedirect(client, res, FOUND_REDIRECT_POST);
+    if (res.checkBits(HttpResponse::HTTP_RESPONSE_REDIRECT_SET)) return res.sendRedirect(client, res, FOUND_REDIRECT_POST);
 
     if (client.getEvents() & EPOLLIN)
     {
@@ -226,7 +224,7 @@ int Post::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespons
     }
     else
     {
-        if (UtilityMethod::sendBuffer(client.getFd(), SERVER_SUCCESS_POST_RESPONSE, UtilityMethod::myStrlen(SERVER_SUCCESS_POST_RESPONSE)) == IO::IO_ERROR)
+        if (res.sendResponse(SERVER_SUCCESS_POST_RESPONSE) == IO::IO_ERROR)
         {
             res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
             return IO::IO_ERROR;

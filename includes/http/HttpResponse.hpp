@@ -6,9 +6,9 @@
 # include "../method/Method.hpp"
 # include "../method/Error.hpp"
 
-
-class HttpRequest;
 class IO;
+class HttpRequest;
+class ClientSocketStream;
 
 class HttpResponse: public HttpMessage, public BitsManipulation
 {
@@ -34,6 +34,9 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         };
         
         /*GETTER*/
+        const std::string& getResponse(void) const;
+        std::string& getResponse(void);
+        const short int& getStatus(void) const;
         const int& getReadEnd(void) const;
         const int& getWriteEnd(void) const;
         int *getPipes(void);
@@ -45,20 +48,38 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         const std::string& getPath(void) const;
 
         /*SETTER*/
+        HttpResponse& appendToResponse(const std::string& message);
+        HttpResponse& appendToResponse(const char* buffer, const size_t& size);
+        HttpResponse& setStatus(const short int& status);
+        HttpResponse& setHeader(const std::string&, const std::string&);
+        HttpResponse& setCookieHeader(IO&);
+        HttpResponse& addCustomHeader(ClientSocketStream&, const short int&);
+        HttpResponse& addCustomHeader(const HttpServer&);
+        HttpResponse& addEndHeaderCRLF(void);
+
+        void setFd(const int& fd);
         void setPath(const std::string&);
         void setMethodObj(Method*);
     
         /*MEMBER FUNCTION*/
+        int sendResponse(void);
+        int sendResponse(const char *);
+        int sendResponse(const char *, const size_t&);
+        int sendRedirect(const ClientSocketStream&, HttpResponse&, const char *);
+        int serveResponse(ClientSocketStream&, HttpRequest&);
+        int setErrorObjectResponse(const short int& status);
         void clearReadEnd();
         void clearWriteEnd();
         void clearBothEnd();
         void clear(void);
         void setDirectory(DIR*);
-        int serveResponse(ClientSocketStream&, HttpRequest&);
-        int setErrorObjectResponse(IO& client, const short int& status);
+        HttpResponse& makeStatusLine(IO&, const int&);
 
     private:
+        int     _fd;
         int     _pipes[2];
+        short int _status;
+        std::string _response;
         std::string _path_req;
         Method  *_method;
         Error   _error;

@@ -63,22 +63,10 @@ std::string Error::getErrorPage(const short int& err) const
     }
 }
 
-void Error::addSpecificHeader(ClientSocketStream& client, const int& err)
-{
-    switch (err)
-    {
-        case METHOD_NOT_ALLOWED: appendToResponse("Allow", getAllowedMethod(*(client.getServer() -> getInstance()), HttpServer::_httpMethods));
-            break;
-        
-        default:
-            break;
-    }
-}
-
 int Error::firstStep(ClientSocketStream& client, HttpResponse& res, const int& err)
 {
     std::map<short int, std::string>& _map = client.getServer() -> getInstance() -> getErrorMaps();
-    std::map<short int, std::string>::iterator it = _map.find(client.getErrStatus());
+    std::map<short int, std::string>::iterator it = _map.find(res.getStatus());
 
     if (it == _map.end()) it = _map.find(DEFAULT_ERROR_PAGE_VALUE);
     
@@ -100,16 +88,16 @@ int Error::firstStep(ClientSocketStream& client, HttpResponse& res, const int& e
 
     if (file.fail()) return IO::IO_ERROR;
 
-    makeStatusLine(client, err);
-    addSpecificHeader(client, err);
     std::cout << "second: " << it -> second << " Res: " << UtilityMethod::getMimeType(it -> second, "", "", false) << std::endl;
-    appendToResponse(CONTENT_TYP, UtilityMethod::getMimeType(it -> second, "", "", false));
-    appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()));
-    _response += CRLF;
-
-    if (UtilityMethod::sendBuffer(client.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
     
-    _response.clear();
+    res.makeStatusLine(client, err)
+       .addCustomHeader(client, err)
+       .setHeader(CONTENT_TYP, UtilityMethod::getMimeType(it -> second, "", "", false))
+       .setHeader(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()))
+       .addEndHeaderCRLF();
+
+    if (res.sendResponse() == IO::IO_ERROR) return (IO::IO_ERROR);
+    
     res.setOptions(HttpResponse::HTTP_RESPONSE_STARTED, SET);
     res.setOptions(HttpResponse::HTTP_RESPONSE_FILE, SET);
 
@@ -123,7 +111,7 @@ int Error::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespon
     if (instance.checkBits(HttpServer::HTTP_SERVER_ERROR_PAGE_SET))
     {
         if (!res.checkBits(HttpResponse::HTTP_RESPONSE_STARTED))
-            err = firstStep(client, res, client.getErrStatus());
+            err = firstStep(client, res, res.getStatus());
 
         if (err == IO::IO_SUCCESS)
         {
@@ -134,26 +122,25 @@ int Error::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespon
             }
 
             if (res.checkBits(HttpResponse::HTTP_RESPONSE_FILE))
-                return handleFileRessource(client, res);
+                return handleFileRessource(res);
         }
 
     }
     
-    std::string error_page = getErrorPage(client.getErrStatus());
+    std::string error_page = getErrorPage(res.getStatus());
     size_t len = error_page.size();
 
     err = IO::IO_SUCCESS;
     
     if (req.getMethod() == HttpServer::HTTP_SERVER_HEAD)
     {
-        error_page.insert(error_page.find(CRLF) + 2, ("Allow: " + getAllowedMethod(*(client.getServer() -> getInstance()), HttpServer::_httpMethods) + CRLF));
+        error_page.insert(error_page.find(CRLF) + 2, ("Allow: " + client.getAllowedMethod(*(client.getServer() -> getInstance()), HttpServer::_httpMethods) + CRLF));
         len = error_page.find(CRLF CRLF) + 4;
         error_page[len] = 0;
         err = IO::IO_ERROR;
     }
 
-    if (UtilityMethod::sendBuffer(client.getFd(), error_page.c_str(), len) == IO::IO_ERROR)
-        return (IO::IO_ERROR);
+    if (res.sendResponse(error_page.c_str(), len) == IO::IO_ERROR) return (IO::IO_ERROR);
 
     res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
 

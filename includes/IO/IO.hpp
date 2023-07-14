@@ -25,7 +25,6 @@ class IO: public BitsManipulation
         const int& getFd(void) const;
         const HttpRequest& getRequest(void) const;
         const HttpResponse& getResponse(void) const;
-        const int& getErrStatus(void) const;
         HttpRequest& getRequest(void);
         HttpResponse& getResponse(void);
         Server* getServer(void) const;
@@ -42,7 +41,6 @@ class IO: public BitsManipulation
         void setIO(IO*);
         void setEvents(const uint32_t&);
         void setFD(const int&);
-        void setErrorStatus(const int&);
 
         /*MEMBER FUNCTION*/
         long getTimestampInMillisecond(const long& _cgi_timesamp) const;
@@ -79,7 +77,6 @@ class IO: public BitsManipulation
         protected:
             int _ws;
             int _fd;
-            int _err;
             long _timestamp;
             Server *_server;
             uint32_t     _event;

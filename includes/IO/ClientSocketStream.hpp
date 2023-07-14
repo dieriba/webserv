@@ -18,6 +18,7 @@ class ClientSocketStream: public IO
         const unsigned int& getPrevContentLength(void) const;
         const unsigned int& getPrevBodySize(void) const;
         std::string& getFilename(void);
+        std::string getAllowedMethod(const HttpServer& instance, const std::map<std::string, short int>& _httpMethods);
         
         /*SETTERS*/
         void setPrevContentLength(const unsigned int&);

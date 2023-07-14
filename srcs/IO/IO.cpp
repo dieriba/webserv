@@ -2,16 +2,15 @@
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 IO::IO(){};
-IO::IO(const int& ws, const int& fd, Server *server):BitsManipulation(),_ws(ws),_fd(fd),_err(0),_timestamp(getCurrentTimestampMs()),_server(server),_event(EPOLLIN),_io(NULL){};
-IO::IO(const int& fd, Server *server):BitsManipulation(),_ws(-1),_fd(fd),_err(0),_timestamp(getCurrentTimestampMs()),_server(server),_event(EPOLLIN),_io(NULL){};
-IO::IO(const IO& rhs):BitsManipulation(rhs),_ws(rhs._ws),_fd(rhs._fd),_err(rhs._err),_timestamp(rhs._timestamp),_server(rhs._server),_event(rhs._event),_io(rhs._io)
+IO::IO(const int& ws, const int& fd, Server *server):BitsManipulation(),_ws(ws),_fd(fd),_timestamp(getCurrentTimestampMs()),_server(server),_event(EPOLLIN),_io(NULL){};
+IO::IO(const int& fd, Server *server):BitsManipulation(),_ws(-1),_fd(fd),_timestamp(getCurrentTimestampMs()),_server(server),_event(EPOLLIN),_io(NULL){};
+IO::IO(const IO& rhs):BitsManipulation(rhs),_ws(rhs._ws),_fd(rhs._fd),_timestamp(rhs._timestamp),_server(rhs._server),_event(rhs._event),_io(rhs._io)
 ,_request(rhs._request),_response(rhs._response){};
 IO& IO::operator=(const IO& rhs)
 {
     if (this == &rhs) return (*this);
     _ws = rhs._ws;
     _fd = rhs._fd;
-    _err = rhs._err;
     _timestamp = rhs._timestamp;
     _server = rhs._server;
     _event = rhs._event;
@@ -31,7 +30,6 @@ IO::~IO()
 int IO::getType(void) const {return _type;}
 long IO::getTimeStamp(void) const {return _timestamp;};
 const int& IO::getFd(void) const { return _fd ;};
-const int& IO::getErrStatus(void) const {return _err;}
 const HttpResponse& IO::getResponse(void) const {return _response;};
 const HttpRequest& IO::getRequest(void) const {return _request;}
 const uint32_t& IO::getEvents(void) const {return _event;};
@@ -51,7 +49,6 @@ long IO::getCurrentTimestampMs(void) const
 }
 /*----------------------------------------SETTER----------------------------------------*/
 void IO::setFD(const int& fd) {_fd = fd;}
-void IO::setErrorStatus(const int& err) {_err = err;}
 void IO::setEvents(const uint32_t& event) {_event = event;};
 void IO::setIO(IO *io) {_io = io;};
 void IO::setWs(const int& ws) {_ws = ws;}

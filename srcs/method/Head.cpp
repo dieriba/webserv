@@ -43,18 +43,16 @@ int Head::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespons
         size_t len = file.tellg();
         file.seekg(0, std::ios::beg);
 
-        makeStatusLine(client, OK);
 
         std::string ressource(full_path);
         
-        appendToResponse(CONTENT_TYP, UtilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex(), true));
-        appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(len));
-        _response += CRLF;
-        
+        res.makeStatusLine(client, OK)
+           .setHeader(CONTENT_TYP, UtilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex(), true))
+           .setHeader(CONTENT_LEN, UtilityMethod::numberToString(len))
+           .addEndHeaderCRLF();
     }
     else if (directory == true || cgi_get == true)
     {
-        makeStatusLine(client, OK);
         
         if (directory)
         {
@@ -71,15 +69,13 @@ int Head::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespons
             if ((access(executable, X_OK) != 0)) return FORBIDEN;
         }
 
-        appendToResponse(CONTENT_TYP, "application/octet-stream");
-        appendToResponse(CONTENT_LEN, UtilityMethod::numberToString(0));
-        _response += CRLF;
-
+        res.makeStatusLine(client, OK)
+           .setHeader(CONTENT_TYP, "application/octet-stream")
+           .setHeader(CONTENT_LEN, UtilityMethod::numberToString(0))
+           .addEndHeaderCRLF();
     }
     
-    if (UtilityMethod::sendBuffer(client.getFd(), _response.c_str(), _response.size()) == IO::IO_ERROR) return (IO::IO_ERROR);
-    
-    _response.clear();
+    if (res.sendResponse() == IO::IO_ERROR) return (IO::IO_ERROR);
 
     res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
     
