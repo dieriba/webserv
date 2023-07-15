@@ -111,14 +111,12 @@ int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
 
 int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event)
 {
-    char buffer[REQUEST_SIZE + 1];
-
-    int size = recv(this -> getFd(), buffer, REQUEST_SIZE, 0);
+    int size = recv(this -> getFd(), Server::buffer, REQUEST_SIZE, 0);
 
     if (size <= 0) return IO::IO_ERROR;
 
     if (checkBits(IO::IO_SOCKET_NOT_FINISH) == 0)
-        _request.appendToBuffer(buffer, size);
+        _request.appendToBuffer(Server::buffer, size);
     else
     {
         if (checkBits(IO::IO_CONTENT_LEN))

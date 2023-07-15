@@ -144,17 +144,18 @@ int HttpResponse::setErrorObjectResponse(const short int& status)
     delete _method;
     _status = status;
     _method = new Error;
+    _response.clear();
     return IO::IO_ERROR;
 }
 
 int HttpResponse::sendRedirect(const ClientSocketStream& client, HttpResponse& res, const char *status_line)
 {
-    if (UtilityMethod::sendBuffer(client.getFd(), status_line, UtilityMethod::myStrlen(status_line)) == IO::IO_ERROR)
+    if (UtilityMethod::sendBuffer(client.getFd(), status_line, std::strlen(status_line)) == IO::IO_ERROR)
             return IO::IO_ERROR;
     
     const std::string& redirect_url = client.getServer() -> getInstance() -> getRedirect();
 
-    if (UtilityMethod::sendBuffer(client.getFd(), redirect_url.c_str(), redirect_url.size()) || UtilityMethod::sendBuffer(client.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
+    if (UtilityMethod::sendBuffer(client.getFd(), redirect_url.c_str(), redirect_url.size()) || UtilityMethod::sendBuffer(client.getFd(), CRLF CRLF, std::strlen(CRLF CRLF)))
         return IO::IO_ERROR;
             
     res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
@@ -164,7 +165,6 @@ int HttpResponse::sendRedirect(const ClientSocketStream& client, HttpResponse& r
 int HttpResponse::sendResponse(void)
 {
     short int res = IO::IO_SUCCESS;
-
     if (UtilityMethod::sendBuffer(_fd, _response.c_str(), _response.size()) == IO::IO_ERROR)
         res = IO::IO_ERROR;
     
