@@ -73,7 +73,6 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
                  .addEndHeaderCRLF();
         setBeginTimeStamp();
         setOptions(CgiStream::STARTED, SET);
-        std::cout << "Entered" << std::endl;
     }        
 
     updateTimeStamp();

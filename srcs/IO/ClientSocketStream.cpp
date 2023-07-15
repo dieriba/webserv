@@ -115,6 +115,9 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
 
     if (size <= 0) return IO::IO_ERROR;
 
+    if (_request.getBuffer().capacity() < static_cast<size_t>(size))
+        _request.getBuffer().reserve(size);
+
     if (checkBits(IO::IO_SOCKET_NOT_FINISH) == 0)
         _request.appendToBuffer(Server::buffer, size);
     else
@@ -145,7 +148,7 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
         return IO::IO_SUCCESS;
     }
 
-    if ((_request.checkBits(HttpRequest::HTTP_REQUEST_END_HEADER_FOUND) || std::strstr(_request.getBuffer().c_str(), CRLF CRLF))
+    if ((_request.checkBits(HttpRequest::HTTP_REQUEST_END_HEADER_FOUND) || _request.getBuffer().find(CRLF CRLF) != std::string::npos)
         || (_request.checkBits(HttpRequest::HTTP_REQUEST_CONTENT_LENGTH) || _request.checkBits(HttpRequest::HTTP_REQUEST_TRANSFER_ENCODING)))
     {
         int _req = _request.parseRequest(*this);

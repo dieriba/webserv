@@ -197,6 +197,29 @@ int HttpResponse::sendResponse(const char *buffer, const size_t& size)
     return res;
 }
 
+int HttpResponse::sendJsonResponse(ClientSocketStream& client, std::vector<std::string>& vec)
+{
+    std::string bodyResponse;
+    
+    bodyResponse.reserve(100);
+    bodyResponse += "{\n\t";
+    for (size_t i = 0; i < vec.size(); i++)
+    {
+        if (i % 2 == 0)
+            bodyResponse += "\"" + vec[i] + "\": ";
+        else
+            bodyResponse += vec[i];
+    }
+    bodyResponse.append("\n}");
+    makeStatusLine(client)
+    .setHeader(CONTENT_TYP, "application/json")
+    .setHeader(CONTENT_LEN, UtilityMethod::numberToString(bodyResponse.size()))
+    .addEndHeaderCRLF()
+    .appendToResponse(bodyResponse);
+
+    return sendResponse();
+}
+
 HttpResponse& HttpResponse::addCustomHeader(ClientSocketStream& client, const short int& err)
 {
     HttpResponse& res = client.getResponse();
@@ -236,6 +259,18 @@ HttpResponse& HttpResponse::makeStatusLine(IO& object, const int& status)
     std::string code(ss.str());
     
     _response = version + " " + code + " " + HttpServer::getHttpResponse(status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime() + CRLF;
+
+    if (object.checkBits(IO::IO_COOKIE) == 0) setCookieHeader(object);
+
+    return *this;
+}
+
+HttpResponse& HttpResponse::makeStatusLine(IO& object)
+{
+    std::string version(HTTP_VERSION);
+
+    _response = version + " " + UtilityMethod::numberToString(_status) + " "
+                + HttpServer::getHttpResponse(_status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime() + CRLF;
 
     if (object.checkBits(IO::IO_COOKIE) == 0) setCookieHeader(object);
 

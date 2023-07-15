@@ -65,15 +65,17 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         int sendResponse(void);
         int sendResponse(const char *);
         int sendResponse(const char *, const size_t&);
+        int sendJsonResponse(ClientSocketStream&, std::vector<std::string>&);
         int sendRedirect(const ClientSocketStream&, HttpResponse&, const char *);
         int serveResponse(ClientSocketStream&, HttpRequest&);
-        int setErrorObjectResponse(const short int& status);
+        int setErrorObjectResponse(const short int&);
         void clearReadEnd();
         void clearWriteEnd();
         void clearBothEnd();
         void clear(void);
         void setDirectory(DIR*);
         HttpResponse& makeStatusLine(IO&, const int&);
+        HttpResponse& makeStatusLine(IO&);
 
     private:
         int     _fd;
