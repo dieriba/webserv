@@ -118,6 +118,7 @@ void Server::setServerStream(IO* server_stream)
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
+
 void    Server::makeLocationInherits(void)
 {
     std::vector<Location>& serv_locations(getLocations());
@@ -185,8 +186,11 @@ void Server::deleteFromEventsMap(IO& client)
     if (client.getFd() > 0) epoll_ctl(getEpollWs(), EPOLL_CTL_DEL, client.getFd(), NULL);
     delete &client;
 }
+
+
+
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 
-/*----------------------------------------STATIC VARIABLE----------------------------------------*/
-char Server::buffer[REQUEST_SIZE];
-/*----------------------------------------STATIC VARIABLE----------------------------------------*/
+/*----------------------------------------VIRTUAL FUNCTION----------------------------------------*/
+
+/*----------------------------------------VIRTUAL FUNCTION----------------------------------------*/

@@ -4,9 +4,8 @@
 
 /*----------------------------------------CONSTRUCTOR/DESTRUCTOR----------------------------------------*/
 CgiStream::CgiStream(){};
-CgiStream::CgiStream(const int& fd, IO *client, int *pipes):_io(client),_pipes(pipes)
+CgiStream::CgiStream(const int& fd, IO *event, int *pipes):_io(event),_pipes(pipes)
 {
-    _response.setFd(client -> getFd());
     setFD(fd);
     _pid = 0;
     _type = IO::IO_CGI_STREAM;
@@ -62,6 +61,7 @@ int CgiStream::resetCgi(IO& object, const int& _ws)
 int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */)
 {
     IO& object = *(getIO());
+    
 
     if (object.checkBits(IO::IO_CGI_ON) == 0) return IO::IO_SUCCESS;
 
@@ -88,22 +88,28 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
     _response.appendToResponse(_buffer, bytes);
     _response.appendToResponse(CRLF, LEN_CRLF);
 
-    if (_response.sendResponse() == IO::IO_ERROR)
+    std::string& resp = _response.getBuffer();
+
+    if (UtilityMethod::sendBuffer(object.getFd(), resp.data(), resp.size()) == IO::IO_ERROR)
     {
         UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
         object.setOptions(IO::IO_KILL_CGI, SET);
+        resp.clear();
         return IO::IO_SUCCESS;
     }
 
+    resp.clear();
+        
     if (bytes == 0) return resetCgi(object, _ws);
     if ((getTimestampInMillisecond(std::clock()) - getTimestampInMillisecond(getCgiBeginTimestamp())) >= MAX_TIMEOUT_CGI)
     {
         kill(_pid, SIGTERM);
         std::cout << "TIMEOUT EPOLLOUT" << std::endl;
-        if (_response.sendResponse("0\r\n\r\n", 5) == IO::IO_ERROR)
+        if (UtilityMethod::sendBuffer(object.getFd(), "0\r\n\r\n", 5) == IO::IO_ERROR)
         {
             UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
             object.setOptions(IO::IO_KILL_CGI, SET);
+            resp.clear();
             return IO::IO_SUCCESS;
         }
 

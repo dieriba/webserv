@@ -136,6 +136,7 @@ int Error::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespon
     {
         error_page.insert(error_page.find(CRLF) + 2, ("Allow: " + client.getAllowedMethod(*(client.getServer() -> getInstance()), HttpServer::_httpMethods) + CRLF));
         len = error_page.find(CRLF CRLF) + 4;
+        error_page[len] = 0;
         err = IO::IO_ERROR;
     }
 

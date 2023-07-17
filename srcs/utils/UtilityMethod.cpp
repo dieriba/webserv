@@ -175,9 +175,7 @@ std::string UtilityMethod::getFileExtension(const std::string& content_type, con
 {
     if (option == false) 
         return HttpServer::getMimeType(content_type);
-
-    if (content_type.size() == 0) return BIN;
-
+    
     int i = content_type.size() - 1;
 
     for (; i >= 0; i--)
@@ -186,6 +184,13 @@ std::string UtilityMethod::getFileExtension(const std::string& content_type, con
     if (i == 0) return "";
     
     return &content_type[i];
+}
+
+size_t  UtilityMethod::myStrlen(const char *buffer)
+{
+    size_t  i = -1;
+    while (buffer[++i]);
+    return i;
 }
 
 std::string UtilityMethod::remove_dup(std::string& ressource)

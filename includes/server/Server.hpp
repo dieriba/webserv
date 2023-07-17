@@ -44,9 +44,6 @@ class Server: public HttpServer
         void deleteFromEventsMap(IO&);
         std::string launchServer(void);
 
-        /*STATIC VARIABLES*/
-        static char buffer[REQUEST_SIZE];
-
     private:
         int _serv_socket;
         struct sockaddr_in _serv_address;

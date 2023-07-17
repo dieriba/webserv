@@ -232,17 +232,13 @@ void HttpServer::clearOutTimedClient(void)
         
         for (std::map<const IO*, IO*>::iterator it = _events.begin(); it != _events.end(); it++)
         {
-            IO& client = *(it -> second);
+            IO* client = it -> second;
             
-            if (client.getEvents() != EPOLLIN || (client.getCurrentTimestampMs() - client.getTimeStamp()) < TIMEOUT_REQUEST)
+            if (client -> getEvents() != EPOLLIN || (client -> getCurrentTimestampMs() - client -> getTimeStamp()) < TIMEOUT_REQUEST)
                 continue;
-
-            std::vector<std::string> vec;
-            vec.push_back("message");
-            vec.push_back("\"Request Timeout\"");
-            client.getResponse().setStatus(REQUEST_TIMEOUT).sendJsonResponse(static_cast<ClientSocketStream&>(client), vec);
-            Server* server = client.getBaseServer();
-            server -> deleteFromEventsMap(client);
+            
+            Server* server = client -> getBaseServer();
+            server -> deleteFromEventsMap(*client);
         }
     }
 }

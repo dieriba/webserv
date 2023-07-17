@@ -30,6 +30,7 @@ class UtilityMethod
         static std::string decimalToHex(const int&);
         static size_t hexToDecimal(const std::string&);
         static int is_a_directory(const char *);
+        static size_t myStrlen(const char *);
         static std::string remove_dup(std::string&);
     
     private:

@@ -124,7 +124,7 @@ int Post::postCgiHandler(HttpRequest& req, HttpResponse& res)
 
         if (dup2(res.getWriteEnd(), STDOUT_FILENO) == IO::IO_ERROR)
         {
-            write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, std::strlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
+            write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
             close(res.getWriteEnd());
             exit(EXIT_FAILURE);
         }
@@ -147,19 +147,19 @@ int Post::postCgiHandler(HttpRequest& req, HttpResponse& res)
 
         if (access(executable, F_OK) != 0)
         {
-            write(res.getWriteEnd(), SERVER_ERROR_PAGE_NOT_FOUND, std::strlen(SERVER_ERROR_PAGE_NOT_FOUND));
+            write(res.getWriteEnd(), SERVER_ERROR_PAGE_NOT_FOUND, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_NOT_FOUND));
             exit(EXIT_FAILURE);
         };
 
         if ((access(executable, X_OK) != 0))
         {
-            write(res.getWriteEnd(), SERVER_ERROR_PAGE_FORBIDDEN, std::strlen(SERVER_ERROR_PAGE_FORBIDDEN));
+            write(res.getWriteEnd(), SERVER_ERROR_PAGE_FORBIDDEN, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_FORBIDDEN));
             exit(EXIT_FAILURE);
         }
 
         execve(executable, argv, envp);
     
-        write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, std::strlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
+        write(res.getWriteEnd(), SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_INTERNAL_SERVER_ERROR));   
 
         exit(EXIT_FAILURE);
     }

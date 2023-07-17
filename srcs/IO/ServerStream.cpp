@@ -36,6 +36,7 @@ int ServerStream::handleIoOperation(const int& _ws, struct epoll_event& /* event
 
     while (1)
     {
+        std::cout << "Entered" << std::endl;
         int client_fd = accept(_fd, NULL, NULL);
         if (client_fd == -1) return IO::IO_SUCCESS;
                         
