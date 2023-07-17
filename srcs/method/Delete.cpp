@@ -33,10 +33,10 @@ int Delete::sendResponse(ClientSocketStream& event, HttpRequest& req, HttpRespon
 
     if (std::remove(full_path.c_str()) != 0)
     {
-        if (UtilityMethod::sendBuffer(event.getFd(), SERVER_ERROR_PAGE_FORBIDDEN, UtilityMethod::myStrlen(SERVER_ERROR_PAGE_FORBIDDEN)) == IO::IO_ERROR)
+        if (res.sendResponse(SERVER_ERROR_PAGE_FORBIDDEN) == IO::IO_ERROR)
             return IO::IO_ERROR;
     }
-    else if (UtilityMethod::sendBuffer(event.getFd(), SERVER_SUCCESS_DELETE_RESPONSE, UtilityMethod::myStrlen(SERVER_SUCCESS_DELETE_RESPONSE)) == IO::IO_ERROR)
+    else if (res.sendResponse(SERVER_SUCCESS_DELETE_RESPONSE) == IO::IO_ERROR)
             return IO::IO_ERROR;
     
     return IO::IO_SUCCESS;

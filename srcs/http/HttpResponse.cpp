@@ -144,17 +144,18 @@ int HttpResponse::setErrorObjectResponse(const short int& status)
     delete _method;
     _status = status;
     _method = new Error;
+    _response.clear();
     return IO::IO_ERROR;
 }
 
 int HttpResponse::sendRedirect(const ClientSocketStream& client, HttpResponse& res, const char *status_line)
 {
-    if (UtilityMethod::sendBuffer(client.getFd(), status_line, UtilityMethod::myStrlen(status_line)) == IO::IO_ERROR)
+    if (UtilityMethod::sendBuffer(client.getFd(), status_line, std::strlen(status_line)) == IO::IO_ERROR)
             return IO::IO_ERROR;
     
     const std::string& redirect_url = client.getServer() -> getInstance() -> getRedirect();
 
-    if (UtilityMethod::sendBuffer(client.getFd(), redirect_url.c_str(), redirect_url.size()) || UtilityMethod::sendBuffer(client.getFd(), CRLF CRLF, UtilityMethod::myStrlen(CRLF CRLF)))
+    if (UtilityMethod::sendBuffer(client.getFd(), redirect_url.c_str(), redirect_url.size()) || UtilityMethod::sendBuffer(client.getFd(), CRLF CRLF, std::strlen(CRLF CRLF)))
         return IO::IO_ERROR;
             
     res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
@@ -164,7 +165,6 @@ int HttpResponse::sendRedirect(const ClientSocketStream& client, HttpResponse& r
 int HttpResponse::sendResponse(void)
 {
     short int res = IO::IO_SUCCESS;
-
     if (UtilityMethod::sendBuffer(_fd, _response.c_str(), _response.size()) == IO::IO_ERROR)
         res = IO::IO_ERROR;
     
@@ -195,6 +195,29 @@ int HttpResponse::sendResponse(const char *buffer, const size_t& size)
     _response.clear();
     
     return res;
+}
+
+int HttpResponse::sendJsonResponse(ClientSocketStream& client, std::vector<std::string>& vec)
+{
+    std::string bodyResponse;
+    
+    bodyResponse.reserve(100);
+    bodyResponse += "{\n\t";
+    for (size_t i = 0; i < vec.size(); i++)
+    {
+        if (i % 2 == 0)
+            bodyResponse += "\"" + vec[i] + "\": ";
+        else
+            bodyResponse += vec[i];
+    }
+    bodyResponse.append("\n}");
+    makeStatusLine(client)
+    .setHeader(CONTENT_TYP, "application/json")
+    .setHeader(CONTENT_LEN, UtilityMethod::numberToString(bodyResponse.size()))
+    .addEndHeaderCRLF()
+    .appendToResponse(bodyResponse);
+
+    return sendResponse();
 }
 
 HttpResponse& HttpResponse::addCustomHeader(ClientSocketStream& client, const short int& err)
@@ -236,6 +259,18 @@ HttpResponse& HttpResponse::makeStatusLine(IO& object, const int& status)
     std::string code(ss.str());
     
     _response = version + " " + code + " " + HttpServer::getHttpResponse(status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime() + CRLF;
+
+    if (object.checkBits(IO::IO_COOKIE) == 0) setCookieHeader(object);
+
+    return *this;
+}
+
+HttpResponse& HttpResponse::makeStatusLine(IO& object)
+{
+    std::string version(HTTP_VERSION);
+
+    _response = version + " " + UtilityMethod::numberToString(_status) + " "
+                + HttpServer::getHttpResponse(_status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime() + CRLF;
 
     if (object.checkBits(IO::IO_COOKIE) == 0) setCookieHeader(object);
 

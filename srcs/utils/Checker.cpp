@@ -550,8 +550,8 @@ int Checker::checkConfigFile(const char *filename)
             {
                 pos = line.find_first_not_of(SERVER_CONTEXT);
                 
-                if ((pos == std::string::npos && line.size() != UtilityMethod::myStrlen(SERVER_CONTEXT))
-                    || (pos != std::string::npos && (UtilityMethod::myStrlen(SERVER_CONTEXT) != pos)))
+                if ((pos == std::string::npos && line.size() != std::strlen(SERVER_CONTEXT))
+                    || (pos != std::string::npos && (std::strlen(SERVER_CONTEXT) != pos)))
                     notifyError("Unknow Context: " + line + " please refer to dieriba for the known context");
 
                 if (UtilityMethod::count(line, '{') > 1)

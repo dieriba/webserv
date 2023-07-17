@@ -35,13 +35,11 @@ int Method::handleFileRessource(HttpResponse& res)
 {
     try
     {
-        char buffer[REQUEST_SIZE];
-
         std::ifstream& file = res.getFile();
         
-        file.read(buffer, REQUEST_SIZE);
+        file.read(Server::buffer, REQUEST_SIZE);
 
-        if (res.sendResponse(buffer, file.gcount()) == IO::IO_ERROR) return (IO::IO_ERROR);
+        if (res.sendResponse(Server::buffer, file.gcount()) == IO::IO_ERROR) return (IO::IO_ERROR);
 
         if (file.fail() || file.eof()) res.setOptions(HttpResponse::HTTP_RESPONSE_FINISHED_RESPONSE, SET);
     }

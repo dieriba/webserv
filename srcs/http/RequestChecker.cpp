@@ -150,7 +150,7 @@ int RequestChecker::checkPostPutMethod(const HttpServer& instance, HttpRequest& 
 
     if (access(alias_root, W_OK) && errno == EACCES) return FORBIDEN;
 
-    size_t len = UtilityMethod::myStrlen(MULTIPART_FORM_DATA"; boundary=");
+    size_t len = std::strlen(MULTIPART_FORM_DATA"; boundary=");
 
     if (it -> second.compare(0, len, MULTIPART_FORM_DATA"; boundary=") == 0)
     {
