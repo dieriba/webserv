@@ -300,7 +300,7 @@ const std::string& HttpServer::getMimeType(const std::string& key)
     std::map<std::string, std::string>::iterator it = _mimeTypes.find(key);
 
     if (it == _mimeTypes.end())
-        return _mimeTypes.find(DEFAULT_CONTENT_TYPE) -> second;
+        return _mimeTypes.find(DEFAULT_EXTENSION) -> second;
     return it -> second;
 }
 
@@ -456,8 +456,8 @@ void HttpServer::initMimeTypes(void)
 
     _mimeTypes[BIN] = MIME_BIN;
     _mimeTypes[MIME_BIN] = BIN; 
-    _mimeTypes[DEFAULT_CONTENT_TYPE] = MIME_PLAIN;
-    _mimeTypes[DEFAULT_EXTENSION] = "";
+    _mimeTypes[DEFAULT_CONTENT_TYPE] = MIME_BIN;
+    _mimeTypes[DEFAULT_EXTENSION] = BIN;
     _mimeTypes[HTM] = MIME_HTM;
     _mimeTypes[HTML] = MIME_HTML;
     _mimeTypes[SLASH] = MIME_HTML;

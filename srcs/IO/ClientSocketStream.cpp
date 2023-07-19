@@ -133,17 +133,15 @@ int ClientSocketStream::readFromSocket(const int& _ws, struct epoll_event& event
                 resetOptions();
             }
         }
-        else
-        {
-            if (std::strstr(_request.getBuffer().c_str(), "0\r\n\r\n"))
-                resetOptions();
-        }
+        else if (_request.getBuffer().rfind("0\r\n\r\n") != std::string::npos)
+            resetOptions();
 
         return IO::IO_SUCCESS;
     }
 
     if (_request.getHeaderSize() >= MAX_HEADER_SIZE)
     {
+        getBaseServer() -> setInstance(getBaseServer());
         UtilityMethod::switchEvents(_ws, EPOLLOUT, event, *(this));
         _response.setErrorObjectResponse(TOO_LARGE_CONTENT);
         return IO::IO_SUCCESS;

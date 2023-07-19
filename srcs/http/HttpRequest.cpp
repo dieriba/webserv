@@ -99,8 +99,17 @@ void HttpRequest::appendToBuffer(const char *toAppend, const ssize_t& size)
 {
     size_t  len;
     s_buffer.append(toAppend, size);
-    if (_header_size == 0 && ((len = s_buffer.find(CRLF CRLF)) != std::string::npos))
-        _header_size = len + 1;
+    
+    if (checkBits(HttpRequest::HTTP_REQUEST_END_HEADER_FOUND) == 0)
+    {
+        if ((len = s_buffer.find(CRLF CRLF)) != std::string::npos)
+        {
+            _header_size += len + 1;
+            return ;
+        }
+        
+        _header_size += size;
+    }
 }
 
 int HttpRequest::parseRequest(ClientSocketStream& client)
@@ -137,6 +146,8 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
 
     Server* server = (HttpServer::getHostnameServerMap(client.getPort(), _headers[HOST]));
     
+    if (server == NULL) server = client.getBaseServer();
+
     client.setServer(server);
 
     server -> setInstance(server);

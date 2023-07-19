@@ -97,11 +97,14 @@ void    Checker::feedingUpInstance(std::map<std::string, std::string>& _map, Htt
 
     if (it != end)
     {
+        if (it -> second.find_first_not_of("0123456789") != std::string::npos)
+            notifyError("Only Digit allowed");
+
         size_t val;
         ss << it -> second;
         ss >> val;
 
-        if (val == std::string::npos) ExceptionThrower("Body Value insanely huge");
+        if (val == std::string::npos) notifyError("Body Value insanely huge");
 
         instance.setBodySize(val);
     }

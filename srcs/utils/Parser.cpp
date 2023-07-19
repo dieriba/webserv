@@ -109,11 +109,14 @@ void    Parser::feedingUpInstance(std::map<std::string, std::string>& _map, Http
 
     if (it != end)
     {
+        if (it -> second.find_first_not_of("0123456789") != std::string::npos)
+            throw ExceptionThrower("Only Digit allowed");
+
         size_t val;
         ss << it -> second;
         ss >> val;
 
-        if (val == std::string::npos) ExceptionThrower("Body Value insanely huge");
+        if (val == std::string::npos) throw ExceptionThrower("Body Value insanely huge");
 
         instance.setBodySize(val);
     }

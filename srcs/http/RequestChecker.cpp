@@ -265,8 +265,7 @@ int RequestChecker::checkAllowedMethod(const HttpServer& instance, HttpRequest& 
 
 int RequestChecker::checkBodySize(const HttpServer& instance, HttpRequest& req)
 {
-    if ((instance.getBodySize() != std::string::npos) && (req.getBodySize() > instance.getBodySize()))                                                                            
-        return TOO_LARGE_CONTENT;
+    if (req.getBodySize() > instance.getBodySize()) return TOO_LARGE_CONTENT;
 
     return IO::IO_SUCCESS;
 }
