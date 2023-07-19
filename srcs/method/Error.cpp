@@ -90,7 +90,7 @@ int Error::firstStep(ClientSocketStream& client, HttpResponse& res, const int& e
 
     std::cout << "second: " << it -> second << " Res: " << UtilityMethod::getMimeType(it -> second, "", "", false) << std::endl;
     
-    res.makeStatusLine(client, err)
+    res.makeStatusLine(err)
        .addCustomHeader(client, err)
        .setHeader(CONTENT_TYP, UtilityMethod::getMimeType(it -> second, "", "", false))
        .setHeader(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()))

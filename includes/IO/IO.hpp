@@ -31,9 +31,11 @@ class IO: public BitsManipulation
         const int& getWs(void) const;
         long getTimeStamp(void) const;
         IO* getIO(void) const;
+        const std::string& getCookie (void) const;
         Server *getBaseServer(void);
 
         /*SETTERS*/
+        void setCookie(const std::string&);
         void updateTimeStamp(void);
         void updateTimeStamp(const long&);
         void setServer(Server *);
@@ -85,6 +87,7 @@ class IO: public BitsManipulation
             HttpResponse _response;
             enum type _type;
             Server *_base_server;
+            std::string _cookies;
 };
 
 # endif

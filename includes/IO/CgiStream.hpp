@@ -38,6 +38,7 @@ class CgiStream: public IO
         char _buffer[REQUEST_SIZE + 1];
         long _cgi_begin;
         pid_t _pid;
+        size_t _size;
 };
 
 # endif

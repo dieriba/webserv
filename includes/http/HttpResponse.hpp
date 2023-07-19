@@ -56,6 +56,7 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         HttpResponse& addCustomHeader(ClientSocketStream&, const short int&);
         HttpResponse& addCustomHeader(const HttpServer&);
         HttpResponse& addEndHeaderCRLF(void);
+        HttpResponse& setHeader(const size_t&, const std::string&, const std::string&);
 
         void setFd(const int& fd);
         void setPath(const std::string&);
@@ -65,7 +66,7 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         int sendResponse(void);
         int sendResponse(const char *);
         int sendResponse(const char *, const size_t&);
-        int sendJsonResponse(ClientSocketStream&, std::vector<std::string>&);
+        int sendJsonResponse(std::vector<std::string>&);
         int sendRedirect(const ClientSocketStream&, HttpResponse&, const char *);
         int serveResponse(ClientSocketStream&, HttpRequest&);
         int setErrorObjectResponse(const short int&);
@@ -74,8 +75,10 @@ class HttpResponse: public HttpMessage, public BitsManipulation
         void clearBothEnd();
         void clear(void);
         void setDirectory(DIR*);
-        HttpResponse& makeStatusLine(IO&, const int&);
-        HttpResponse& makeStatusLine(IO&);
+        HttpResponse& makeStatusLine();
+        HttpResponse& makeStatusLine(const size_t&);
+        HttpResponse& makeStatusLine(const int&);
+        HttpResponse& makeStatusLine(const size_t&, const int&);
 
     private:
         int     _fd;

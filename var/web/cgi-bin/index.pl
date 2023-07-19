@@ -1,5 +1,8 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
+use strict;
+use warnings;
 
-my $body = $ENV{'BODY'};  # Access the environment variable named 'BODY'
-
-print $body;  # Print the value of the 'BODY' environment variable
+print "Content-type: text/html\r\n\r\n";
+print "<html><body>\n";
+print "<h1>Hello, World!</h1>\n";
+print "</body></html>\n";

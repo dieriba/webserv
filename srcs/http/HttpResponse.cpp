@@ -109,6 +109,7 @@ HttpResponse& HttpResponse::appendToResponse(const char* buffer, const size_t& s
     return *this;
 }
 
+
 HttpResponse& HttpResponse::appendToResponse(const std::string& to_append)
 {
     _response.append(to_append);
@@ -192,12 +193,10 @@ int HttpResponse::sendResponse(const char *buffer, const size_t& size)
     if (UtilityMethod::sendBuffer(_fd, buffer, size) == IO::IO_ERROR)
         res = IO::IO_ERROR;
     
-    _response.clear();
-    
     return res;
 }
 
-int HttpResponse::sendJsonResponse(ClientSocketStream& client, std::vector<std::string>& vec)
+int HttpResponse::sendJsonResponse(std::vector<std::string>& vec)
 {
     std::string bodyResponse;
     
@@ -211,7 +210,7 @@ int HttpResponse::sendJsonResponse(ClientSocketStream& client, std::vector<std::
             bodyResponse += vec[i];
     }
     bodyResponse.append("\n}");
-    makeStatusLine(client)
+    makeStatusLine()
     .setHeader(CONTENT_TYP, "application/json")
     .setHeader(CONTENT_LEN, UtilityMethod::numberToString(bodyResponse.size()))
     .addEndHeaderCRLF()
@@ -250,7 +249,27 @@ HttpResponse& HttpResponse::setCookieHeader(IO& object)
     return *this;
 }
 
-HttpResponse& HttpResponse::makeStatusLine(IO& object, const int& status)
+HttpResponse& HttpResponse::makeStatusLine(void)
+{
+    std::string version(HTTP_VERSION);
+
+    _response = version + " " + UtilityMethod::numberToString(_status) + " "
+                + HttpServer::getHttpResponse(_status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime() + CRLF;
+
+    return *this;
+}
+
+HttpResponse& HttpResponse::makeStatusLine(const size_t& pos)
+{
+    std::string version(HTTP_VERSION);
+
+    _response.insert(pos, version + " " + UtilityMethod::numberToString(_status) + " "
+                + HttpServer::getHttpResponse(_status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime() + CRLF);
+
+    return *this;
+}
+
+HttpResponse& HttpResponse::makeStatusLine(const int& status)
 {
     std::string version(HTTP_VERSION);
     std::ostringstream ss;
@@ -258,24 +277,25 @@ HttpResponse& HttpResponse::makeStatusLine(IO& object, const int& status)
     ss << status;
     std::string code(ss.str());
     
-    _response = version + " " + code + " " + HttpServer::getHttpResponse(status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime() + CRLF;
-
-    if (object.checkBits(IO::IO_COOKIE) == 0) setCookieHeader(object);
+    _response = version + " " + code + " "
+            + HttpServer::getHttpResponse(status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime() + CRLF;
 
     return *this;
 }
 
-HttpResponse& HttpResponse::makeStatusLine(IO& object)
+HttpResponse& HttpResponse::makeStatusLine(const size_t& pos, const int& status)
 {
     std::string version(HTTP_VERSION);
-
-    _response = version + " " + UtilityMethod::numberToString(_status) + " "
-                + HttpServer::getHttpResponse(_status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime() + CRLF;
-
-    if (object.checkBits(IO::IO_COOKIE) == 0) setCookieHeader(object);
+    std::ostringstream ss;
+    
+    ss << status;
+    std::string code(ss.str());
+    
+    _response.insert(pos, version + " " + code + " " + HttpServer::getHttpResponse(status) -> second + CRLF SERVER_NAME + UtilityMethod::getDateAndTime() + CRLF);
 
     return *this;
 }
+
 
 HttpResponse& HttpResponse::addEndHeaderCRLF(void)
 {
@@ -287,6 +307,13 @@ HttpResponse& HttpResponse::addEndHeaderCRLF(void)
 HttpResponse& HttpResponse::setHeader(const std::string& key, const std::string& value)
 {
     _response += key + ": " + value + CRLF;
+
+    return *this;
+}
+
+HttpResponse& HttpResponse::setHeader(const size_t& pos, const std::string& key, const std::string& value)
+{
+    _response.insert(pos, key + ": " + value + CRLF);
 
     return *this;
 }

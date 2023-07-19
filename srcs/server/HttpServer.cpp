@@ -240,7 +240,7 @@ void HttpServer::clearOutTimedClient(void)
             std::vector<std::string> vec;
             vec.push_back("message");
             vec.push_back("\"Request Timeout\"");
-            client.getResponse().setStatus(REQUEST_TIMEOUT).sendJsonResponse(static_cast<ClientSocketStream&>(client), vec);
+            client.getResponse().setStatus(REQUEST_TIMEOUT).sendJsonResponse(vec);
             Server* server = client.getBaseServer();
             server -> deleteFromEventsMap(client);
         }

@@ -1,5 +1,6 @@
-#!/usr/bin/env python
-
-import os
-
-print(os.getenv('BODY'))  # Print the value of the 'BODY' environment variable
+#!/usr/bin/env python3
+print("Content-type: text/html\r\n\r\n")
+print()
+print("<html><body>")
+print("<h1>Hello, World!</h1>")
+print("</body></html>")

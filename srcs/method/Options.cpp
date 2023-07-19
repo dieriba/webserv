@@ -25,7 +25,7 @@ Options::~Options(){};
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
 int Options::sendResponse(ClientSocketStream& client, HttpRequest& /* req */, HttpResponse& res)
 {
-    res.makeStatusLine(client, NO_CONTENT);
+    res.makeStatusLine(NO_CONTENT);
     
     HttpServer* instance = client.getServer() -> getInstance();
     

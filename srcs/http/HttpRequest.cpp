@@ -118,15 +118,19 @@ int HttpRequest::parseRequest(ClientSocketStream& client)
 
     for (size_t i = 1; i < len; i++)
     {
+        short int cookie = 0;
+
         header = UtilityMethod::stringSpliter(headers[i], ":");
 
         if (header.size() <= 1) return BAD_REQUEST;
 
-        if (i != 0)
-            for (size_t i = 2; i < header.size(); i++)
-                header[1] += ":" + header[i];
+        for (size_t i = 2; i < header.size(); i++)
+            header[1] += ":" + header[i];
         
-        _headers[header[0]] = header[1].erase(0, 1);
+        if (header[0] == "Cookie")
+            _headers[header[0] + "_" + UtilityMethod::numberToString(cookie++)] = header[1].erase(0, 1);
+        else
+            _headers[header[0]] = header[1].erase(0, 1);
     }
     
     if (_headers.find(HOST) != _headers.end()) _headers[HOST] =_headers[HOST].substr(0, _headers[HOST].find(':'));

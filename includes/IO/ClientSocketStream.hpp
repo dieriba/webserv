@@ -37,6 +37,7 @@ class ClientSocketStream: public IO
         unsigned int _prev_body_size;
         unsigned int _prev_content_len;
         std::string _filename;
+        std::string cookie;
 };
 
 # endif

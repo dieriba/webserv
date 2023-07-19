@@ -26,6 +26,7 @@ elif request_method == "POST":
 
 # Output the key-value pairs in an HTML list
 if form:
+    print("Content-type: text/html\r\n\r\n")
     print("<html>")
     print("<body>")
     print("<ul>")

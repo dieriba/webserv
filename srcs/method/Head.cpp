@@ -46,7 +46,7 @@ int Head::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespons
 
         std::string ressource(full_path);
         
-        res.makeStatusLine(client, OK)
+        res.makeStatusLine(OK)
            .setHeader(CONTENT_TYP, UtilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex(), true))
            .setHeader(CONTENT_LEN, UtilityMethod::numberToString(len))
            .addEndHeaderCRLF();
@@ -69,7 +69,7 @@ int Head::sendResponse(ClientSocketStream& client, HttpRequest& req, HttpRespons
             if ((access(executable, X_OK) != 0)) return FORBIDEN;
         }
 
-        res.makeStatusLine(client, OK)
+        res.makeStatusLine(OK)
            .setHeader(CONTENT_TYP, "application/octet-stream")
            .setHeader(CONTENT_LEN, UtilityMethod::numberToString(0))
            .addEndHeaderCRLF();

@@ -90,6 +90,7 @@ std::string ClientSocketStream::getAllowedMethod(const HttpServer& instance, con
 
 int ClientSocketStream::writeToSocket(const int& _ws, struct epoll_event& event)
 {
+    if (_response.getHttpMethod() == NULL) _response.setErrorObjectResponse(BAD_REQUEST);
 
     int res = _response.serveResponse((*this), getRequest());
     

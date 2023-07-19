@@ -60,8 +60,17 @@ int Get::getCgiHandler(ClientSocketStream& client , const HttpRequest&  req, Htt
         res.clearWriteEnd();
 
         std::string method = "REQUEST_METHOD=GET";
+        std::string cookie;
 
-        char *envp[] = {(char *)query_string.c_str(), (char *)method.c_str() ,NULL};
+        for (std::map<std::string, std::string>::const_iterator it = map.begin(); it != map.end(); it ++)
+        {
+            if (it -> first.find("Cookie") == 0)
+            {
+                cookie = "COOKIE=" + it -> second;    
+                break ;
+            }
+        }
+        char *envp[] = {(char *)query_string.c_str(), (char *)method.c_str(), (char *)cookie.c_str(), NULL};
 
         char *argv[] = {(char *)executable, (char *)map.find(CGI_ARGS)->second.c_str(),  NULL};
 
@@ -156,7 +165,7 @@ int Get::firstStep(ClientSocketStream& client, const HttpRequest& req, HttpRespo
 
         std::string ressource(full_path);
 
-        res.makeStatusLine(client, OK)
+        res.makeStatusLine(OK)
            .addCustomHeader(instance)
            .setHeader(CONTENT_TYP, UtilityMethod::getMimeType(ressource, instance.getFullIndexPath(), instance.getIndex(), true))
            .setHeader(CONTENT_LEN, UtilityMethod::numberToString(res.getBodySize()))

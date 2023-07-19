@@ -39,6 +39,7 @@ Server* IO::getBaseServer(void) { return _base_server;}
 HttpRequest& IO::getRequest(void)  {return _request;}
 HttpResponse& IO::getResponse(void) {return _response;};
 IO* IO::getIO(void) const {return _io;}; 
+const std::string& IO::getCookie(void) const { return _cookies ;}
 /*----------------------------------------GETTER----------------------------------------*/
 long IO::getCurrentTimestampMs(void) const 
 {
@@ -48,6 +49,7 @@ long IO::getCurrentTimestampMs(void) const
 	return ((now.tv_sec * 1000) + (now.tv_usec / 1000));
 }
 /*----------------------------------------SETTER----------------------------------------*/
+void IO::setCookie(const std::string& cookie) { _cookies = cookie; }
 void IO::setFD(const int& fd) {_fd = fd;}
 void IO::setEvents(const uint32_t& event) {_event = event;};
 void IO::setIO(IO *io) {_io = io;};
