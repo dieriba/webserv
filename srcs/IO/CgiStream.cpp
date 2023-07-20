@@ -46,16 +46,16 @@ void CgiStream::setPid(const pid_t& pid) { _pid = pid; }
 /*----------------------------------------SETTER----------------------------------------*/
 
 /*----------------------------------------MEMBER FUNCTION----------------------------------------*/
-int CgiStream::resetCgi(IO& object, const int& _ws)
+int CgiStream::resetCgi(IO& client, const int& _ws)
 {
     epoll_event ev;
     ev.events = EPOLLIN;
-    ev.data.ptr = &object;
-    UtilityMethod::switchEvents(_ws, EPOLLIN, ev, object);
+    ev.data.ptr = &client;
+    UtilityMethod::switchEvents(_ws, EPOLLIN, ev, client);
     UtilityMethod::deleteEventFromEpollInstance(_ws, _fd);
-    object.clear();
+    client.clear();
     this -> clear();
-    object.getResponse().clearReadEnd();
+    client.getResponse().clearReadEnd();
     return IO::IO_SUCCESS;
 }
 
@@ -84,7 +84,6 @@ int CgiStream::handleIoOperation(const int& _ws, struct epoll_event& /* event */
     std::string& response = _response.getResponse();
     
     response.append(_buffer, bytes);
-
     if (_request.checkBits(HttpRequest::HTTP_REQUEST_END_HEADER_FOUND) == 0 
         && (pos = response.find(CRLF CRLF)) != std::string::npos)
     {

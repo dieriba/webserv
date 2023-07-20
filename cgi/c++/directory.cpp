@@ -14,6 +14,7 @@ int main ()
 
     if (dir) 
     {
+        std::cout << "Content-Type: text/html\r\n\r\n";
         std::cout << "<!DOCTYPE html>\n";
         std::cout << "<html lang=\"en\">\n";
         std::cout << "<head>\n";

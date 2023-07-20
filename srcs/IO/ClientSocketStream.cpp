@@ -200,6 +200,7 @@ int ClientSocketStream::handleIoOperation(const int& _ws, struct epoll_event& ev
             std::cout << "TIMEOUT EPOLLIN" << std::endl;
             epoll_ctl(_ws, EPOLL_CTL_DEL, cgi.getFd(), NULL);
             getResponse().clearReadEnd();
+            cgi.clear();
             if (cgi.checkBits(CgiStream::STARTED) != 0)
             {
                 this -> clear();

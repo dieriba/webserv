@@ -234,7 +234,8 @@ void HttpServer::clearOutTimedClient(void)
         {
             IO& client = *(it -> second);
             
-            if (client.getEvents() != EPOLLIN || (client.getCurrentTimestampMs() - client.getTimeStamp()) < TIMEOUT_REQUEST)
+            if (client.checkBits(IO::IO_CGI_ON) == 0 
+                && (client.getEvents() != EPOLLIN || (client.getCurrentTimestampMs() - client.getTimeStamp()) < TIMEOUT_REQUEST))
                 continue;
 
             std::vector<std::string> vec;
@@ -259,7 +260,7 @@ void HttpServer::makeServerServe(void)
 
         if (HttpServer::g_signal == 1 && to_proceed == IO::IO_ERROR) throw ExceptionThrower("Epoll_wait failled");
 
-        if (to_proceed == 0) clearOutTimedClient();
+        //if (to_proceed == 0) clearOutTimedClient();
 
         for (int i = 0; i < to_proceed; i++)
         {
