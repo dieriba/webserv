@@ -1,88 +1,82 @@
- #===============================================================================#
-#								SOURCES											  #
- #===============================================================================#
+SRCS_MAIN   = main.cpp
 
-MAIN_DIR				= ./
-CLASS_DIR				= ./classes/
-STRING_HELP_DIR			= $(CLASS_DIR)LibHelp/
-FILE_READER_DIR			= $(CLASS_DIR)FileReader/
-PARSER_DIR				= $(CLASS_DIR)Parser/
-STREAM_DIR				= $(CLASS_DIR)Stream/
-LOCATION_DIR			= $(CLASS_DIR)Location/
-HTTP_SERVER_DIR			= $(CLASS_DIR)HttpServer/
-PAGE					= $(CLASS_DIR)Page/
+SRCS_SERVER	= ./srcs/server/HttpServer.cpp \
+              ./srcs/server/Server.cpp \
+              ./srcs/server/Location.cpp \
+              
+SRCS_UTILS	= ./srcs/utils/ExceptionThrower.cpp \
+              ./srcs/utils/UtilityMethod.cpp \
+              ./srcs/utils/Parser.cpp \
+              ./srcs/utils/BitsManipulation.cpp \
+              ./srcs/utils/FileWriter.cpp \
+              ./srcs/utils/Checker.cpp
 
- #=============================================================================#
-INCLUDES				=	-Iincludes \
-							-Iincludes/FileReader \
-							-Iincludes/Parser \
-							-Iincludes/LibHelp \
-							-Iincludes/Stream \
-							-Iincludes/Location \
-							-Iincludes/HttpServer \
-							-Iincludes/Page \
+SRCS_IO     = ./srcs/IO/IO.cpp \
+              ./srcs/IO/ServerStream.cpp \
+              ./srcs/IO/ClientSocketStream.cpp \
+              ./srcs/IO/CgiStream.cpp \
 
-SRC_FILES = $(addprefix $(MAIN_DIR), main.cpp) \
-			$(addprefix $(STRING_HELP_DIR), LibHelp.cpp) \
-			$(addprefix $(FILE_READER_DIR), FileReader.cpp) \
-			$(addprefix $(PARSER_DIR), Parser.cpp setters.cpp Methods.cpp Get.cpp Post.cpp Cgi.cpp Delete.cpp) \
-			$(addprefix $(STREAM_DIR), Server.cpp) \
-			$(addprefix $(STREAM_DIR), Stream.cpp) \
-			$(addprefix $(STREAM_DIR), Client.cpp) \
-			$(addprefix $(LOCATION_DIR), Location.cpp) \
-			$(addprefix $(HTTP_SERVER_DIR), HttpServer.cpp) \
-			$(addprefix $(PAGE), Page.cpp) \
+SRCS_HTTP   = ./srcs/http/HttpMessage.cpp \
+              ./srcs/http/HttpRequest.cpp \
+              ./srcs/http/HttpResponse.cpp \
+              ./srcs/http/RequestChecker.cpp \
 
- #=============================================================================#
-#									OBJETS										#
- #=============================================================================#
+SRCS_METHOD	= ./srcs/method/Method.cpp \
+			  ./srcs/method/Get.cpp \
+			  ./srcs/method/Post.cpp \
+			  ./srcs/method/Delete.cpp \
+              ./srcs/method/Head.cpp \
+              ./srcs/method/Put.cpp \
+              ./srcs/method/Options.cpp \
+			  ./srcs/method/Error.cpp \
 
-OBJS_DIR = objects
-OBJS = $(SRC_FILES:%.cpp=$(OBJS_DIR)/%.o)
-DEPS = $(SRC_FILES:%.cpp=$(OBJS_DIR)/%.d)
+OBJ_DIR     = ./obj
+DEP_DIR     = ./dep
 
- #=============================================================================#
-#									COMPILATION									#
- #=============================================================================#
+OBJS        = $(addprefix $(OBJ_DIR)/, $(SRCS_MAIN:.cpp=.o)) \
+              $(addprefix $(OBJ_DIR)/, $(SRCS_SERVER:.cpp=.o)) \
+              $(addprefix $(OBJ_DIR)/, $(SRCS_UTILS:.cpp=.o)) \
+              $(addprefix $(OBJ_DIR)/, $(SRCS_IO:.cpp=.o)) \
+              $(addprefix $(OBJ_DIR)/, $(SRCS_HTTP:.cpp=.o)) \
+              $(addprefix $(OBJ_DIR)/, $(SRCS_METHOD:.cpp=.o)) \
 
-CC = c++
-CFLAGS = -g3 -Wall -Wextra -Werror -std=c++98 $(INCLUDES)
-CDFLAGS = -MMD -MP
+DEPS        = $(addprefix $(DEP_DIR)/, $(SRCS_MAIN:.cpp=.d)) \
+              $(addprefix $(DEP_DIR)/, $(SRCS_SERVER:.cpp=.d)) \
+              $(addprefix $(DEP_DIR)/, $(SRCS_UTILS:.cpp=.d)) \
+              $(addprefix $(DEP_DIR)/, $(SRCS_IO:.cpp=.d)) \
+              $(addprefix $(DEP_DIR)/, $(SRCS_HTTP:.cpp=.d)) \
+              $(addprefix $(DEP_DIR)/, $(SRCS_METHOD:.cpp=.d)) \
 
- #=============================================================================#
-#									MAKEFILE									#
- #=============================================================================#
+CC          = c++ -g3
 
-NAME = webserv
+CFLAGS      = -Wall -Wextra -Werror -MMD -std=c++98
 
-all : $(NAME)
+NAME        = webserv
 
-$(NAME) : $(OBJS_DIR) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(CLFLAGS) -o $(NAME)
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-$(OBJS_DIR) :
-	mkdir $(OBJS_DIR)
-	mkdir -p $(OBJS_DIR)/$(STRING_HELP_DIR)
-	mkdir -p $(OBJS_DIR)/$(FILE_READER_DIR)
-	mkdir -p $(OBJS_DIR)/$(PARSER_DIR)
-	mkdir -p $(OBJS_DIR)/$(STREAM_DIR)
-	mkdir -p $(OBJS_DIR)/$(LOCATION_DIR)
-	mkdir -p $(OBJS_DIR)/$(HTTP_SERVER_DIR)
-	mkdir -p $(OBJS_DIR)/$(PAGE)
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
-$(OBJS) : $(OBJS_DIR)/%.o : %.cpp
-	$(CC) $(CFLAGS) $(CDFLAGS) -c $< -o $@
+all: $(OBJ_DIR) $(DEP_DIR) $(NAME)
 
-clean :
-	rm -rf $(OBJS_DIR)
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(DEP_DIR):
+	mkdir -p $(DEP_DIR)
+
+clean:
+	rm -rf $(OBJ_DIR)
+	rm -rf $(DEP_DIR)
 
 fclean: clean
-	rm -rf $(NAME)
+	rm -f $(NAME)
 
-re : fclean all
+re: fclean all
 
 -include $(DEPS)
 
 .PHONY: all clean fclean re
-
-#.SILENT:
